@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS.AI | Security & Compliance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --bg: #03040a;
+  --surface: #0a0d1a;
+  --surface2: #0f1225;
+  --border: rgba(99,120,255,0.12);
+  --border2: rgba(99,120,255,0.22);
+  --text: #e4e8ff;
+  --muted: #5a6080;
+  --muted2: #7a84a8;
+  --accent: #4f6dff;
+  --accent2: #7b8fff;
+  --cyan: #00d4ff;
+  --gold: #f0b84a;
+  --gold2: #fcd37a;
+  --green: #00e676;
+  --green2: #4ade80;
+  --red: #ff4560;
+  --rose: #f472b6;
+  --glow: rgba(79,109,255,0.35);
+  --glow-cyan: rgba(0,212,255,0.3);
+  --glow-green: rgba(0,230,118,0.3);
+}
+
+html { scroll-behavior:smooth; }
+body {
+  font-family:'Syne',sans-serif;
+  background:var(--bg); color:var(--text);
+  overflow-x:hidden; cursor:none;
+}
+
+/* ─── CURSOR ─── */
+#cur { position:fixed;width:10px;height:10px;background:var(--cyan);border-radius:50%;pointer-events:none;z-index:9999;mix-blend-mode:screen;transition:transform .15s,background .2s; }
+#cur-ring { position:fixed;width:36px;height:36px;border:1px solid rgba(0,212,255,0.4);border-radius:50%;pointer-events:none;z-index:9998;transition:transform .35s cubic-bezier(.23,1,.32,1); }
+
+/* ─── CANVAS ─── */
+#bg-canvas { position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5; }
+
+/* ─── GRID ─── */
+.grid-bg {
+  position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image: linear-gradient(rgba(79,109,255,.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(79,109,255,.03) 1px,transparent 1px);
+  background-size:64px 64px;
+}
+
+/* ─── HEADER ─── */
+.site-header {
+  position:sticky;top:0;z-index:100;
+  background:rgba(3,4,10,.78);
+  backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid var(--border);
+}
+.hdr-inner {
+  max-width:1280px;margin:0 auto;padding:0 32px;height:72px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo { display:flex;align-items:center;gap:12px;text-decoration:none; }
+.logo-mark {
+  width:34px;height:34px;background:linear-gradient(135deg,var(--cyan),var(--accent));
+  border-radius:9px;position:relative;overflow:hidden;
+}
+.logo-mark::after { content:'';position:absolute;inset:0;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.2)); }
+.logo-text { font-size:18px;font-weight:800;letter-spacing:.18em;color:white; }
+nav { display:flex;align-items:center;gap:36px; }
+nav a {
+  font-size:13px;font-weight:600;color:var(--muted2);
+  text-decoration:none;letter-spacing:.06em;
+  transition:color .3s;position:relative;
+}
+nav a::after { content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--cyan);transition:width .3s; }
+nav a:hover { color:var(--text); }
+nav a:hover::after { width:100%; }
+nav a.active { color:var(--cyan); }
+nav a.active::after { width:100%; }
+.nav-dd { position:relative; }
+.nav-dd-btn {
+  background:none;border:none;font-family:'Syne',sans-serif;
+  font-size:13px;font-weight:600;color:var(--muted2);cursor:none;
+  display:flex;align-items:center;gap:5px;letter-spacing:.06em;transition:color .3s;
+}
+.nav-dd:hover .nav-dd-btn { color:var(--text); }
+.nav-dd-menu {
+  position:absolute;top:calc(100% + 12px);left:-12px;
+  background:rgba(9,12,28,.97);border:1px solid var(--border2);
+  border-radius:12px;padding:8px;min-width:180px;
+  opacity:0;visibility:hidden;transform:translateY(-8px);
+  transition:all .25s cubic-bezier(.23,1,.32,1);
+  box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+.nav-dd:hover .nav-dd-menu { opacity:1;visibility:visible;transform:translateY(0); }
+.nav-dd-menu a { display:block;padding:9px 16px;font-size:13px;color:var(--muted2);border-radius:8px;transition:background .2s,color .2s; }
+.nav-dd-menu a::after { display:none; }
+.nav-dd-menu a:hover { background:rgba(79,109,255,.1);color:var(--text); }
+.nav-actions { display:flex;align-items:center;gap:12px; }
+.btn-ghost {
+  padding:8px 22px;font-family:'Syne',sans-serif;
+  font-size:13px;font-weight:600;letter-spacing:.06em;
+  color:var(--muted2);background:transparent;
+  border:1px solid var(--border2);border-radius:100px;cursor:none;
+  transition:all .3s;text-decoration:none;display:inline-block;
+}
+.btn-ghost:hover { color:var(--text);border-color:rgba(99,120,255,.5);background:rgba(79,109,255,.08); }
+.btn-cta {
+  padding:9px 24px;font-family:'Syne',sans-serif;
+  font-size:13px;font-weight:700;letter-spacing:.06em;
+  color:white;background:linear-gradient(135deg,var(--accent),#2a4aff);
+  border:none;border-radius:100px;cursor:none;
+  transition:all .3s;position:relative;overflow:hidden;
+}
+.btn-cta::before { content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.15),transparent);opacity:0;transition:opacity .3s; }
+.btn-cta:hover::before { opacity:1; }
+.btn-cta:hover { box-shadow:0 0 30px rgba(79,109,255,.5);transform:translateY(-1px); }
+
+/* ─── PAGE ─── */
+.page { position:relative;z-index:1; }
+
+/* ─── HERO ─── */
+.hero {
+  min-height:88vh;display:flex;align-items:center;
+  padding:100px 32px 80px;position:relative;overflow:hidden;
+}
+.hero-inner { max-width:1060px;margin:0 auto;width:100%; }
+.hero-glow {
+  position:absolute;width:700px;height:700px;
+  background:radial-gradient(circle,rgba(79,109,255,.07) 0,transparent 70%);
+  top:10%;left:-5%;pointer-events:none;
+}
+.hero-badge {
+  display:inline-flex;align-items:center;gap:8px;padding:5px 14px;
+  border-radius:100px;border:1px solid rgba(0,212,255,.25);
+  background:rgba(0,212,255,.06);font-size:11px;font-weight:600;
+  letter-spacing:.2em;color:var(--cyan);margin-bottom:20px;
+}
+.hero-badge .dot { width:6px;height:6px;border-radius:50%;background:var(--cyan);animation:pdot 2s infinite; }
+@keyframes pdot { 0%,100%{box-shadow:0 0 0 0 rgba(0,212,255,.7)} 50%{box-shadow:0 0 0 6px rgba(0,212,255,0)} }
+.hero-title {
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(40px,6vw,76px);font-weight:400;
+  line-height:1.05;letter-spacing:-.02em;margin-bottom:24px;
+}
+.hero-title em { font-style:italic;color:var(--cyan); }
+.hero-sub {
+  font-size:17px;color:var(--muted2);max-width:540px;
+  line-height:1.75;margin-bottom:36px;font-weight:400;
+}
+.hero-actions { display:flex;align-items:center;flex-wrap:wrap;gap:14px; }
+.btn-primary {
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 28px;border-radius:100px;
+  background:linear-gradient(135deg,var(--accent),#2a4aff);
+  color:white;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:.06em;border:none;cursor:none;text-decoration:none;
+  box-shadow:0 4px 24px rgba(79,109,255,.35);
+  transition:all .35s cubic-bezier(.23,1,.32,1);
+}
+.btn-primary:hover { box-shadow:0 8px 32px rgba(79,109,255,.5);transform:translateY(-2px); }
+.btn-secondary {
+  display:inline-flex;align-items:center;gap:8px;
+  padding:13px 28px;border-radius:100px;
+  background:transparent;color:var(--muted2);
+  font-family:'Syne',sans-serif;font-size:13px;font-weight:600;
+  letter-spacing:.06em;border:1px solid var(--border2);cursor:none;text-decoration:none;
+  transition:all .3s;
+}
+.btn-secondary:hover { color:var(--text);border-color:rgba(99,120,255,.4); }
+
+/* ─── SECTIONS ─── */
+.section { padding:80px 0;position:relative;z-index:1; }
+.container { max-width:1060px;margin:0 auto;padding:0 32px; }
+.divider { height:1px;background:linear-gradient(to right,transparent,var(--border2),transparent);position:relative;z-index:1; }
+.sec-num { font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent2);letter-spacing:.15em;margin-bottom:8px;opacity:.7; }
+.sec-eyebrow {
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.2em;color:var(--accent2);text-transform:uppercase;
+  margin-bottom:12px;
+}
+.sec-eyebrow::before { content:'';width:20px;height:1px;background:var(--accent2); }
+.sec-title {
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(26px,3.5vw,40px);font-weight:400;
+  color:var(--text);line-height:1.2;margin-bottom:12px;
+}
+.sec-title em { font-style:italic;color:var(--cyan); }
+.sec-sub { font-size:15px;color:var(--muted2);line-height:1.75;max-width:520px;font-weight:400; }
+
+/* ─── SCROLL REVEAL ─── */
+.rv { opacity:0;transform:translateY(32px);transition:opacity .8s cubic-bezier(.23,1,.32,1),transform .8s cubic-bezier(.23,1,.32,1); }
+.rv.on { opacity:1;transform:none; }
+.rv.d1 { transition-delay:.1s; }
+.rv.d2 { transition-delay:.2s; }
+.rv.d3 { transition-delay:.3s; }
+.rv.d4 { transition-delay:.4s; }
+
+/* ─── ISOLATION DIAGRAM ─── */
+.iso-card {
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:22px;padding:40px;overflow:hidden;position:relative;
+  margin-top:48px;
+}
+.iso-card::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:1px;
+  background:linear-gradient(to right,transparent,var(--accent2),var(--cyan),transparent);opacity:.5;
+}
+#iso-svg { width:100%;display:block; }
+.iso-path {
+  stroke-dasharray:1;stroke-dashoffset:1;
+  transition:stroke-dashoffset 1.4s cubic-bezier(.23,1,.32,1);
+}
+.iso-path.drawn { stroke-dashoffset:0; }
+
+/* ─── CERT CARDS ─── */
+.cert-grid {
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:16px;margin-top:48px;
+}
+.cert-card {
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:20px;padding:28px;
+  transition:transform .4s cubic-bezier(.23,1,.32,1),border-color .3s,box-shadow .4s;
+  cursor:default;
+}
+.cert-card:hover {
+  transform:translateY(-6px);
+  border-color:var(--border2);
+  box-shadow:0 24px 60px rgba(0,0,0,.4),0 0 24px var(--glow);
+}
+.cert-icon {
+  width:48px;height:48px;border-radius:14px;
+  background:rgba(79,109,255,.1);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:20px;font-size:22px;
+}
+.cert-name {
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
+  color:var(--text);margin-bottom:6px;letter-spacing:.03em;
+}
+.cert-desc { font-size:13px;color:var(--muted2);line-height:1.65;font-weight:400; }
+.cert-badge {
+  display:inline-flex;align-items:center;gap:5px;
+  margin-top:14px;padding:3px 10px;border-radius:100px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.2);
+  color:var(--green);letter-spacing:.1em;
+}
+.cert-badge::before { content:'';width:5px;height:5px;border-radius:50%;background:var(--green); }
+
+/* ─── TIMELINE ─── */
+.timeline-layout {
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:64px;align-items:start;
+}
+@media(max-width:700px) { .timeline-layout{grid-template-columns:1fr;} }
+.tl-wrap { position:relative;padding-left:28px; }
+.tl-line {
+  position:absolute;left:0;top:8px;bottom:8px;
+  width:2px;background:var(--border);border-radius:2px;
+}
+.tl-fill {
+  position:absolute;top:0;left:0;width:100%;
+  background:linear-gradient(to bottom,var(--accent),var(--cyan));
+  border-radius:2px;height:0%;transition:height .4s ease;
+}
+.tl-item {
+  position:relative;padding-left:28px;margin-bottom:36px;
+  opacity:.3;transform:translateX(-10px);
+  transition:opacity .5s ease,transform .5s ease;
+}
+.tl-item:last-child { margin-bottom:0; }
+.tl-item.lit { opacity:1;transform:translateX(0); }
+.tl-dot {
+  position:absolute;left:-42px;top:2px;
+  width:30px;height:30px;border-radius:50%;
+  background:var(--surface);border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color .4s,background .4s,box-shadow .4s;
+}
+.tl-item.lit .tl-dot {
+  background:linear-gradient(135deg,var(--accent),#2a4aff);
+  border-color:var(--accent2);
+  box-shadow:0 0 16px rgba(79,109,255,.4);
+}
+.tl-dot-n {
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  color:var(--muted);font-weight:500;
+}
+.tl-item.lit .tl-dot-n { color:white; }
+.tl-step {
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.15em;color:var(--accent2);margin-bottom:5px;text-transform:uppercase;
+}
+.tl-title { font-size:15px;font-weight:700;color:var(--text);margin-bottom:5px;letter-spacing:.02em; }
+.tl-desc { font-size:13px;color:var(--muted2);line-height:1.65;margin-bottom:6px;font-weight:400; }
+.tl-ts {
+  font-family:'JetBrains Mono',monospace;font-size:11px;
+  color:var(--accent2);opacity:.7;
+}
+.retention-box {
+  margin-top:28px;padding:18px 20px;
+  background:rgba(79,109,255,.05);
+  border:1px solid rgba(79,109,255,.2);border-radius:14px;
+}
+.retention-box .rlbl {
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.15em;color:var(--accent2);text-transform:uppercase;margin-bottom:6px;
+}
+.retention-box p { font-size:13px;color:var(--muted2);line-height:1.65; }
+.retention-box strong { color:var(--text);font-weight:700; }
+
+/* ─── FAQ ─── */
+.faq-list { margin-top:40px;max-width:740px; }
+.faq-item {
+  border-bottom:1px solid var(--border);
+}
+.faq-q {
+  width:100%;display:flex;align-items:center;justify-content:space-between;
+  padding:20px 0;background:transparent;border:none;cursor:none;
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:500;
+  color:var(--muted2);text-align:left;gap:16px;
+  transition:color .25s;
+}
+.faq-q:hover { color:var(--text); }
+.faq-item.open .faq-q { color:var(--text); }
+.faq-toggle {
+  width:28px;height:28px;border-radius:50%;flex-shrink:0;
+  background:rgba(79,109,255,.1);border:1px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  transition:transform .45s cubic-bezier(.23,1,.32,1),background .3s;
+}
+.faq-item.open .faq-toggle { transform:rotate(45deg);background:rgba(79,109,255,.2); }
+.faq-body {
+  max-height:0;overflow:hidden;
+  transition:max-height .55s cubic-bezier(.23,1,.32,1),padding .4s;
+  padding:0;
+}
+.faq-item.open .faq-body { max-height:240px;padding-bottom:20px; }
+.faq-body p {
+  font-size:14px;color:var(--muted2);line-height:1.75;
+  font-family:'Syne',sans-serif;font-weight:400;
+}
+
+/* ─── FINAL CTA ─── */
+.final-cta {
+  position:relative;z-index:1;padding:80px 32px;text-align:center;
+  background:linear-gradient(to bottom,transparent,var(--surface) 20%,var(--surface) 80%,transparent);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  overflow:hidden;
+}
+.final-cta::before {
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse at 50% 100%,rgba(0,212,255,.05),transparent 65%);
+}
+.cta-inner { position:relative;z-index:1;max-width:600px;margin:0 auto; }
+.cta-eyebrow {
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:12px;
+}
+.cta-title {
+  font-family:'Instrument Serif',serif;
+  font-size:clamp(28px,4.5vw,48px);font-weight:400;
+  line-height:1.15;margin-bottom:16px;
+}
+.cta-title em {
+  font-style:italic;
+  background:linear-gradient(120deg,var(--accent2),var(--cyan));
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+}
+.cta-sub { font-size:15px;color:var(--muted2);line-height:1.75;margin-bottom:32px;max-width:460px;margin-left:auto;margin-right:auto; }
+.cta-btn {
+  display:inline-flex;align-items:center;gap:10px;
+  padding:14px 34px;border-radius:100px;
+  background:linear-gradient(135deg,var(--accent),#2a4aff);
+  color:white;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;border:none;cursor:none;
+  box-shadow:0 4px 30px rgba(79,109,255,.4);
+  transition:all .35s cubic-bezier(.23,1,.32,1);
+}
+.cta-btn:hover { box-shadow:0 8px 40px rgba(79,109,255,.55);transform:translateY(-2px); }
+
+/* ─── FOOTER ─── */
+.site-footer {
+  position:relative;z-index:1;
+  background:var(--bg);border-top:1px solid var(--border);
+  padding:28px 48px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px;
+}
+.footer-copy { font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.06em; }
+.footer-links { display:flex;gap:24px; }
+.footer-links a { font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-decoration:none;letter-spacing:.06em;transition:color .2s; }
+.footer-links a:hover { color:var(--muted2); }
+
+/* ─── STAT STRIP ─── */
+.stat-strip {
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border:1px solid var(--border);border-radius:20px;
+  overflow:hidden;margin-top:56px;
+}
+@media(max-width:640px) { .stat-strip{grid-template-columns:1fr 1fr;} }
+.stat-cell {
+  padding:28px 24px;border-right:1px solid var(--border);
+  position:relative;
+}
+.stat-cell:last-child { border-right:none; }
+.stat-cell::before {
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(to right,var(--accent),var(--cyan));
+  opacity:0;transition:opacity .4s;
+}
+.stat-cell:hover::before { opacity:1; }
+.stat-n {
+  font-family:'Instrument Serif',serif;
+  font-size:36px;font-weight:400;color:var(--text);
+  margin-bottom:4px;
+}
+.stat-n .hi { color:var(--cyan); }
+.stat-lbl { font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase; }
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur-ring"></div>
+<canvas id="bg-canvas"></canvas>
+<div class="grid-bg"></div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="hdr-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark"></div>
+      <span class="logo-text">NEXUS.AI</span>
+    </a>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="page2.html">Product</a>
+      <div class="nav-dd">
+        <button class="nav-dd-btn">Solutions
+          <svg width="10" height="10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+        <div class="nav-dd-menu">
+          <a href="solutions-finance.html">Finance</a>
+          <a href="solutions-manufacturing.html">Manufacturing</a>
+          <a href="solutions-other.html">Other Industries</a>
+        </div>
+      </div>
+      <a href="security-page.html" class="active">Compliance</a>
+      <a href="page3.html#pricing">Pricing</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login-page.html" class="btn-ghost">Log In</a>
+      <button class="btn-cta" onclick="window.open('https://meet.google.com/bvv-zsky-wum','_blank')">Book a Demo</button>
+    </div>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-inner">
+      <div class="hero-badge rv"><span class="dot"></span>SECURITY & COMPLIANCE CENTER</div>
+      <h1 class="hero-title rv" style="transition-delay:.08s">
+        Your Data,<br>
+        <em>Your Fortress.</em>
+      </h1>
+      <p class="hero-sub rv" style="transition-delay:.16s">Built with enterprise-grade encryption and air-gapped isolation. We don't just process your compliance data — we protect the intellectual heart of your organization.</p>
+      <div class="hero-actions rv" style="transition-delay:.24s">
+        <a href="#" class="btn-primary">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download Security Whitepaper
+        </a>
+        <a href="#isolation" class="btn-secondary">
+          View Architecture
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </a>
+      </div>
+
+      <!-- Stat strip -->
+      <div class="stat-strip rv" style="transition-delay:.32s">
+        <div class="stat-cell">
+          <div class="stat-n">AES<span class="hi">-256</span></div>
+          <div class="stat-lbl">ENCRYPTION AT REST</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-n">TLS<span class="hi"> 1.3</span></div>
+          <div class="stat-lbl">ALL DATA IN TRANSIT</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-n"><span class="hi">99.95</span>%</div>
+          <div class="stat-lbl">UPTIME SLA</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-n"><span class="hi">7</span> yr</div>
+          <div class="stat-lbl">AUDIT LOG RETENTION</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 1: ISOLATION DIAGRAM -->
+  <div class="section" id="isolation">
+    <div class="container">
+      <div class="rv">
+        <div class="sec-eyebrow">Architecture</div>
+        <h2 class="sec-title">Your AI Brain.<br><em>Completely Isolated.</em></h2>
+        <p class="sec-sub">Every client gets a dedicated, air-gapped AI instance. Your data never mingles with another tenant's knowledge — not even at the inference layer.</p>
+      </div>
+
+      <div class="iso-card rv">
+        <svg id="iso-svg" viewBox="0 0 820 340" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="coreGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(79,109,255,0.14)"/>
+              <stop offset="100%" stop-color="rgba(3,4,10,0)"/>
+            </radialGradient>
+            <radialGradient id="tenantGrad" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stop-color="rgba(79,109,255,0.07)"/>
+              <stop offset="100%" stop-color="rgba(10,13,26,0)"/>
+            </radialGradient>
+            <filter id="gfx">
+              <feGaussianBlur stdDeviation="5" result="blur"/>
+              <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+            </filter>
+            <filter id="gfx2">
+              <feGaussianBlur stdDeviation="10" result="blur"/>
+              <feFlood flood-color="#00d4ff" flood-opacity="0.25" result="c"/>
+              <feComposite in="c" in2="blur" operator="in" result="g"/>
+              <feComposite in="SourceGraphic" in2="g" operator="over"/>
+            </filter>
+            <marker id="arrowB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M2 2L8 5L2 8" fill="none" stroke="#7b8fff" stroke-width="1.5" stroke-linecap="round"/>
+            </marker>
+          </defs>
+
+          <!-- Tenant A -->
+          <circle cx="120" cy="170" r="95" fill="url(#tenantGrad)" stroke="rgba(79,109,255,0.3)" stroke-width="1.5"/>
+          <circle cx="120" cy="170" r="95" fill="none" stroke="rgba(79,109,255,0.15)" stroke-width="1" stroke-dasharray="5 4"/>
+          <!-- Server icon -->
+          <rect x="90" y="138" width="60" height="12" rx="3" fill="none" stroke="#7b8fff" stroke-width="1.5" opacity=".8"/>
+          <circle cx="98" cy="144" r="2.5" fill="#00d4ff" opacity=".7"/>
+          <rect x="90" y="156" width="60" height="12" rx="3" fill="none" stroke="#7b8fff" stroke-width="1.5" opacity=".6"/>
+          <circle cx="98" cy="162" r="2.5" fill="#4f6dff" opacity=".7"/>
+          <rect x="90" y="174" width="60" height="12" rx="3" fill="none" stroke="#7b8fff" stroke-width="1.5" opacity=".4"/>
+          <circle cx="98" cy="180" r="2.5" fill="#7b8fff" opacity=".5"/>
+          <text x="120" y="204" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#a78bfa">Tenant A</text>
+          <text x="120" y="220" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5a6080">Finance Bank</text>
+          <text x="120" y="238" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#00e676">● ISOLATED</text>
+
+          <!-- Tenant B -->
+          <circle cx="700" cy="170" r="95" fill="url(#tenantGrad)" stroke="rgba(79,109,255,0.3)" stroke-width="1.5"/>
+          <circle cx="700" cy="170" r="95" fill="none" stroke="rgba(79,109,255,0.15)" stroke-width="1" stroke-dasharray="5 4"/>
+          <!-- Bar chart icon -->
+          <rect x="674" y="160" width="10" height="28" rx="2" fill="#4f6dff" opacity=".5"/>
+          <rect x="689" y="150" width="10" height="38" rx="2" fill="#7b8fff" opacity=".6"/>
+          <rect x="704" y="155" width="10" height="33" rx="2" fill="#4f6dff" opacity=".45"/>
+          <line x1="670" y1="190" x2="720" y2="190" stroke="#7b8fff" stroke-width="1" opacity=".4"/>
+          <text x="700" y="204" text-anchor="middle" font-family="Syne,sans-serif" font-size="13" font-weight="700" fill="#a78bfa">Tenant B</text>
+          <text x="700" y="220" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5a6080">Manufacturing Co.</text>
+          <text x="700" y="238" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="9" fill="#00e676">● ISOLATED</text>
+
+          <!-- NEXUS CORE -->
+          <circle cx="410" cy="170" r="88" fill="url(#coreGrad)"/>
+          <circle cx="410" cy="170" r="74" fill="#0a0d1a" stroke="#4f6dff" stroke-width="1.8"/>
+          <circle cx="410" cy="170" r="74" fill="none" stroke="rgba(0,212,255,0.15)" stroke-width="1" stroke-dasharray="3 5"/>
+          <!-- Shield -->
+          <path d="M410 136 L430 143 L430 163 Q430 182 410 192 Q390 182 390 163 L390 143 Z" fill="none" stroke="#4f6dff" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M402 165 L408 171 L420 158" fill="none" stroke="#00d4ff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <text x="410" y="204" text-anchor="middle" font-family="Syne,sans-serif" font-size="14" font-weight="800" fill="white">NEXUS CORE</text>
+          <text x="410" y="220" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7b8fff">AI ENGINE</text>
+
+          <!-- Arrows A → Core -->
+          <path class="iso-path" id="p1" d="M213 158 Q300 140 336 162" fill="none" stroke="#4f6dff" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arrowB)" style="transition-delay:.1s"/>
+          <path class="iso-path" id="p2" d="M336 178 Q300 200 213 182" fill="none" stroke="#4f6dff" stroke-width="1" stroke-linecap="round" marker-end="url(#arrowB)" style="transition-delay:.35s"/>
+
+          <!-- Arrows B → Core -->
+          <path class="iso-path" id="p3" d="M607 158 Q520 140 484 162" fill="none" stroke="#4f6dff" stroke-width="1.5" stroke-linecap="round" marker-end="url(#arrowB)" style="transition-delay:.2s"/>
+          <path class="iso-path" id="p4" d="M484 178 Q520 200 607 182" fill="none" stroke="#4f6dff" stroke-width="1" stroke-linecap="round" marker-end="url(#arrowB)" style="transition-delay:.5s"/>
+
+          <!-- Labels on arrows -->
+          <rect x="260" y="130" width="84" height="18" rx="5" fill="#0a0d1a"/>
+          <text x="302" y="143" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7b8fff">Encrypted API</text>
+          <rect x="476" y="130" width="84" height="18" rx="5" fill="#0a0d1a"/>
+          <text x="518" y="143" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#7b8fff">Encrypted API</text>
+
+          <!-- No mixing bar -->
+          <line x1="336" y1="170" x2="484" y2="170" stroke="#1e2640" stroke-width="1.5" stroke-dasharray="6 4"/>
+          <rect x="368" y="158" width="84" height="24" rx="7" fill="#0a0d1a" stroke="rgba(99,120,255,0.15)" stroke-width="1"/>
+          <text x="410" y="174" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="10" fill="#5a6080">NO DATA MIXING</text>
+
+          <!-- Bottom caption -->
+          <text x="410" y="300" text-anchor="middle" font-family="JetBrains Mono,monospace" font-size="11" fill="#3d4560">Each tenant's knowledge base, model weights &amp; audit logs live in fully isolated containers</text>
+
+          <!-- Floating lock dot Tenant A -->
+          <circle cx="120" cy="130" r="5" fill="#00d4ff" opacity=".6" filter="url(#gfx)"/>
+          <!-- Floating lock dot Tenant B -->
+          <circle cx="700" cy="130" r="5" fill="#00d4ff" opacity=".6" filter="url(#gfx)"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 2: CERTIFICATIONS -->
+  <div class="section" id="certs">
+    <div class="container">
+      <div class="rv" style="text-align:center;max-width:560px;margin:0 auto">
+        <div class="sec-eyebrow" style="justify-content:center">Certifications</div>
+        <h2 class="sec-title" style="text-align:center">Industry-Standard<br><em>Compliance, Built-in.</em></h2>
+        <p class="sec-sub" style="text-align:center;margin:0 auto">Security isn't bolted on after the fact — it's baked into every layer of Nexus.AI's infrastructure from day zero.</p>
+      </div>
+
+      <div class="cert-grid">
+        <div class="cert-card rv d1">
+          <div class="cert-icon">🛡️</div>
+          <div class="cert-name">SOC 2 Type II</div>
+          <div class="cert-desc">Annual third-party audits. Trust Services Criteria met across all five pillars — security, availability, processing integrity, confidentiality, and privacy.</div>
+          <div class="cert-badge">CERTIFIED</div>
+        </div>
+        <div class="cert-card rv d2">
+          <div class="cert-icon">🔐</div>
+          <div class="cert-name">AES-256 Encryption</div>
+          <div class="cert-desc">Military-grade encryption for all data at rest. Zero-knowledge key management per tenant — Nexus.AI never holds unencrypted access to your data.</div>
+          <div class="cert-badge">ACTIVE</div>
+        </div>
+        <div class="cert-card rv d3">
+          <div class="cert-icon">🔒</div>
+          <div class="cert-name">TLS 1.3</div>
+          <div class="cert-desc">Latest transport security on every connection. Perfect forward secrecy ensures past sessions remain secure even if long-term keys are compromised.</div>
+          <div class="cert-badge">ENFORCED</div>
+        </div>
+        <div class="cert-card rv d4">
+          <div class="cert-icon">🌍</div>
+          <div class="cert-name">GDPR Ready</div>
+          <div class="cert-desc">Full EU data residency options. Right to erasure, data portability, and a Data Processing Agreement available on request for all enterprise clients.</div>
+          <div class="cert-badge">COMPLIANT</div>
+        </div>
+        <div class="cert-card rv d1">
+          <div class="cert-icon">📋</div>
+          <div class="cert-name">ISO 27001:2022</div>
+          <div class="cert-desc">Information security management system certified. Annual penetration tests, continuous vulnerability scanning, and public-facing security reports available under NDA.</div>
+          <div class="cert-badge">CERTIFIED</div>
+        </div>
+        <div class="cert-card rv d2">
+          <div class="cert-icon">⚕️</div>
+          <div class="cert-name">HIPAA Aligned</div>
+          <div class="cert-desc">BAA available for healthcare organizations. All access controls, audit logging, and encryption requirements satisfied. PHI processed only in designated regions.</div>
+          <div class="cert-badge">AVAILABLE</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 3: TIMELINE -->
+  <div class="section" id="timeline">
+    <div class="container">
+      <div class="timeline-layout">
+        <div class="rv">
+          <div class="sec-eyebrow">Transparency</div>
+          <h2 class="sec-title">Every Action.<br><em>On Record.</em></h2>
+          <p class="sec-sub">Your AI instance maintains a tamper-proof audit trail of every interaction — timestamped, encrypted, and instantly surfaced to your compliance team.</p>
+          <div class="retention-box">
+            <div class="rlbl">Retention Policy</div>
+            <p>All audit logs stored for <strong>7 years</strong> by default. Custom retention windows available on Enterprise plans. Deletion certificate provided upon cancellation.</p>
+          </div>
+        </div>
+
+        <div class="tl-wrap rv" id="tl-wrap">
+          <div class="tl-line"><div class="tl-fill" id="tl-fill"></div></div>
+          <div class="tl-item" data-tl>
+            <div class="tl-dot"><span class="tl-dot-n">01</span></div>
+            <div class="tl-step">STEP 01</div>
+            <div class="tl-title">Document Uploaded</div>
+            <div class="tl-desc">User uploads SOP via encrypted portal. SHA-256 hash generated and stored immediately as a tamper-evident record.</div>
+            <div class="tl-ts">2024-11-12 · 09:14:03 UTC</div>
+          </div>
+          <div class="tl-item" data-tl>
+            <div class="tl-dot"><span class="tl-dot-n">02</span></div>
+            <div class="tl-step">STEP 02</div>
+            <div class="tl-title">AI Indexes & Learns</div>
+            <div class="tl-desc">Isolated AI instance processes and indexes content. No data leaves the tenant container at any point during indexing.</div>
+            <div class="tl-ts">2024-11-12 · 09:14:11 UTC</div>
+          </div>
+          <div class="tl-item" data-tl>
+            <div class="tl-dot"><span class="tl-dot-n">03</span></div>
+            <div class="tl-step">STEP 03</div>
+            <div class="tl-title">Audit Event Triggered</div>
+            <div class="tl-desc">Any query, export, or access attempt auto-generates an immutable audit event with full actor context and timestamp.</div>
+            <div class="tl-ts">2024-11-12 · 11:32:44 UTC</div>
+          </div>
+          <div class="tl-item" data-tl>
+            <div class="tl-dot"><span class="tl-dot-n">04</span></div>
+            <div class="tl-step">STEP 04</div>
+            <div class="tl-title">Compliance Team Notified</div>
+            <div class="tl-desc">Real-time Slack, email, or webhook alert dispatched to your designated compliance officer within seconds of the event.</div>
+            <div class="tl-ts">2024-11-12 · 11:32:45 UTC</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 4: FAQ -->
+  <div class="section" id="faq">
+    <div class="container">
+      <div class="rv">
+        <div class="sec-eyebrow">FAQ</div>
+        <h2 class="sec-title">Security Questions,<br><em>Answered Plainly.</em></h2>
+      </div>
+      <div class="faq-list rv" id="faq-list"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- FINAL CTA -->
+<div class="final-cta">
+  <div class="cta-inner rv">
+    <div class="cta-eyebrow">Get Started</div>
+    <h2 class="cta-title">
+      Built for enterprises that<br>
+      <em>can't afford to compromise.</em>
+    </h2>
+    <p class="cta-sub">Schedule a 30-minute security deep-dive with our team. We'll walk through your compliance architecture and show you exactly how your data stays protected.</p>
+    <button class="cta-btn" onclick="window.open('https://meet.google.com/bvv-zsky-wum','_blank')">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Book a Security Review
+    </button>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <a href="index.html" class="logo">
+    <div class="logo-mark"></div>
+    <span class="logo-text" style="font-size:15px">NEXUS.AI</span>
+  </a>
+  <span class="footer-copy">© 2025 Nexus AI Inc. All rights reserved.</span>
+  <div class="footer-links">
+    <a href="#">Privacy Policy</a>
+    <a href="#">Terms of Service</a>
+    <a href="#">DPA</a>
+    <a href="#">Status</a>
+  </div>
+</footer>
+
+<script>
+// ─── CURSOR ───
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+let mx=-100,my=-100,rx=-100,ry=-100;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;});
+(function loop(){
+  cur.style.left=mx+'px';cur.style.top=my+'px';cur.style.transform='translate(-50%,-50%)';
+  rx+=(mx-rx)*.12;ry+=(my-ry)*.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';ring.style.transform='translate(-50%,-50%)';
+  requestAnimationFrame(loop);
+})();
+
+// ─── CANVAS ───
+const cv=document.getElementById('bg-canvas'),gl=cv.getContext('2d');
+let W,H,pts=[];
+function resize(){W=cv.width=window.innerWidth;H=cv.height=window.innerHeight;}
+resize();window.addEventListener('resize',resize);
+for(let i=0;i<55;i++) pts.push({x:Math.random()*W,y:Math.random()*H,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*1.5+.5,a:Math.random()});
+(function draw(){
+  gl.clearRect(0,0,W,H);
+  pts.forEach(p=>{
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>W)p.vx*=-1;if(p.y<0||p.y>H)p.vy*=-1;
+    gl.beginPath();gl.arc(p.x,p.y,p.r,0,Math.PI*2);
+    gl.fillStyle=`rgba(79,109,255,${p.a*.5})`;gl.fill();
+  });
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+    const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<120){gl.beginPath();gl.moveTo(pts[i].x,pts[i].y);gl.lineTo(pts[j].x,pts[j].y);gl.strokeStyle=`rgba(79,109,255,${(1-d/120)*.07})`;gl.lineWidth=.8;gl.stroke();}
+  }
+  requestAnimationFrame(draw);
+})();
+
+// ─── SCROLL REVEAL ───
+const io=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      e.target.classList.add('on');
+      // Trigger ISO path draw
+      if(e.target.closest('#isolation')){
+        setTimeout(()=>document.querySelectorAll('.iso-path').forEach(p=>p.classList.add('drawn')),300);
+      }
+      io.unobserve(e.target);
+    }
+  });
+},{threshold:.14});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+// ─── TIMELINE ───
+const tlItems=document.querySelectorAll('.tl-item[data-tl]');
+const tlFill=document.getElementById('tl-fill');
+const tlWrap=document.getElementById('tl-wrap');
+function updateTL(){
+  if(!tlWrap)return;
+  const rect=tlWrap.getBoundingClientRect();
+  const wH=tlWrap.offsetHeight;
+  const scrolled=Math.max(0,window.innerHeight*.65-rect.top);
+  const pct=Math.min(100,(scrolled/wH)*100);
+  if(tlFill)tlFill.style.height=pct+'%';
+  tlItems.forEach(item=>{
+    const r=item.getBoundingClientRect();
+    if(r.top<window.innerHeight*.78)item.classList.add('lit');
+  });
+}
+window.addEventListener('scroll',updateTL,{passive:true});
+updateTL();
+
+// ─── FAQ ───
+const faqs=[
+  {q:'Where is my data stored?',a:'Your data is stored in regional cloud servers based on your selected jurisdiction (EU, US, or APAC). All data is encrypted at rest using AES-256 and never leaves your designated region. You can request a Data Processing Agreement and full infrastructure map from your account manager.'},
+  {q:'Can Nexus.AI employees read my SOPs?',a:'No. Our engineering team operates under strict zero-access policies enforced by technical controls — not just policy. Your tenant environment is cryptographically isolated. Any support access requires explicit customer approval, generates an immutable audit event, and is time-limited to the agreed session window.'},
+  {q:'Can the AI access my private emails or communications?',a:'Only if you explicitly enable the Audit Integration layer and grant the required OAuth permissions. By default, Nexus.AI has zero access to your email, calendar, or communication platforms. All integrations are opt-in, individually scoped, and revocable from your admin dashboard at any time.'},
+  {q:'What happens to my data if I cancel?',a:'Upon cancellation, you have a 30-day window to export all data in standard formats (JSON, CSV, PDF). After 30 days, all data including embeddings, audit logs, and model weights are cryptographically wiped. You receive a signed deletion certificate for your compliance records.'},
+  {q:'Is Nexus.AI compliant with ISO 27001?',a:'Yes, ISO 27001:2022 certified. Alongside our SOC 2 Type II attestation and GDPR readiness, Nexus.AI undergoes annual third-party penetration tests and continuous vulnerability scanning. All certificates and latest test reports are available under NDA for enterprise prospects.'},
+  {q:'How is multi-tenancy isolation enforced technically?',a:'Each tenant runs in a dedicated container with separate encryption keys, separate vector store namespaces, separate model fine-tune weights, and separate audit log partitions. There is no shared memory or shared compute context between tenants at any layer of the stack.'},
+];
+const fl=document.getElementById('faq-list');
+faqs.forEach(f=>{
+  const el=document.createElement('div');el.className='faq-item';
+  el.innerHTML=`
+    <button class="faq-q" onclick="toggleFaq(this)">
+      <span>${f.q}</span>
+      <span class="faq-toggle"><svg width="12" height="12" fill="none" stroke="var(--accent2)" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+    </button>
+    <div class="faq-body"><p>${f.a}</p></div>`;
+  fl.appendChild(el);
+});
+function toggleFaq(btn){
+  const item=btn.closest('.faq-item'),wasOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(e=>e.classList.remove('open'));
+  if(!wasOpen)item.classList.add('open');
+}
+</script>
+</body>
+</html>

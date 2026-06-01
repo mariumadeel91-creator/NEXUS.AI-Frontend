@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXUS.AI | Enterprise AI Precision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --ink: #1C1C1E;
+      --ink-soft: #6B6860;
+      --ink-ghost: #9B9890;
+      --bg: #FAF8F5;
+      --gold: #C8A96E;
+      --glow: rgba(200,169,110,0.18);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: #1A1A1A; font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+    h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+    #neuralCanvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 1; transition: opacity 1s; }
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 200px 200px; mix-blend-mode: multiply;
+    }
+    .glass { background: rgba(250,248,245,0.82); backdrop-filter: blur(18px) saturate(1.4); -webkit-backdrop-filter: blur(18px) saturate(1.4); border: 1px solid rgba(26,26,26,0.09); }
+    .glass-header { background: rgba(250,248,245,0.92); backdrop-filter: blur(24px) saturate(1.4); -webkit-backdrop-filter: blur(24px) saturate(1.4); border-bottom: 1px solid rgba(26,26,26,0.08); }
+    .scroll-reveal { opacity: 0; transform: translateY(36px); transition: opacity 0.75s ease, transform 0.75s ease; }
+    .scroll-reveal.active { opacity: 1; transform: translateY(0); }
+    .delay-1 { transition-delay: 0.12s; } .delay-2 { transition-delay: 0.24s; } .delay-3 { transition-delay: 0.36s; }
+    .nav-link { position: relative; }
+    .nav-link::after { content:''; position:absolute; bottom:-2px; left:0; width:0; height:1px; background:var(--ink); transition:width 0.3s; }
+    .nav-link:hover::after { width:100%; }
+    .hero-blob { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; animation: blobFloat 8s ease-in-out infinite alternate; }
+    @keyframes blobFloat { from { transform: translate(0,0) scale(1); } to { transform: translate(30px,20px) scale(1.08); } }
+    .counter-num { font-variant-numeric: tabular-nums; }
+    .pill { display: inline-flex; align-items: center; gap: 6px; padding: 3px 14px; border-radius: 999px; font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; border: 1px solid rgba(28,28,30,0.14); background: rgba(28,28,30,0.05); color: var(--ink); }
+    .card-hover { transition: transform 0.35s ease, box-shadow 0.35s ease; }
+    .card-hover:hover { transform: translateY(-8px); box-shadow: 0 24px 64px rgba(28,28,30,0.09); }
+    #chatbot-window { display: none; }
+    #chatbot-window.open { display: flex; }
+    .typing span { display:inline-block; width:6px; height:6px; border-radius:50%; background:#9B9890; animation:blink 1.2s infinite; }
+    .typing span:nth-child(2){animation-delay:.2s;} .typing span:nth-child(3){animation-delay:.4s;}
+    @keyframes blink{0%,80%,100%{opacity:0;}40%{opacity:1;}}
+    #chat-messages { scrollbar-width:thin; scrollbar-color:#1e293b transparent; }
+    #chat-messages::-webkit-scrollbar { width:4px; }
+    #chat-messages::-webkit-scrollbar-thumb { background:#1e293b; border-radius:2px; }
+    .gold-dot { width:8px; height:8px; border-radius:50%; background:var(--gold); box-shadow:0 0 10px var(--glow); }
+    .btn-shimmer { position: relative; overflow: hidden; }
+    .btn-shimmer::after { content: ''; position: absolute; top: -50%; left: -75%; width: 50%; height: 200%; background: linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.25) 50%, transparent 100%); transform: skewX(-20deg); animation: shimmer 3s ease-in-out infinite; }
+    @keyframes shimmer { 0%,100%{left:-75%;opacity:0} 30%{opacity:1} 60%{left:130%;opacity:0} }
+    .industry-btn { transition: all 0.25s ease; }
+    .industry-btn.active { background: var(--ink); color: #FAF8F5; border-color: var(--ink); box-shadow: 0 4px 20px rgba(28,28,30,0.18); }
+    .glow-ring { box-shadow: 0 0 0 1px rgba(200,169,110,0.2), 0 0 30px rgba(200,169,110,0.08); }
+    @keyframes floatUp { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
+    .float-badge { animation: floatUp 0.6s ease forwards; }
+    .word-cycle span { display: none; }
+    .word-cycle span.active { display: inline; animation: wordIn 0.4s ease; }
+    @keyframes wordIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .ticker-wrap { overflow: hidden; white-space: nowrap; }
+    .ticker-inner { display: inline-flex; gap: 3rem; animation: ticker 22s linear infinite; }
+    .ticker-inner:hover { animation-play-state: paused; }
+    @keyframes ticker { from{transform:translateX(0)} to{transform:translateX(-50%)} }
+    .divider { height:1px; background:linear-gradient(90deg,transparent,rgba(28,28,30,0.1) 30%,rgba(28,28,30,0.1) 70%,transparent); }
+
+    /* ── STANDARD HEADER ── */
+    .site-header{position:sticky;top:0;z-index:100;background:rgba(250,248,245,0.92);backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5);border-bottom:1px solid rgba(26,26,26,0.08);transition:box-shadow .4s;}
+    .site-header.scrolled{box-shadow:0 4px 30px rgba(28,28,30,0.08);}
+    .header-inner{max-width:1280px;margin:0 auto;padding:0 32px;height:72px;display:flex;align-items:center;justify-content:space-between;}
+    .logo{display:flex;align-items:center;gap:11px;text-decoration:none;cursor:pointer;}
+    .logo-mark{width:34px;height:34px;background:#1C1C1E;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .4s cubic-bezier(0.34,1.56,0.64,1),box-shadow .4s;}
+    .logo:hover .logo-mark{transform:rotate(15deg) scale(1.08);box-shadow:0 4px 20px rgba(200,169,110,0.35);}
+    .logo-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:.18em;color:#1C1C1E;}
+    .site-header nav{display:flex;align-items:center;gap:34px;}
+    .site-header nav a{font-size:13px;font-weight:600;color:#6B6860;text-decoration:none;letter-spacing:.06em;transition:color .3s;position:relative;}
+    .site-header nav a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:#C8A96E;transition:width .35s cubic-bezier(0.23,1,0.32,1);}
+    .site-header nav a:hover{color:#1C1C1E;}
+    .site-header nav a:hover::after{width:100%;}
+    .site-header nav a.active{color:#1C1C1E;}
+    .site-header nav a.active::after{width:100%;background:#1C1C1E;}
+    .nav-actions{display:flex;align-items:center;gap:12px;}
+    .btn-ghost{padding:8px 22px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;color:#6B6860;background:transparent;border:1px solid rgba(28,28,30,0.18);border-radius:100px;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block;position:relative;overflow:hidden;}
+    .btn-ghost::before{content:'';position:absolute;inset:0;background:#1C1C1E;border-radius:100px;transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(0.23,1,0.32,1);z-index:0;}
+    .btn-ghost span{position:relative;z-index:1;transition:color .4s;}
+    .btn-ghost:hover::before{transform:scaleX(1);}
+    .btn-ghost:hover span{color:#FAF8F5;}
+    .btn-ghost:hover{border-color:#1C1C1E;}
+    .btn-cta{padding:9px 24px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;color:#FAF8F5;background:#1C1C1E;border:none;border-radius:100px;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+    .btn-cta::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,0.12) 50%,transparent 100%);transform:translateX(-100%);transition:transform .5s ease;}
+    .btn-cta:hover::after{transform:translateX(100%);}
+    .btn-cta:hover{box-shadow:0 6px 24px rgba(28,28,30,0.22);}
+    /* ── HAMBURGER ── */
+    .ham-btn{display:none;flex-direction:column;gap:6px;padding:4px;background:none;border:none;cursor:pointer;z-index:210;}
+    .ham-btn .ham-line{display:block;width:22px;height:2px;background:#1A1A1A;border-radius:2px;transition:transform .3s,opacity .3s;}
+    .ham-btn.open .ham-line:nth-child(1){transform:translateY(8px) rotate(45deg);}
+    .ham-btn.open .ham-line:nth-child(2){opacity:0;transform:scaleX(0);}
+    .ham-btn.open .ham-line:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+    @media(max-width:768px){.site-header nav,.nav-actions{display:none!important;}.ham-btn{display:flex;}}
+    /* ── MOBILE PANEL ── */
+    #mob-overlay{position:fixed;inset:0;z-index:190;background:rgba(26,26,26,0.35);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s;}
+    #mob-overlay.open{opacity:1;pointer-events:all;}
+    #mobile-menu{position:fixed;top:0;right:0;width:min(320px,85vw);height:100vh;z-index:200;background:rgba(250,248,245,0.97);backdrop-filter:blur(28px);border-left:1px solid rgba(26,26,26,0.10);transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;padding:1.5rem;gap:0.5rem;}
+    #mobile-menu.open{transform:translateX(0);}
+    /* ── STANDARD FOOTER ── */
+    .site-footer{position:relative;z-index:1;border-top:1px solid rgba(28,28,30,0.08);padding:40px 32px;background:rgba(250,248,245,0.9);}
+    .footer-inner{max-width:1280px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:16px;}
+    @media(min-width:768px){.footer-inner{flex-direction:row;justify-content:space-between;}}
+    .footer-logo{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:.18em;color:#1C1C1E;text-decoration:none;display:flex;align-items:center;gap:8px;}
+    .footer-copy{font-size:12px;color:#9B9890;letter-spacing:.04em;}
+    .footer-links{display:flex;gap:24px;}
+    .footer-links a{font-size:13px;font-weight:500;color:#6B6860;text-decoration:none;position:relative;transition:color .3s;}
+    .footer-links a::after{content:'';position:absolute;bottom:-2px;left:0;width:0;height:1px;background:#C8A96E;transition:width .3s;}
+    .footer-links a:hover{color:#1C1C1E;}
+    .footer-links a:hover::after{width:100%;}
+  </style>
+</head>
+<body>
+
+<!-- ✅ ANIMATED NEURAL CANVAS BACKGROUND -->
+<canvas id="neuralCanvas"></canvas>
+
+<header class="site-header" id="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">
+        <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
+          <path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="#FAF8F5" stroke-width="1.2"/>
+          <circle cx="7" cy="7" r="2" fill="#C8A96E"/>
+        </svg>
+      </div>
+      <span class="logo-text">NEXUS.AI</span>
+    </a>
+    <nav>
+      <a href="index.html" class="active">Home</a>
+      <a href="page2.html">Product</a>
+      <a href="soulion.html">Solutions</a>
+      <a href="page3.html">Compliance</a>
+      <a href="page3.html#pricing">Pricing</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login-page.html" class="btn-ghost"><span>Log In</span></a>
+      <button class="btn-cta" onclick="window.open('https://meet.google.com/bvv-zsky-wum','_blank')"><span>Book a Demo</span></button>
+    </div>
+    <button class="ham-btn" id="ham-btn" aria-label="Toggle menu">
+      <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
+    </button>
+  </div>
+</header>
+
+<!-- MOBILE MENU -->
+<div id="mob-overlay"></div>
+<div id="mobile-menu" role="dialog" aria-modal="true">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;padding-top:.5rem;">
+    <span style="font-family:'Syne',sans-serif;font-size:16px;font-weight:800;letter-spacing:.18em;">NEXUS.AI</span>
+    <button id="mob-close" style="background:none;border:none;cursor:pointer;color:#6B6860;" aria-label="Close menu">
+      <svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <a href="index.html" style="display:block;padding:12px 16px;color:#1C1C1E;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;text-decoration:none;border-radius:12px;background:rgba(28,28,30,0.08);border:1px solid rgba(28,28,30,0.15);margin-bottom:2px;">Home</a>
+  <a href="page2.html" style="display:block;padding:12px 16px;color:#1C1C1E;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;text-decoration:none;border-radius:12px;transition:background .2s;">Product</a>
+  <a href="soulion.html" style="display:block;padding:12px 16px;color:#1C1C1E;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;text-decoration:none;border-radius:12px;transition:background .2s;">Solutions</a>
+  <a href="page3.html" style="display:block;padding:12px 16px;color:#1C1C1E;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;text-decoration:none;border-radius:12px;transition:background .2s;">Compliance</a>
+  <a href="page3.html#pricing" style="display:block;padding:12px 16px;color:#1C1C1E;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;text-decoration:none;border-radius:12px;transition:background .2s;">Pricing</a>
+  <div style="margin-top:auto;display:flex;flex-direction:column;gap:10px;padding-top:1rem;border-top:1px solid rgba(28,28,30,0.08);">
+    <button onclick="window.open('https://meet.google.com/bvv-zsky-wum','_blank')" style="padding:11px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#FAF8F5;background:#1C1C1E;border:none;border-radius:100px;cursor:pointer;">Book a Demo</button>
+    <a href="login-page.html" style="display:block;text-align:center;padding:10px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;color:#6B6860;border:1px solid rgba(28,28,30,0.15);border-radius:100px;text-decoration:none;">Log In</a>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="relative z-10">
+  <div class="ticker-wrap border-y border-[#1C1C1E]/08 py-2.5 bg-[#1C1C1E]/03">
+    <div class="ticker-inner text-xs font-semibold tracking-widest text-[#6B6860] uppercase">
+      <span>SOC2 Compliant</span><span class="text-[#C8A96E]">✦</span>
+      <span>End-to-End Encryption</span><span class="text-[#C8A96E]">✦</span>
+      <span>70% Faster Onboarding</span><span class="text-[#C8A96E]">✦</span>
+      <span>Real-Time Auditing</span><span class="text-[#C8A96E]">✦</span>
+      <span>95% Error Reduction</span><span class="text-[#C8A96E]">✦</span>
+      <span>30 Min Setup</span><span class="text-[#C8A96E]">✦</span>
+      <span>Zero Data Sharing</span><span class="text-[#C8A96E]">✦</span>
+      <span>SOC2 Compliant</span><span class="text-[#C8A96E]">✦</span>
+      <span>End-to-End Encryption</span><span class="text-[#C8A96E]">✦</span>
+      <span>70% Faster Onboarding</span><span class="text-[#C8A96E]">✦</span>
+      <span>Real-Time Auditing</span><span class="text-[#C8A96E]">✦</span>
+      <span>95% Error Reduction</span><span class="text-[#C8A96E]">✦</span>
+      <span>30 Min Setup</span><span class="text-[#C8A96E]">✦</span>
+      <span>Zero Data Sharing</span><span class="text-[#C8A96E]">✦</span>
+    </div>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="relative z-10 min-h-[90vh] flex flex-col items-center justify-center text-center px-4 md:px-12 py-16 overflow-hidden">
+  <div class="hero-blob w-[420px] h-[420px] bg-[#C8A96E]/10 left-[-100px] top-[10%]" style="animation-delay:0s"></div>
+  <div class="hero-blob w-[340px] h-[340px] bg-[#1C1C1E]/06 right-[-80px] bottom-[15%]" style="animation-delay:3s"></div>
+  <div class="pill mb-8 float-badge"><span class="gold-dot"></span>AI-Powered Operations Platform</div>
+  <h1 class="text-4xl md:text-6xl lg:text-[5.2rem] font-bold tracking-tight text-[#1A1A1A] mb-6 max-w-5xl leading-[1.06]">
+    Your Company's<br/>
+    <span id="cycleWord" class="word-cycle text-[#6B6860]">
+      <span class="active">Collective Knowledge,</span>
+      <span>Institutional Memory,</span>
+      <span>SOPs &amp; Playbooks,</span>
+    </span><br/>
+    Now Live &amp; Automated.
+  </h1>
+  <p class="text-[#6B6860] text-base md:text-xl max-w-2xl mb-10 leading-relaxed">Turn static SOPs into an AI-powered Auditor and Training Simulator. Stop human error before it happens — and scale operations with confidence.</p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center">
+    <a href="https://meet.google.com/bvv-zsky-wum" target="_blank" class="btn-shimmer py-3.5 px-9 bg-[#1C1C1E] text-white rounded-full font-semibold text-base hover:shadow-[0_0_36px_rgba(28,28,30,0.22)] transition-all duration-300">Book a Live Demo</a>
+    <a href="page2.html" class="py-3.5 px-9 border border-[#1C1C1E]/20 rounded-full font-semibold text-base hover:bg-[#1C1C1E]/05 transition-all duration-300">See How It Works</a>
+  </div>
+  <div class="mt-12 flex flex-wrap gap-x-8 gap-y-3 justify-center text-sm text-[#9B9890]">
+    <div class="flex items-center gap-2"><span class="text-[#C8A96E]">✓</span> No credit card required</div>
+    <div class="flex items-center gap-2"><span class="text-[#C8A96E]">✓</span> Setup in 30 mins</div>
+    <div class="flex items-center gap-2"><span class="text-[#C8A96E]">✓</span> SOC2 Compliant</div>
+  </div>
+  <div class="mt-14 glass border border-[#1C1C1E]/10 rounded-2xl px-6 py-4 flex items-center gap-4 shadow-sm glow-ring">
+    <div class="flex -space-x-2">
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#1C1C1E] to-[#3d3d3d] flex items-center justify-center text-white text-[10px] font-bold border-2 border-[#FAF8F5]">AK</div>
+      <div class="w-8 h-8 rounded-full bg-gradient-to-br from-[#6B6860] to-[#1C1C1E] flex items-center justify-center text-white text-[10px] font-bold border-2 border-[#FAF8F5]">SR</div>
+      <div class="w-8 h-8 rounded-full bg-[#C8A96E] flex items-center justify-center text-white text-[10px] font-bold border-2 border-[#FAF8F5]">+48</div>
+    </div>
+    <div class="text-left">
+      <div class="text-xs font-semibold text-[#1A1A1A]">50+ companies onboarded</div>
+      <div class="text-[10px] text-[#9B9890]">Results from Day 1</div>
+    </div>
+    <div class="flex gap-0.5 text-[#C8A96E] text-xs">★★★★★</div>
+  </div>
+</section>
+
+<!-- PROBLEM / SOLUTION -->
+<section class="relative z-10 py-16 md:py-28 px-4 md:px-12 max-w-6xl mx-auto">
+  <div class="divider mb-20"></div>
+  <div class="grid md:grid-cols-2 gap-10 md:gap-20 items-center">
+    <div class="scroll-reveal space-y-8">
+      <div class="flex items-center gap-2 text-rose-400 font-medium tracking-wider text-xs uppercase"><span class="w-2 h-2 rounded-full bg-rose-500"></span> The Problem</div>
+      <h2 class="text-3xl md:text-5xl font-bold tracking-tight leading-[1.1]">The "Static Manual" <br/><span class="text-[#9B9890]">is costing you.</span></h2>
+      <ul class="space-y-7">
+        <li class="flex gap-4 group">
+          <div class="mt-1 text-rose-500/70 flex-shrink-0 group-hover:text-rose-500 transition-colors"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div><h4 class="font-semibold mb-1">Slow Onboarding</h4><p class="text-[#6B6860] text-sm leading-relaxed">New hires take weeks to become productive. Every delay is a direct cost to your operations.</p></div>
+        </li>
+        <li class="flex gap-4 group">
+          <div class="mt-1 text-rose-500/70 flex-shrink-0 group-hover:text-rose-500 transition-colors"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div><h4 class="font-semibold mb-1">Inconsistent Audits</h4><p class="text-[#6B6860] text-sm leading-relaxed">Manual reviews are biased and prone to missing critical compliance violations.</p></div>
+        </li>
+        <li class="flex gap-4 group">
+          <div class="mt-1 text-rose-500/70 flex-shrink-0 group-hover:text-rose-500 transition-colors"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+          <div><h4 class="font-semibold mb-1">Knowledge Silos</h4><p class="text-[#6B6860] text-sm leading-relaxed">Institutional knowledge lives in people's heads. When they leave, it's gone forever.</p></div>
+        </li>
+      </ul>
+    </div>
+    <div class="relative bg-[#1C1C1E]/04 border border-[#1C1C1E]/12 p-8 md:p-10 rounded-[2rem] backdrop-blur-xl scroll-reveal delay-2 card-hover overflow-hidden">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-[#C8A96E]/08 to-transparent rounded-[2rem]"></div>
+      <div class="flex items-center gap-2 text-[#C8A96E] font-medium tracking-wider text-xs uppercase mb-6"><span class="gold-dot"></span> The Nexus Solution</div>
+      <h3 class="text-2xl font-bold mb-4">An AI Brain Built Into Your Workflow</h3>
+      <p class="text-[#6B6860] leading-relaxed mb-8">Nexus ingests your SOPs and converts them into a live knowledge system. Monitor compliance, automate training, and flag risks in real-time.</p>
+      <div class="space-y-3">
+        <div class="flex items-center gap-3 bg-[#1C1C1E]/06 px-4 py-3 rounded-xl border border-[#1C1C1E]/10"><svg class="w-4 h-4 text-[#C8A96E] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg><span class="text-sm font-medium">Real-time compliance monitoring</span></div>
+        <div class="flex items-center gap-3 bg-[#1C1C1E]/06 px-4 py-3 rounded-xl border border-[#1C1C1E]/10"><svg class="w-4 h-4 text-[#C8A96E] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2.5" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span class="text-sm font-medium">AI simulation training engine</span></div>
+        <div class="flex items-center gap-3 bg-[#1C1C1E]/06 px-4 py-3 rounded-xl border border-[#1C1C1E]/10"><svg class="w-4 h-4 text-[#C8A96E] flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="2.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg><span class="text-sm font-medium">Zero manual effort — fully automated</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works" class="relative z-10 py-16 md:py-28 px-4 md:px-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-16 md:mb-24 scroll-reveal">
+      <span class="pill mb-4">How It Works</span>
+      <h2 class="text-4xl md:text-6xl font-bold mt-4 mb-6 tracking-tight">Three Pillars of Intelligence</h2>
+      <p class="text-[#6B6860] text-base md:text-lg max-w-xl mx-auto leading-relaxed">One platform. Three powerful engines working together to eliminate operational risk.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
+      <div class="group relative bg-gradient-to-b from-white/60 to-white/20 p-6 md:p-8 rounded-[2rem] border border-[#1C1C1E]/10 transition-all duration-500 hover:border-[#C8A96E]/30 hover:shadow-[0_0_60px_-12px_rgba(200,169,110,0.15)] scroll-reveal delay-1 overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-36 h-36 bg-[#C8A96E]/05 blur-[60px] rounded-full pointer-events-none group-hover:bg-[#C8A96E]/10 transition-all duration-700"></div>
+        <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-[#1C1C1E]/06 border border-[#1C1C1E]/10 flex items-center justify-center mb-7 group-hover:bg-[#1C1C1E]/10 transition-all"><svg class="w-6 h-6 text-[#1C1C1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="1.5" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"/></svg></div>
+        <div class="text-[10px] font-bold tracking-widest text-[#C8A96E] uppercase mb-3">Step 01</div>
+        <h3 class="text-xl md:text-2xl font-bold mb-3">Smart Ingestion</h3>
+        <p class="text-[#6B6860] text-sm leading-relaxed mb-7">Upload your PDFs, Notion docs, and Wikis. Our AI parses every page and organizes it into an interactive training brain.</p>
+        <div class="flex items-center gap-2.5 text-[#6B6860] bg-[#1C1C1E]/04 p-3 rounded-xl border border-[#1C1C1E]/08"><div class="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div><span class="text-xs font-medium">Ready for immediate Q&amp;A</span></div>
+      </div>
+      <div class="group relative bg-gradient-to-b from-white/60 to-white/20 p-6 md:p-8 rounded-[2rem] border border-[#1C1C1E]/10 transition-all duration-500 hover:border-[#C8A96E]/30 hover:shadow-[0_0_60px_-12px_rgba(200,169,110,0.15)] scroll-reveal delay-2 overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-36 h-36 bg-[#C8A96E]/05 blur-[60px] rounded-full pointer-events-none group-hover:bg-[#C8A96E]/10 transition-all duration-700"></div>
+        <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-[#1C1C1E]/06 border border-[#1C1C1E]/10 flex items-center justify-center mb-7 group-hover:bg-[#1C1C1E]/10 transition-all"><svg class="w-6 h-6 text-[#1C1C1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="1.5" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg></div>
+        <div class="text-[10px] font-bold tracking-widest text-[#C8A96E] uppercase mb-3">Step 02</div>
+        <h3 class="text-xl md:text-2xl font-bold mb-3">Live Simulation</h3>
+        <p class="text-[#6B6860] text-sm leading-relaxed mb-7">Employees face real-life scenarios in a safe, sandboxed AI environment. Every mistake is a learning moment, not a liability.</p>
+        <div class="flex items-center gap-2.5 text-[#6B6860] bg-[#1C1C1E]/04 p-3 rounded-xl border border-[#1C1C1E]/08"><div class="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"></div><span class="text-xs font-medium">Safe sandbox environment</span></div>
+      </div>
+      <div class="group relative bg-gradient-to-b from-white/60 to-white/20 p-6 md:p-8 rounded-[2rem] border border-[#1C1C1E]/10 transition-all duration-500 hover:border-[#C8A96E]/30 hover:shadow-[0_0_60px_-12px_rgba(200,169,110,0.15)] scroll-reveal delay-3 overflow-hidden">
+        <div class="absolute -top-10 -right-10 w-36 h-36 bg-[#C8A96E]/05 blur-[60px] rounded-full pointer-events-none group-hover:bg-[#C8A96E]/10 transition-all duration-700"></div>
+        <div class="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-[#1C1C1E]/06 border border-[#1C1C1E]/10 flex items-center justify-center mb-7 group-hover:bg-[#1C1C1E]/10 transition-all"><svg class="w-6 h-6 text-[#1C1C1E]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.959 11.959 0 0012 18.036 11.959 11.959 0 0020.402 6 11.959 11.959 0 0012 2.714z"/></svg></div>
+        <div class="text-[10px] font-bold tracking-widest text-[#C8A96E] uppercase mb-3">Step 03</div>
+        <h3 class="text-xl md:text-2xl font-bold mb-3">Real-Time Auditing</h3>
+        <p class="text-[#6B6860] text-sm leading-relaxed mb-7">Monitor workflows 24/7. Get alerted the second a protocol is bypassed — before it becomes a compliance violation.</p>
+        <div class="flex items-center gap-2.5 text-[#6B6860] bg-[#1C1C1E]/04 p-3 rounded-xl border border-[#1C1C1E]/08"><div class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></div><span class="text-xs font-medium">Proactive risk detection</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INDUSTRIES -->
+<section id="industries" class="relative z-10 py-16 md:py-28 px-4 md:px-6">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-12 md:mb-16 scroll-reveal">
+      <span class="pill mb-4">Who Is This For?</span>
+      <h2 class="text-4xl md:text-6xl font-bold mt-4 mb-6">Built for Every Industry</h2>
+      <p class="text-[#6B6860] max-w-xl mx-auto text-base md:text-lg">Nexus isn't a niche tool. If your business runs on processes, Nexus makes them bulletproof.</p>
+    </div>
+    <div class="flex flex-wrap justify-center gap-3 mb-10 scroll-reveal">
+      <button class="industry-btn py-3 px-5 rounded-xl border border-[#1C1C1E]/12 bg-[#1C1C1E]/04 text-sm active" data-industry="banking"><span class="mr-2">🏦</span> Banking &amp; Finance</button>
+      <button class="industry-btn py-3 px-5 rounded-xl border border-[#1C1C1E]/12 bg-[#1C1C1E]/04 text-sm" data-industry="manufacturing"><span class="mr-2">🏭</span> Manufacturing</button>
+      <button class="industry-btn py-3 px-5 rounded-xl border border-[#1C1C1E]/12 bg-[#1C1C1E]/04 text-sm" data-industry="support"><span class="mr-2">🎧</span> Customer Support</button>
+      <button class="industry-btn py-3 px-5 rounded-xl border border-[#1C1C1E]/12 bg-[#1C1C1E]/04 text-sm" data-industry="software"><span class="mr-2">💻</span> Software Houses</button>
+    </div>
+    <div id="industry-panel" class="glass border border-[#1C1C1E]/12 p-6 md:p-10 rounded-3xl max-w-4xl mx-auto transition-all duration-500 scroll-reveal"></div>
+  </div>
+</section>
+
+<!-- OUTCOMES -->
+<section id="outcomes" class="relative z-10 py-16 md:py-28 px-4 md:px-6 text-center">
+  <div class="max-w-6xl mx-auto">
+    <div class="scroll-reveal mb-16 md:mb-24">
+      <span class="pill mb-4">Proven Results</span>
+      <h2 class="text-4xl md:text-6xl font-bold mt-4 mb-5">Companies Run on Numbers.</h2>
+      <p class="text-[#6B6860] text-base md:text-lg">Here's what clients report after 90 days with Nexus.</p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-8">
+      <div class="group relative glass border border-[#1C1C1E]/10 p-8 md:p-10 rounded-[2.5rem] transition-all duration-500 hover:border-[#C8A96E]/25 hover:shadow-[0_20px_60px_rgba(28,28,30,0.07)] scroll-reveal overflow-hidden"><div class="absolute -bottom-8 -right-8 w-40 h-40 bg-[#C8A96E]/04 blur-[60px] rounded-full pointer-events-none group-hover:bg-[#C8A96E]/10 transition-all duration-700"></div><div class="counter-num text-5xl md:text-7xl font-black text-[#1A1A1A] mb-4" data-target="70" data-suffix="%">0%</div><h4 class="font-bold text-lg md:text-xl mb-3">Faster Onboarding</h4><p class="text-[#6B6860] text-sm leading-relaxed">New hires become productive in days, not weeks. Slash training costs instantly.</p></div>
+      <div class="group relative glass border border-[#1C1C1E]/10 p-8 md:p-10 rounded-[2.5rem] transition-all duration-500 hover:border-[#C8A96E]/25 hover:shadow-[0_20px_60px_rgba(28,28,30,0.07)] scroll-reveal delay-2 overflow-hidden"><div class="absolute -bottom-8 -right-8 w-40 h-40 bg-[#C8A96E]/04 blur-[60px] rounded-full pointer-events-none group-hover:bg-[#C8A96E]/10 transition-all duration-700"></div><div class="counter-num text-5xl md:text-7xl font-black text-[#1C1C1E] mb-4" data-target="95" data-suffix="%">0%</div><h4 class="font-bold text-lg md:text-xl mb-3">Reduction in Errors</h4><p class="text-[#6B6860] text-sm leading-relaxed">AI-monitored workflows catch protocol deviations before they cause damage.</p></div>
+      <div class="group relative glass border border-[#1C1C1E]/10 p-8 md:p-10 rounded-[2.5rem] transition-all duration-500 hover:border-[#C8A96E]/25 hover:shadow-[0_20px_60px_rgba(28,28,30,0.07)] scroll-reveal delay-3 overflow-hidden"><div class="absolute -bottom-8 -right-8 w-40 h-40 bg-[#C8A96E]/04 blur-[60px] rounded-full pointer-events-none group-hover:bg-[#C8A96E]/10 transition-all duration-700"></div><div class="counter-num text-5xl md:text-7xl font-black text-[#6B6860] mb-4" data-prefix="$" data-target="0" data-suffix="">$0</div><h4 class="font-bold text-lg md:text-xl mb-3">Compliance Fines</h4><p class="text-[#6B6860] text-sm leading-relaxed">100% audit trail visibility. Save thousands in regulatory penalties.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- SECURITY -->
+<section id="security" class="relative z-10 py-16 md:py-28 px-4 md:px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="relative glass border border-[#1C1C1E]/12 p-8 md:p-16 rounded-[2.5rem] overflow-hidden scroll-reveal">
+      <div class="absolute -top-28 -right-28 w-72 h-72 bg-[#C8A96E]/06 blur-[100px] rounded-full pointer-events-none"></div>
+      <div class="absolute -bottom-20 -left-20 w-56 h-56 bg-[#1C1C1E]/04 blur-[80px] rounded-full pointer-events-none"></div>
+      <div class="text-center mb-12 md:mb-16">
+        <span class="pill mb-6">Enterprise Trust</span>
+        <h2 class="text-3xl md:text-5xl font-bold mt-4 mb-6">Your Data. Your AI Brain.<br/>Full Stop.</h2>
+        <p class="text-[#6B6860] max-w-xl mx-auto text-base md:text-lg">We treat your internal data as our most critical asset. Security isn't an afterthought—it's the core of the Nexus architecture.</p>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        <div class="group bg-[#1C1C1E]/04 border border-[#1C1C1E]/08 p-5 md:p-6 rounded-2xl text-center hover:bg-[#1C1C1E]/08 hover:border-[#C8A96E]/20 transition-all duration-300"><i data-lucide="lock" class="w-7 h-7 md:w-8 md:h-8 text-[#1C1C1E] mx-auto mb-3 group-hover:scale-110 transition-transform"></i><h4 class="text-xs md:text-sm font-semibold">SOC2 Compliant</h4></div>
+        <div class="group bg-[#1C1C1E]/04 border border-[#1C1C1E]/08 p-5 md:p-6 rounded-2xl text-center hover:bg-[#1C1C1E]/08 hover:border-[#C8A96E]/20 transition-all duration-300"><i data-lucide="shield" class="w-7 h-7 md:w-8 md:h-8 text-[#1C1C1E] mx-auto mb-3 group-hover:scale-110 transition-transform"></i><h4 class="text-xs md:text-sm font-semibold">E2E Encrypted</h4></div>
+        <div class="group bg-[#1C1C1E]/04 border border-[#1C1C1E]/08 p-5 md:p-6 rounded-2xl text-center hover:bg-[#1C1C1E]/08 hover:border-[#C8A96E]/20 transition-all duration-300"><i data-lucide="database" class="w-7 h-7 md:w-8 md:h-8 text-[#1C1C1E] mx-auto mb-3 group-hover:scale-110 transition-transform"></i><h4 class="text-xs md:text-sm font-semibold">Data Isolation</h4></div>
+        <div class="group bg-[#1C1C1E]/04 border border-[#1C1C1E]/08 p-5 md:p-6 rounded-2xl text-center hover:bg-[#1C1C1E]/08 hover:border-[#C8A96E]/20 transition-all duration-300"><i data-lucide="eye-off" class="w-7 h-7 md:w-8 md:h-8 text-[#1C1C1E] mx-auto mb-3 group-hover:scale-110 transition-transform"></i><h4 class="text-xs md:text-sm font-semibold">Zero Sharing</h4></div>
+      </div>
+      <div class="bg-[#1C1C1E]/04 border border-[#C8A96E]/20 p-6 md:p-8 rounded-2xl text-center">
+        <p class="text-sm md:text-base leading-relaxed max-w-2xl mx-auto"><strong class="text-[#C8A96E] block mb-2">Data Isolation Guarantee:</strong>Your AI-Brain is yours alone. Your documents, SOPs, and training data are never shared, mixed, or used to train models for other companies. Period.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="relative z-10 py-16 md:py-28 px-4 md:px-6">
+  <div class="max-w-5xl mx-auto">
+    <div class="text-center mb-12 md:mb-16 scroll-reveal"><span class="pill mb-4">Early Access Feedback</span><h2 class="text-3xl md:text-5xl font-bold mt-4">What Our Partners Say</h2></div>
+    <div class="grid md:grid-cols-2 gap-5 md:gap-8">
+      <div class="relative glass border border-[#1C1C1E]/08 p-6 md:p-8 rounded-[2rem] transition-all duration-500 hover:border-[#C8A96E]/25 hover:shadow-[0_20px_60px_rgba(28,28,30,0.07)] scroll-reveal"><div class="flex gap-0.5 mb-6 text-[#C8A96E]">★★★★★</div><p class="text-[#6B6860] text-sm md:text-base leading-relaxed mb-8 italic">"We onboarded 12 new agents in one week without a single training session. Nexus did it all. Our compliance manager nearly cried."</p><div class="flex items-center gap-4"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#1C1C1E] to-[#3d3d3d] flex items-center justify-center font-bold text-white text-sm flex-shrink-0">AK</div><div><div class="text-sm font-bold">Ahmed K.</div><div class="text-xs text-[#9B9890] uppercase tracking-wider">Head of Operations, FinServe</div></div></div></div>
+      <div class="relative glass border border-[#1C1C1E]/08 p-6 md:p-8 rounded-[2rem] transition-all duration-500 hover:border-[#C8A96E]/25 hover:shadow-[0_20px_60px_rgba(28,28,30,0.07)] scroll-reveal delay-2"><div class="flex gap-0.5 mb-6 text-[#C8A96E]">★★★★★</div><p class="text-[#6B6860] text-sm md:text-base leading-relaxed mb-8 italic">"The real-time audit feature caught a major compliance breach before it reached the client. Nexus paid for itself on day one."</p><div class="flex items-center gap-4"><div class="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-[#6B6860] to-[#1C1C1E] flex items-center justify-center font-bold text-white text-sm flex-shrink-0">SR</div><div><div class="text-sm font-bold">Sara R.</div><div class="text-xs text-[#9B9890] uppercase tracking-wider">VP Engineering, TechFlow</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING NUDGE -->
+<section id="pricing-link" class="relative z-10 py-16 md:py-20 px-4 md:px-6 text-center scroll-reveal">
+  <div class="max-w-3xl mx-auto glass border border-[#1C1C1E]/12 p-8 md:p-12 rounded-[2.5rem] shadow-lg hover:border-[#C8A96E]/25 transition-all duration-500">
+    <h3 class="text-2xl md:text-3xl font-bold mb-4">Transparent pricing for every team size.</h3>
+    <p class="text-[#6B6860] text-base md:text-lg mb-8 max-w-lg mx-auto leading-relaxed">Whether you're a startup or an enterprise, we have a plan built for you. No hidden fees. Cancel anytime.</p>
+    <a href="compliance.html#pricing"><button class="btn-shimmer group py-3 px-8 bg-[#1C1C1E] text-white rounded-full font-bold text-base md:text-lg hover:shadow-[0_0_32px_rgba(28,28,30,0.2)] transition-all duration-300"><span class="flex items-center gap-2">View Pricing Plans<svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg></span></button></a>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="relative z-10 py-24 md:py-36 px-4 md:px-6 text-center overflow-hidden">
+  <div class="absolute inset-0 flex justify-center items-center pointer-events-none"><div class="w-[400px] md:w-[600px] h-[400px] md:h-[600px] bg-[#C8A96E]/08 rounded-full blur-[120px]"></div></div>
+  <div class="relative max-w-4xl mx-auto">
+    <h2 class="text-5xl md:text-8xl font-black text-[#1A1A1A] mb-8 leading-[1.02] scroll-reveal">Operations,<br/><span class="text-[#C8A96E]">Bulletproof.</span></h2>
+    <p class="text-[#6B6860] text-base md:text-xl mb-12 max-w-lg mx-auto scroll-reveal delay-1">Join 50+ industry leaders. Setup takes 30 minutes. Results start from Day 1.</p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center items-center scroll-reveal delay-2">
+      <button onclick="window.open('https://meet.google.com/bvv-zsky-wum','_blank')" class="btn-shimmer w-full sm:w-auto py-4 px-10 bg-[#1C1C1E] text-white font-bold text-base md:text-lg rounded-2xl hover:shadow-[0_0_40px_rgba(28,28,30,0.22)] transition-all duration-300">Get Started Now</button>
+      <a href="page3.html#contact-section" class="w-full sm:w-auto py-4 px-10 text-[#1A1A1A] font-semibold text-base md:text-lg border border-[#1C1C1E]/15 rounded-2xl hover:bg-[#1C1C1E]/05 transition-all">Talk to Sales →</a>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <a href="index.html" class="footer-logo">
+      <div style="width:22px;height:22px;background:#1C1C1E;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="#FAF8F5" stroke-width="1.2"/><circle cx="7" cy="7" r="2" fill="#C8A96E"/></svg>
+      </div>
+      NEXUS.AI
+    </a>
+    <span class="footer-copy">© 2025 Nexus AI Inc. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="Privacy-policy.html">Privacy</a>
+      <a href="Terms-Service.html">Terms</a>
+      <a href="page3.html#contact-section">Contact</a>
+    </div>
+  </div>
+</footer>
+
+<!-- CHAT -->
+<button id="chat-toggle" class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-[#1C1C1E] rounded-full flex items-center justify-center shadow-lg hover:shadow-[0_0_28px_rgba(28,28,30,0.3)] transition-all hover:scale-105" aria-label="Open chat"><i data-lucide="message-circle" style="width:22px;height:22px;color:white"></i></button>
+<div id="chatbot-window" class="fixed bottom-24 right-4 md:right-6 z-50 w-[calc(100vw-2rem)] sm:w-80 md:w-96 glass rounded-3xl border border-[#1C1C1E]/15 flex-col overflow-hidden shadow-2xl" style="height:480px;max-height:calc(100vh - 120px);">
+  <div class="px-5 py-4 border-b border-[#1C1C1E]/08 flex items-center justify-between">
+    <div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-[#1C1C1E] flex items-center justify-center flex-shrink-0"><i data-lucide="bot" style="width:14px;height:14px;color:#C8A96E"></i></div><div><div class="text-sm font-bold">Nexus Assistant</div><div class="text-xs text-[#C8A96E]">Trained on our own SOPs</div></div></div>
+    <button id="chat-close" class="text-[#9B9890] hover:text-[#1A1A1A] p-1"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+  </div>
+  <div id="chat-messages" class="px-4 py-4 space-y-3" style="flex:1;overflow-y:auto;"></div>
+  <div class="px-4 py-3 border-t border-[#1C1C1E]/08 flex gap-2">
+    <input id="chat-input" type="text" placeholder="Ask anything about Nexus..." class="flex-1 bg-[#1C1C1E]/04 border border-[#1C1C1E]/12 rounded-full px-4 py-2 text-sm placeholder-gray-400 outline-none focus:border-[#C8A96E]/40 transition-colors" />
+    <button id="chat-send" class="w-9 h-9 bg-[#1C1C1E] rounded-full flex items-center justify-center shrink-0 hover:bg-[#3d3d3d] transition-all"><i data-lucide="send" style="width:14px;height:14px;color:white"></i></button>
+  </div>
+</div>
+
+<script>
+lucide.createIcons();
+function checkReveal(){document.querySelectorAll('.scroll-reveal').forEach(el=>{if(el.getBoundingClientRect().top<window.innerHeight-80)el.classList.add('active');});}
+window.addEventListener('scroll',checkReveal,{passive:true});checkReveal();
+
+/* ✅ NEURAL CANVAS ANIMATION — FULLY WORKING */
+const canvas=document.getElementById('neuralCanvas');
+const ctx=canvas.getContext('2d');
+let particles=[];
+let mouse={x:-9999,y:-9999,active:false};
+const CONFIG={
+  count:()=>window.innerWidth<768?80:180,
+  maxDist:160,
+  mouseRadius:240,
+  baseSpeed:0.5,
+  dotSize:2.2,
+  lineOpacityMult:0.14,
+  dotOpacity:0.55
+};
+class Particle{
+  constructor(w,h){this.reset(w,h);}
+  reset(w,h){
+    this.x=Math.random()*w;
+    this.y=Math.random()*h;
+    const angle=Math.random()*Math.PI*2;
+    const speed=CONFIG.baseSpeed*(0.4+Math.random()*0.8);
+    this.vx=Math.cos(angle)*speed;
+    this.vy=Math.sin(angle)*speed;
+    this.size=1.2+Math.random()*CONFIG.dotSize;
+    this.opacity=0.25+Math.random()*0.45;
+    this.gold=Math.random()<0.12;
+  }
+}
+function initParticles(){
+  const w=canvas.width,h=canvas.height;
+  particles=Array.from({length:CONFIG.count()},()=>new Particle(w,h));
+}
+function resizeCanvas(){
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+  initParticles();
+}
+window.addEventListener('resize',resizeCanvas,{passive:true});
+window.addEventListener('mousemove',e=>{mouse.x=e.clientX;mouse.y=e.clientY;mouse.active=true;},{passive:true});
+window.addEventListener('touchmove',e=>{mouse.x=e.touches[0].clientX;mouse.y=e.touches[0].clientY;mouse.active=true;},{passive:true});
+window.addEventListener('mouseleave',()=>{mouse.active=false;mouse.x=-9999;mouse.y=-9999;});
+resizeCanvas();
+function draw(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const w=canvas.width,h=canvas.height;
+  const n=particles.length;
+  for(let i=0;i<n;i++){
+    const pi=particles[i];
+    for(let j=i+1;j<n;j++){
+      const pj=particles[j];
+      const dx=pi.x-pj.x,dy=pi.y-pj.y;
+      const dSq=dx*dx+dy*dy;
+      if(dSq<CONFIG.maxDist*CONFIG.maxDist){
+        const t=1-Math.sqrt(dSq)/CONFIG.maxDist;
+        const alpha=t*t*CONFIG.lineOpacityMult;
+        ctx.beginPath();
+        ctx.strokeStyle=`rgba(28,28,30,${alpha})`;
+        ctx.lineWidth=0.6;
+        ctx.moveTo(pi.x,pi.y);
+        ctx.lineTo(pj.x,pj.y);
+        ctx.stroke();
+      }
+    }
+  }
+  for(let i=0;i<n;i++){
+    const p=particles[i];
+    p.x+=p.vx;p.y+=p.vy;
+    if(p.x<0||p.x>w)p.vx*=-1;
+    if(p.y<0||p.y>h)p.vy*=-1;
+    const mdx=mouse.x-p.x,mdy=mouse.y-p.y;
+    const mdSq=mdx*mdx+mdy*mdy;
+    if(mdSq<CONFIG.mouseRadius*CONFIG.mouseRadius){
+      const t=1-Math.sqrt(mdSq)/CONFIG.mouseRadius;
+      const grd=ctx.createLinearGradient(p.x,p.y,mouse.x,mouse.y);
+      grd.addColorStop(0,`rgba(200,169,110,${t*0.55})`);
+      grd.addColorStop(1,`rgba(200,169,110,0)`);
+      ctx.beginPath();ctx.strokeStyle=grd;ctx.lineWidth=1.2;
+      ctx.moveTo(p.x,p.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();
+      const dist=Math.sqrt(mdSq);
+      p.vx-=(mdx/dist)*0.06*t;
+      p.vy-=(mdy/dist)*0.06*t;
+      const spd=Math.sqrt(p.vx*p.vx+p.vy*p.vy);
+      if(spd>2.5){p.vx*=0.92;p.vy*=0.92;}
+    }
+    if(p.gold){ctx.fillStyle=`rgba(200,169,110,${p.opacity})`;}
+    else{ctx.fillStyle=`rgba(28,28,30,${p.opacity})`;}
+    ctx.beginPath();ctx.arc(p.x,p.y,p.size,0,Math.PI*2);ctx.fill();
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+
+/* Word cycle */
+const words=document.querySelectorAll('#cycleWord span');let wordIdx=0;
+setInterval(()=>{words[wordIdx].classList.remove('active');wordIdx=(wordIdx+1)%words.length;words[wordIdx].classList.add('active');},2800);
+
+/* Industries */
+const industryData={banking:{icon:'🏦',title:'Banking & Finance',desc:'In a world of strict regulations and zero tolerance for mistakes, Nexus is your compliance backbone.',points:['Auto-audit customer communication for KYC/AML compliance','Train relationship managers on sensitive client scenarios','Real-time alerts on regulatory protocol deviations','Complete audit trail for every employee action']},manufacturing:{icon:'🏭',title:'Manufacturing',desc:'Safety is non-negotiable on the floor. Nexus ensures every worker knows every protocol, every time.',points:['Digitize machine SOPs into interactive training modules','Simulate dangerous scenarios safely before shift work begins','Monitor safety checklists in real time via floor tablets','Instant alerts when safety protocol is skipped']},support:{icon:'🎧',title:'Customer Support',desc:'Your support agents are your brand. Nexus trains them to handle every escalation flawlessly.',points:['AI simulation of angry, complex, or escalated customer calls','Instant SOP lookup during live conversations','Audit email replies for tone, accuracy, and policy adherence','Reduce Average Handle Time by 40%']},software:{icon:'💻',title:'Software Houses',desc:'Code quality and deployment protocols are your lifeline. Nexus keeps your whole team aligned.',points:['Train junior developers on internal coding standards','Audit PRs and deployments against defined protocols','Simulate incident response drills for your DevOps team','Onboard new engineers 3x faster with interactive playbooks']}};
+function renderIndustry(key){const d=industryData[key];const check=`<svg xmlns="http://www.w3.org/2000/svg" style="width:15px;height:15px;color:#C8A96E;margin-top:2px;flex-shrink:0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>`;document.getElementById('industry-panel').innerHTML=`<div class="flex flex-col sm:flex-row items-start gap-4 sm:gap-6"><div class="text-4xl sm:text-5xl shrink-0">${d.icon}</div><div><h3 class="text-xl sm:text-2xl font-bold mb-2">${d.title}</h3><p class="text-[#6B6860] text-sm mb-5 leading-relaxed">${d.desc}</p><ul class="space-y-3">${d.points.map(p=>`<li class="flex items-start gap-3 text-sm">${check}${p}</li>`).join('')}</ul></div></div>`;}
+renderIndustry('banking');
+document.querySelectorAll('.industry-btn').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.industry-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');renderIndustry(btn.dataset.industry);});});
+
+/* Counters */
+function animateCounter(el){const target=parseInt(el.dataset.target);const suffix=el.dataset.suffix||'';const prefix=el.dataset.prefix||'';if(target===0)return;const duration=1800;const start=performance.now();function step(now){const t=Math.min((now-start)/duration,1);const ease=1-Math.pow(1-t,3);el.textContent=prefix+Math.round(ease*target)+suffix;if(t<1)requestAnimationFrame(step);}requestAnimationFrame(step);}
+const counterObserver=new IntersectionObserver((entries)=>{entries.forEach(entry=>{if(entry.isIntersecting){animateCounter(entry.target);counterObserver.unobserve(entry.target);}});},{threshold:0.5});
+document.querySelectorAll('[data-target]').forEach(el=>counterObserver.observe(el));
+
+/* Chatbot */
+const chatWindow=document.getElementById('chatbot-window');const chatToggle=document.getElementById('chat-toggle');const chatClose=document.getElementById('chat-close');const chatInput=document.getElementById('chat-input');const chatSend=document.getElementById('chat-send');const chatMsgs=document.getElementById('chat-messages');let chatOpen=false;
+const botReplies={price:"We offer Starter ($99/mo), Growth ($299/mo), and Enterprise (custom) plans. Want to see the full breakdown?",security:"Your data is fully isolated — SOC2 compliant, end-to-end encrypted, never shared or used to train shared models.",demo:"Absolutely! Book a live 30-minute demo via the button in the header. We'll show Nexus running on a real SOP.",onboard:"Most clients are fully set up within 30 minutes. Just upload your SOPs and we handle everything else.",default:"Great question! Nexus can definitely help with that. Would you like to book a live demo to see it in action?"};
+function getBotReply(msg){const m=msg.toLowerCase();if(m.includes('price')||m.includes('cost')||m.includes('plan'))return botReplies.price;if(m.includes('secure')||m.includes('data')||m.includes('privacy'))return botReplies.security;if(m.includes('demo'))return botReplies.demo;if(m.includes('setup')||m.includes('onboard')||m.includes('start'))return botReplies.onboard;return botReplies.default;}
+function addMsg(text,role){const div=document.createElement('div');div.className=`flex ${role==='user'?'justify-end':'justify-start'}`;div.innerHTML=`<div class="max-w-[82%] px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${role==='user'?'bg-[#1C1C1E] text-white':'glass text-[#1A1A1A] border border-[#1C1C1E]/10'}">${text}</div>`;chatMsgs.appendChild(div);chatMsgs.scrollTop=chatMsgs.scrollHeight;}
+function showTyping(){const div=document.createElement('div');div.id='typing-indicator';div.className='flex justify-start';div.innerHTML=`<div class="glass px-4 py-2.5 rounded-2xl border border-[#1C1C1E]/08 typing"><span></span><span></span><span></span></div>`;chatMsgs.appendChild(div);chatMsgs.scrollTop=chatMsgs.scrollHeight;}
+function removeTyping(){document.getElementById('typing-indicator')?.remove();}
+function sendMsg(){const msg=chatInput.value.trim();if(!msg)return;addMsg(msg,'user');chatInput.value='';showTyping();setTimeout(()=>{removeTyping();addMsg(getBotReply(msg),'bot');},800+Math.random()*600);}
+chatToggle.addEventListener('click',()=>{chatOpen=!chatOpen;chatWindow.classList.toggle('open',chatOpen);if(chatOpen&&chatMsgs.children.length===0)setTimeout(()=>addMsg("👋 Hi! I'm the Nexus AI Assistant — trained on our own SOPs. Ask me anything about features, pricing, or security.",'bot'),300);lucide.createIcons();});
+chatClose.addEventListener('click',()=>{chatOpen=false;chatWindow.classList.remove('open');});
+chatSend.addEventListener('click',sendMsg);
+chatInput.addEventListener('keydown',e=>{if(e.key==='Enter')sendMsg();});
+
+/* Mobile Menu */
+(function(){
+  var btn=document.getElementById('ham-btn'),
+      menu=document.getElementById('mobile-menu'),
+      overlay=document.getElementById('mob-overlay'),
+      close=document.getElementById('mob-close');
+  if(!btn)return;
+  function openMenu(){btn.classList.add('open');menu.classList.add('open');overlay.classList.add('open');document.body.style.overflow='hidden';}
+  function closeMenu(){btn.classList.remove('open');menu.classList.remove('open');overlay.classList.remove('open');document.body.style.overflow='';}
+  btn.addEventListener('click',function(){menu.classList.contains('open')?closeMenu():openMenu();});
+  close.addEventListener('click',closeMenu);
+  overlay.addEventListener('click',closeMenu);
+  var hdr=document.getElementById('site-header');
+  if(hdr)window.addEventListener('scroll',function(){hdr.classList.toggle('scrolled',window.scrollY>20);},{passive:true});
+})();
+</script>
+</body>
+</html>
