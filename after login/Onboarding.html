@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NEXUS.AI | Company Onboarding</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    :root {
+      --ink: #1C1C1E;
+      --ink-soft: #6B6860;
+      --ink-ghost: #9B9890;
+      --bg: #FAF8F5;
+      --gold: #C8A96E;
+      --glow: rgba(200,169,110,0.18);
+      --success: #2D7A4F;
+      --success-bg: #EAF5EE;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--ink); font-family: 'DM Sans', sans-serif; overflow-x: hidden; min-height: 100vh; }
+    h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+    /* noise overlay */
+    body::before {
+      content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.035'/%3E%3C/svg%3E");
+      background-repeat: repeat; background-size: 200px 200px; mix-blend-mode: multiply;
+    }
+
+    /* ── HEADER ── */
+    .site-header{position:sticky;top:0;z-index:100;background:rgba(250,248,245,0.92);backdrop-filter:blur(24px) saturate(1.5);-webkit-backdrop-filter:blur(24px) saturate(1.5);border-bottom:1px solid rgba(26,26,26,0.08);transition:box-shadow .4s;}
+    .site-header.scrolled{box-shadow:0 4px 30px rgba(28,28,30,0.08);}
+    .header-inner{max-width:1280px;margin:0 auto;padding:0 32px;height:72px;display:flex;align-items:center;justify-content:space-between;}
+    .logo{display:flex;align-items:center;gap:11px;text-decoration:none;cursor:pointer;}
+    .logo-mark{width:34px;height:34px;background:#1C1C1E;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .4s cubic-bezier(0.34,1.56,0.64,1),box-shadow .4s;}
+    .logo:hover .logo-mark{transform:rotate(15deg) scale(1.08);box-shadow:0 4px 20px rgba(200,169,110,0.35);}
+    .logo-text{font-family:'Syne',sans-serif;font-size:18px;font-weight:800;letter-spacing:.18em;color:#1C1C1E;}
+    .site-header nav{display:flex;align-items:center;gap:34px;}
+    .site-header nav a{font-size:13px;font-weight:600;color:#6B6860;text-decoration:none;letter-spacing:.06em;transition:color .3s;position:relative;}
+    .site-header nav a::after{content:'';position:absolute;bottom:-3px;left:0;width:0;height:1px;background:#C8A96E;transition:width .35s cubic-bezier(0.23,1,0.32,1);}
+    .site-header nav a:hover{color:#1C1C1E;}
+    .site-header nav a:hover::after{width:100%;}
+    .nav-actions{display:flex;align-items:center;gap:12px;}
+    .btn-ghost{padding:8px 22px;font-family:'Syne',sans-serif;font-size:13px;font-weight:600;letter-spacing:.06em;color:#6B6860;background:transparent;border:1px solid rgba(28,28,30,0.18);border-radius:100px;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block;position:relative;overflow:hidden;}
+    .btn-ghost::before{content:'';position:absolute;inset:0;background:#1C1C1E;border-radius:100px;transform:scaleX(0);transform-origin:left;transition:transform .4s cubic-bezier(0.23,1,0.32,1);z-index:0;}
+    .btn-ghost span{position:relative;z-index:1;transition:color .4s;}
+    .btn-ghost:hover::before{transform:scaleX(1);}
+    .btn-ghost:hover span{color:#FAF8F5;}
+    .btn-ghost:hover{border-color:#1C1C1E;}
+    .btn-cta{padding:9px 24px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.06em;color:#FAF8F5;background:#1C1C1E;border:none;border-radius:100px;cursor:pointer;transition:all .3s;text-decoration:none;display:inline-block;}
+    .btn-cta:hover{box-shadow:0 6px 24px rgba(28,28,30,0.22);}
+    .ham-btn{display:none;flex-direction:column;gap:6px;padding:4px;background:none;border:none;cursor:pointer;z-index:210;}
+    .ham-btn .ham-line{display:block;width:22px;height:2px;background:#1A1A1A;border-radius:2px;transition:transform .3s,opacity .3s;}
+    .ham-btn.open .ham-line:nth-child(1){transform:translateY(8px) rotate(45deg);}
+    .ham-btn.open .ham-line:nth-child(2){opacity:0;transform:scaleX(0);}
+    .ham-btn.open .ham-line:nth-child(3){transform:translateY(-8px) rotate(-45deg);}
+    @media(max-width:768px){.site-header nav,.nav-actions{display:none!important;}.ham-btn{display:flex;}}
+    #mob-overlay{position:fixed;inset:0;z-index:190;background:rgba(26,26,26,0.35);backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:opacity .3s;}
+    #mob-overlay.open{opacity:1;pointer-events:all;}
+    #mobile-menu{position:fixed;top:0;right:0;width:min(320px,85vw);height:100vh;z-index:200;background:rgba(250,248,245,0.97);backdrop-filter:blur(28px);border-left:1px solid rgba(26,26,26,0.10);transform:translateX(100%);transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);display:flex;flex-direction:column;padding:1.5rem;gap:0.5rem;}
+    #mobile-menu.open{transform:translateX(0);}
+    .mob-link{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;letter-spacing:.08em;color:#1C1C1E;text-decoration:none;padding:12px 0;border-bottom:1px solid rgba(26,26,26,0.07);}
+
+    /* ── PROGRESS STEPPER ── */
+    .stepper-wrap{max-width:680px;margin:0 auto;padding:40px 32px 0;}
+    .stepper{display:flex;align-items:center;gap:0;position:relative;}
+    .step{display:flex;flex-direction:column;align-items:center;gap:8px;flex:1;position:relative;}
+    .step-circle{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;transition:all .4s cubic-bezier(0.34,1.56,0.64,1);position:relative;z-index:2;}
+    .step-circle.done{background:#1C1C1E;color:#FAF8F5;box-shadow:0 4px 16px rgba(28,28,30,0.22);}
+    .step-circle.active{background:#C8A96E;color:#FAF8F5;box-shadow:0 4px 20px rgba(200,169,110,0.4);}
+    .step-circle.idle{background:#FAF8F5;color:#9B9890;border:1.5px solid rgba(26,26,26,0.15);}
+    .step-label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#9B9890;white-space:nowrap;transition:color .3s;}
+    .step-label.active{color:#1C1C1E;}
+    .step-label.done{color:#6B6860;}
+    .step-line{flex:1;height:1.5px;background:rgba(26,26,26,0.12);margin-top:-28px;position:relative;z-index:1;transition:background .5s;}
+    .step-line.done{background:#1C1C1E;}
+
+    /* ── MAIN LAYOUT ── */
+    .onboard-wrap{max-width:900px;margin:0 auto;padding:48px 32px 80px;}
+    @media(max-width:640px){.onboard-wrap{padding:32px 16px 60px;}}
+
+    /* ── PANEL ── */
+    .panel{display:none;animation:panelIn .45s cubic-bezier(0.23,1,0.32,1) both;}
+    .panel.active{display:block;}
+    @keyframes panelIn{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+    /* ── FORM ELEMENTS ── */
+    .field-group{margin-bottom:20px;}
+    .field-label{font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:#6B6860;margin-bottom:8px;display:block;}
+    .field-input{width:100%;padding:13px 16px;background:rgba(255,255,255,0.7);border:1.5px solid rgba(26,26,26,0.12);border-radius:12px;font-family:'DM Sans',sans-serif;font-size:15px;color:#1C1C1E;transition:border-color .25s,box-shadow .25s;outline:none;}
+    .field-input:focus{border-color:#C8A96E;box-shadow:0 0 0 3px rgba(200,169,110,0.12);}
+    .field-input::placeholder{color:#9B9890;}
+    .field-select{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%239B9890' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 16px center;padding-right:44px;}
+    .field-hint{font-size:12px;color:#9B9890;margin-top:6px;}
+    .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+    @media(max-width:520px){.grid-2{grid-template-columns:1fr;}}
+
+    /* ── SECTION TITLE ── */
+    .section-eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#C8A96E;margin-bottom:10px;}
+    .section-heading{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;color:#1C1C1E;line-height:1.1;margin-bottom:8px;}
+    .section-sub{font-size:15px;color:#6B6860;line-height:1.6;margin-bottom:36px;}
+
+    /* ── UPLOAD ZONE ── */
+    .upload-zone{border:2px dashed rgba(26,26,26,0.16);border-radius:16px;padding:48px 32px;text-align:center;cursor:pointer;transition:all .3s;background:rgba(255,255,255,0.5);position:relative;overflow:hidden;}
+    .upload-zone:hover,.upload-zone.dragover{border-color:#C8A96E;background:rgba(200,169,110,0.04);box-shadow:0 0 0 4px rgba(200,169,110,0.08);}
+    .upload-zone.dragover::before{content:'Drop files here';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:#C8A96E;background:rgba(200,169,110,0.06);z-index:10;}
+    .upload-icon{width:56px;height:56px;background:rgba(26,26,26,0.05);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;}
+    .upload-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:#1C1C1E;margin-bottom:6px;}
+    .upload-sub{font-size:13px;color:#9B9890;margin-bottom:20px;}
+    .upload-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;background:#1C1C1E;color:#FAF8F5;border:none;border-radius:100px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.04em;cursor:pointer;transition:all .3s;}
+    .upload-btn:hover{box-shadow:0 6px 20px rgba(28,28,30,0.22);}
+    .file-types{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:20px;}
+    .file-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;background:rgba(26,26,26,0.06);color:#6B6860;letter-spacing:.05em;}
+
+    /* ── FILE LIST ── */
+    .file-list{margin-top:24px;display:flex;flex-direction:column;gap:10px;}
+    .file-item{display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.8);border:1.5px solid rgba(26,26,26,0.09);border-radius:12px;transition:border-color .2s;}
+    .file-item:hover{border-color:rgba(26,26,26,0.18);}
+    .file-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;font-weight:800;letter-spacing:.04em;font-family:'Syne',sans-serif;}
+    .file-icon.pdf{background:#FEE8E8;color:#C0392B;}
+    .file-icon.doc,.file-icon.docx{background:#E8F0FE;color:#2962CC;}
+    .file-icon.xls,.file-icon.xlsx{background:#E8F7EE;color:#1A7A43;}
+    .file-icon.ppt,.file-icon.pptx{background:#FFF0E8;color:#C65D1A;}
+    .file-icon.txt{background:#F1EFE8;color:#5F5E5A;}
+    .file-name{flex:1;font-size:14px;font-weight:500;color:#1C1C1E;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .file-size{font-size:12px;color:#9B9890;flex-shrink:0;}
+    .file-status{flex-shrink:0;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;}
+    .file-status.ready{color:var(--success);}
+    .file-status.uploading{color:#C8A96E;}
+    .file-remove{background:none;border:none;cursor:pointer;color:#9B9890;padding:4px;border-radius:6px;transition:color .2s,background .2s;display:flex;align-items:center;}
+    .file-remove:hover{color:#1C1C1E;background:rgba(26,26,26,0.06);}
+
+    /* ── PROGRESS BAR ── */
+    .prog-bar{height:3px;background:rgba(26,26,26,0.08);border-radius:2px;overflow:hidden;margin-top:6px;}
+    .prog-fill{height:100%;background:var(--gold);border-radius:2px;transition:width 1.2s cubic-bezier(0.23,1,0.32,1);}
+
+    /* ── CATEGORY SELECTOR ── */
+    .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:28px;}
+    .cat-card{padding:14px 16px;border:1.5px solid rgba(26,26,26,0.10);border-radius:12px;cursor:pointer;transition:all .25s;background:rgba(255,255,255,0.6);position:relative;}
+    .cat-card:hover{border-color:rgba(26,26,26,0.22);background:rgba(255,255,255,0.9);}
+    .cat-card.selected{border-color:#C8A96E;background:rgba(200,169,110,0.06);box-shadow:0 0 0 3px rgba(200,169,110,0.12);}
+    .cat-card input{position:absolute;opacity:0;pointer-events:none;}
+    .cat-icon{font-size:22px;margin-bottom:8px;}
+    .cat-name{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#1C1C1E;}
+    .cat-desc{font-size:11px;color:#9B9890;margin-top:3px;line-height:1.4;}
+    .cat-check{position:absolute;top:10px;right:10px;width:18px;height:18px;border-radius:50%;background:#C8A96E;display:none;align-items:center;justify-content:center;}
+    .cat-card.selected .cat-check{display:flex;}
+
+    /* ── BRAIN VISUALIZATION ── */
+    .brain-wrap{text-align:center;padding:40px 0;}
+    .brain-circle{width:140px;height:140px;border-radius:50%;background:#1C1C1E;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;position:relative;box-shadow:0 0 0 12px rgba(200,169,110,0.12),0 0 0 24px rgba(200,169,110,0.06);}
+    .brain-pulse{position:absolute;inset:-8px;border-radius:50%;border:1.5px solid rgba(200,169,110,0.4);animation:pulse 2s ease-out infinite;}
+    .brain-pulse:nth-child(2){animation-delay:.7s;}
+    @keyframes pulse{0%{transform:scale(1);opacity:.8;}100%{transform:scale(1.3);opacity:0;}}
+    .brain-label{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:#9B9890;margin-top:8px;}
+    .brain-value{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:#1C1C1E;line-height:1;}
+    .doc-counter{font-size:13px;color:#9B9890;margin-top:4px;}
+
+    /* ── TRAINING TOPICS ── */
+    .topic-input-wrap{display:flex;gap:10px;margin-bottom:16px;}
+    .topic-input{flex:1;}
+    .topic-add-btn{padding:13px 20px;background:#1C1C1E;color:#FAF8F5;border:none;border-radius:12px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .3s;white-space:nowrap;}
+    .topic-add-btn:hover{box-shadow:0 4px 16px rgba(28,28,30,0.22);}
+    .topics-wrap{display:flex;flex-wrap:wrap;gap:8px;}
+    .topic-tag{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;background:rgba(28,28,30,0.06);border-radius:100px;font-size:13px;font-weight:500;color:#1C1C1E;}
+    .topic-x{background:none;border:none;cursor:pointer;color:#9B9890;display:flex;align-items:center;padding:0;transition:color .2s;}
+    .topic-x:hover{color:#1C1C1E;}
+
+    /* ── NAV BUTTONS ── */
+    .step-nav{display:flex;justify-content:space-between;align-items:center;margin-top:48px;padding-top:28px;border-top:1px solid rgba(26,26,26,0.08);}
+    .btn-back{display:flex;align-items:center;gap:8px;padding:12px 24px;background:transparent;border:1.5px solid rgba(26,26,26,0.14);border-radius:100px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:#6B6860;cursor:pointer;transition:all .3s;}
+    .btn-back:hover{border-color:rgba(26,26,26,0.3);color:#1C1C1E;}
+    .btn-next{display:flex;align-items:center;gap:10px;padding:14px 32px;background:#1C1C1E;border:none;border-radius:100px;font-family:'Syne',sans-serif;font-size:14px;font-weight:700;letter-spacing:.04em;color:#FAF8F5;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+    .btn-next::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,transparent 0%,rgba(255,255,255,0.1) 50%,transparent 100%);transform:translateX(-100%);transition:transform .5s ease;}
+    .btn-next:hover::after{transform:translateX(100%);}
+    .btn-next:hover{box-shadow:0 8px 28px rgba(28,28,30,0.28);}
+    .btn-finish{background:var(--gold);color:#FAF8F5;}
+    .btn-finish:hover{box-shadow:0 8px 28px rgba(200,169,110,0.45);}
+
+    /* ── SUCCESS ── */
+    .success-wrap{text-align:center;padding:60px 0;}
+    .success-icon{width:80px;height:80px;background:#1C1C1E;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 24px;box-shadow:0 0 0 10px rgba(200,169,110,0.12);}
+    .success-title{font-family:'Syne',sans-serif;font-size:34px;font-weight:800;color:#1C1C1E;margin-bottom:12px;}
+    .success-sub{font-size:16px;color:#6B6860;line-height:1.6;max-width:440px;margin:0 auto 36px;}
+    .success-stats{display:flex;gap:32px;justify-content:center;flex-wrap:wrap;margin-bottom:40px;}
+    .stat-box{text-align:center;}
+    .stat-num{font-family:'Syne',sans-serif;font-size:32px;font-weight:800;color:#1C1C1E;}
+    .stat-label{font-size:12px;color:#9B9890;text-transform:uppercase;letter-spacing:.08em;font-weight:600;}
+    .go-dashboard{display:inline-flex;align-items:center;gap:10px;padding:16px 40px;background:#1C1C1E;color:#FAF8F5;border:none;border-radius:100px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .3s;text-decoration:none;}
+    .go-dashboard:hover{box-shadow:0 10px 32px rgba(28,28,30,0.28);}
+
+    /* ── CARD ── */
+    .card{background:rgba(255,255,255,0.65);border:1.5px solid rgba(26,26,26,0.09);border-radius:18px;padding:32px;backdrop-filter:blur(8px);}
+
+    /* ── INLINE NOTICE ── */
+    .notice{display:flex;gap:12px;padding:14px 18px;background:rgba(200,169,110,0.08);border:1px solid rgba(200,169,110,0.22);border-radius:12px;margin-bottom:24px;}
+    .notice p{font-size:13px;color:#6B6860;line-height:1.5;}
+    .notice strong{color:#1C1C1E;}
+
+    /* scroll reveal */
+    .rv{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease;}
+    .rv.in{opacity:1;transform:translateY(0);}
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header class="site-header" id="site-header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+          <path d="M9 1L16.5 5.5V12.5L9 17L1.5 12.5V5.5L9 1Z" stroke="#C8A96E" stroke-width="1.5"/>
+          <circle cx="9" cy="9" r="2.5" fill="#C8A96E"/>
+        </svg>
+      </div>
+      <span class="logo-text">NEXUS.AI</span>
+    </a>
+    <nav>
+      <a href="page2.html">Product</a>
+      <a href="soulion.html">Solutions</a>
+      <a href="security-page.html">Security</a>
+      <a href="page3.html#pricing">Pricing</a>
+    </nav>
+    <div class="nav-actions">
+      <a href="login-page.html" class="btn-ghost"><span>Sign In</span></a>
+    </div>
+    <button class="ham-btn" id="ham-btn" aria-label="Toggle menu">
+      <span class="ham-line"></span><span class="ham-line"></span><span class="ham-line"></span>
+    </button>
+  </div>
+</header>
+<div id="mob-overlay"></div>
+<div id="mobile-menu" role="dialog" aria-modal="true">
+  <button id="mob-close" style="background:none;border:none;cursor:pointer;color:#6B6860;margin-bottom:12px;align-self:flex-end;" aria-label="Close menu">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+  <a href="page2.html" class="mob-link">Product</a>
+  <a href="soulion.html" class="mob-link">Solutions</a>
+  <a href="security-page.html" class="mob-link">Security</a>
+  <a href="page3.html" class="mob-link">Pricing</a>
+  <a href="login-page.html" class="mob-link">Sign In</a>
+</div>
+
+<!-- ── STEPPER ── -->
+<div class="stepper-wrap">
+  <div class="stepper">
+    <div class="step" id="step-ind-1">
+      <div class="step-circle active" id="sc-1">1</div>
+      <span class="step-label active" id="sl-1">Company</span>
+    </div>
+    <div class="step-line" id="line-1"></div>
+    <div class="step">
+      <div class="step-circle idle" id="sc-2">2</div>
+      <span class="step-label" id="sl-2">Documents</span>
+    </div>
+    <div class="step-line" id="line-2"></div>
+    <div class="step">
+      <div class="step-circle idle" id="sc-3">3</div>
+      <span class="step-label" id="sl-3">AI Brain</span>
+    </div>
+    <div class="step-line" id="line-3"></div>
+    <div class="step">
+      <div class="step-circle idle" id="sc-4">4</div>
+      <span class="step-label" id="sl-4">Done</span>
+    </div>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="onboard-wrap">
+
+  <!-- STEP 1: Company Info -->
+  <div class="panel active" id="panel-1">
+    <div class="card rv in">
+      <p class="section-eyebrow">Step 1 of 4</p>
+      <h2 class="section-heading">Tell us about<br>your company</h2>
+      <p class="section-sub">This helps us personalise your AI Brain for your industry and scale.</p>
+
+      <div class="grid-2">
+        <div class="field-group">
+          <label class="field-label">Company Name *</label>
+          <input class="field-input" type="text" placeholder="Acme Corporation" id="company-name" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Industry *</label>
+          <select class="field-input field-select" id="industry">
+            <option value="" disabled selected>Select industry</option>
+            <option>Banking & Finance</option>
+            <option>Manufacturing & Factory</option>
+            <option>Hospitality & Hotels</option>
+            <option>Software & Technology</option>
+            <option>Healthcare</option>
+            <option>Retail & E-Commerce</option>
+            <option>Logistics & Supply Chain</option>
+            <option>Legal & Compliance</option>
+            <option>Education</option>
+            <option>Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field-group">
+          <label class="field-label">Company Size *</label>
+          <select class="field-input field-select" id="company-size">
+            <option value="" disabled selected>Number of employees</option>
+            <option>1 – 10 employees</option>
+            <option>11 – 50 employees</option>
+            <option>51 – 200 employees</option>
+            <option>201 – 1000 employees</option>
+            <option>1000+ employees</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Country / Region *</label>
+          <input class="field-input" type="text" placeholder="Pakistan" id="country" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Company Website</label>
+        <input class="field-input" type="url" placeholder="https://yourcompany.com" id="website" />
+        <p class="field-hint">Optional — helps us understand your public brand voice</p>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Primary Language of SOPs</label>
+        <select class="field-input field-select" id="lang">
+          <option>English</option>
+          <option>Urdu</option>
+          <option>Arabic</option>
+          <option>Hindi</option>
+          <option>French</option>
+          <option>Other</option>
+        </select>
+      </div>
+
+      <div class="step-nav">
+        <div></div>
+        <button class="btn-next" onclick="goTo(2)">
+          Continue <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Upload Documents -->
+  <div class="panel" id="panel-2">
+    <div class="card rv">
+      <p class="section-eyebrow">Step 2 of 4</p>
+      <h2 class="section-heading">Upload your<br>SOPs & manuals</h2>
+      <p class="section-sub">Your AI Brain learns exclusively from these documents. The more you upload, the smarter it gets.</p>
+
+      <div class="notice">
+        <i data-lucide="shield-check" style="width:18px;height:18px;color:#C8A96E;flex-shrink:0;margin-top:2px;"></i>
+        <p><strong>100% Private.</strong> Your documents are encrypted and stored in an isolated environment. No other company or AI model can access them.</p>
+      </div>
+
+      <!-- Upload Zone -->
+      <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+        <input type="file" id="file-input" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt" style="display:none" onchange="handleFiles(this.files)" />
+        <div class="upload-icon">
+          <i data-lucide="upload-cloud" style="width:28px;height:28px;color:#6B6860;"></i>
+        </div>
+        <p class="upload-title">Drag & drop files here</p>
+        <p class="upload-sub">or click to browse from your computer</p>
+        <button class="upload-btn" onclick="event.stopPropagation();document.getElementById('file-input').click()">
+          <i data-lucide="folder-open" style="width:15px;height:15px;"></i>
+          Browse Files
+        </button>
+        <div class="file-types">
+          <span class="file-badge">PDF</span>
+          <span class="file-badge">Word</span>
+          <span class="file-badge">Excel</span>
+          <span class="file-badge">PowerPoint</span>
+          <span class="file-badge">TXT</span>
+          <span class="file-badge">Max 50 MB each</span>
+        </div>
+      </div>
+
+      <!-- Uploaded File List -->
+      <div class="file-list" id="file-list"></div>
+
+      <!-- Upload Summary -->
+      <div id="upload-summary" style="display:none;margin-top:20px;padding:16px 20px;background:rgba(200,169,110,0.07);border:1px solid rgba(200,169,110,0.18);border-radius:12px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;font-weight:600;color:#1C1C1E;" id="summary-text">0 files ready</span>
+          <span style="font-size:12px;color:#9B9890;" id="summary-size">0 MB total</span>
+        </div>
+        <div class="prog-bar" style="margin-top:10px;">
+          <div class="prog-fill" id="upload-prog" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-back" onclick="goTo(1)">
+          <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> Back
+        </button>
+        <button class="btn-next" onclick="goTo(3)">
+          Continue <i data-lucide="arrow-right" style="width:16px;height:16px;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: AI Brain Config -->
+  <div class="panel" id="panel-3">
+    <div class="card rv">
+      <p class="section-eyebrow">Step 3 of 4</p>
+      <h2 class="section-heading">Configure your<br>AI Brain</h2>
+      <p class="section-sub">Tell the AI what to focus on. This shapes how it trains employees and monitors compliance.</p>
+
+      <!-- Brain visual -->
+      <div class="brain-wrap">
+        <div class="brain-circle">
+          <div class="brain-pulse"></div>
+          <div class="brain-pulse"></div>
+          <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
+            <path d="M28 8C18 8 10 16 10 26c0 4 1.5 7.8 4 10.8V44h28v-7.2C44.5 33.8 46 30 46 26c0-10-8-18-18-18z" stroke="#C8A96E" stroke-width="1.5" fill="none"/>
+            <path d="M22 26c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="#FAF8F5" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <circle cx="28" cy="26" r="3" fill="#C8A96E"/>
+            <path d="M20 44v4M28 44v6M36 44v4" stroke="#FAF8F5" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brain-value" id="brain-doc-count">0</div>
+        <div class="doc-counter">documents loaded into AI Brain</div>
+        <p class="brain-label" style="margin-top:16px;" id="brain-company-name">Your Company</p>
+      </div>
+
+      <!-- SOP Categories -->
+      <p class="field-label" style="margin-bottom:14px;">What types of SOPs are you uploading?</p>
+      <div class="cat-grid">
+        <div class="cat-card" onclick="toggleCat(this)">
+          <input type="checkbox" />
+          <div class="cat-icon">📋</div>
+          <div class="cat-name">Operations</div>
+          <div class="cat-desc">Day-to-day procedures</div>
+          <div class="cat-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div class="cat-card" onclick="toggleCat(this)">
+          <input type="checkbox" />
+          <div class="cat-icon">🔒</div>
+          <div class="cat-name">Compliance</div>
+          <div class="cat-desc">Legal & regulatory rules</div>
+          <div class="cat-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div class="cat-card" onclick="toggleCat(this)">
+          <input type="checkbox" />
+          <div class="cat-icon">🧑‍💼</div>
+          <div class="cat-name">HR Policies</div>
+          <div class="cat-desc">People & conduct rules</div>
+          <div class="cat-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div class="cat-card" onclick="toggleCat(this)">
+          <input type="checkbox" />
+          <div class="cat-icon">🛡️</div>
+          <div class="cat-name">Safety</div>
+          <div class="cat-desc">Health & safety protocols</div>
+          <div class="cat-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div class="cat-card" onclick="toggleCat(this)">
+          <input type="checkbox" />
+          <div class="cat-icon">💬</div>
+          <div class="cat-name">Customer Service</div>
+          <div class="cat-desc">Client interaction scripts</div>
+          <div class="cat-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+        <div class="cat-card" onclick="toggleCat(this)">
+          <input type="checkbox" />
+          <div class="cat-icon">💻</div>
+          <div class="cat-name">Technical</div>
+          <div class="cat-desc">IT & system procedures</div>
+          <div class="cat-check"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4l3 3 5-6" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+      </div>
+
+      <!-- Training Focus -->
+      <div class="field-group" style="margin-top:8px;">
+        <label class="field-label">Key training topics (optional)</label>
+        <div class="topic-input-wrap">
+          <input class="field-input topic-input" type="text" id="topic-input" placeholder="e.g. Emergency shutdown procedure" onkeydown="if(event.key==='Enter'){addTopic();}" />
+          <button class="topic-add-btn" onclick="addTopic()">Add</button>
+        </div>
+        <div class="topics-wrap" id="topics-wrap"></div>
+        <p class="field-hint">Press Enter or click Add. These become priority areas for simulations.</p>
+      </div>
+
+      <!-- Audit toggle -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;background:rgba(255,255,255,0.7);border:1.5px solid rgba(26,26,26,0.09);border-radius:12px;margin-top:4px;">
+        <div>
+          <p style="font-size:14px;font-weight:600;color:#1C1C1E;">Enable Live Auditing</p>
+          <p style="font-size:12px;color:#9B9890;margin-top:2px;">AI monitors ongoing work & alerts manager on violations</p>
+        </div>
+        <label style="position:relative;display:inline-block;width:44px;height:24px;cursor:pointer;">
+          <input type="checkbox" id="audit-toggle" style="opacity:0;width:0;height:0;" onchange="updateToggle(this)" />
+          <span id="toggle-track" style="position:absolute;inset:0;background:rgba(26,26,26,0.15);border-radius:100px;transition:background .3s;"></span>
+          <span id="toggle-thumb" style="position:absolute;top:3px;left:3px;width:18px;height:18px;background:white;border-radius:50%;transition:transform .3s;box-shadow:0 1px 4px rgba(0,0,0,0.2);"></span>
+        </label>
+      </div>
+
+      <div class="step-nav">
+        <button class="btn-back" onclick="goTo(2)">
+          <i data-lucide="arrow-left" style="width:15px;height:15px;"></i> Back
+        </button>
+        <button class="btn-next" onclick="goTo(4)">
+          Activate AI Brain <i data-lucide="zap" style="width:16px;height:16px;"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Success -->
+  <div class="panel" id="panel-4">
+    <div class="card rv">
+      <div class="success-wrap">
+        <div class="success-icon">
+          <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+            <path d="M7 18l7 7 15-14" stroke="#C8A96E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2 class="success-title">AI Brain Activated!</h2>
+        <p class="success-sub">Your company's AI Brain is now live. It has learned from your documents and is ready to train and audit your team.</p>
+
+        <div class="success-stats">
+          <div class="stat-box">
+            <div class="stat-num" id="fin-docs">0</div>
+            <div class="stat-label">Documents Trained</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num" id="fin-company" style="font-size:20px;">—</div>
+            <div class="stat-label">Company</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-num">100%</div>
+            <div class="stat-label">Brain Accuracy</div>
+          </div>
+        </div>
+
+        <a href="dashboard.html" class="go-dashboard">
+          Go to Dashboard <i data-lucide="arrow-right" style="width:18px;height:18px;"></i>
+        </a>
+
+        <p style="font-size:13px;color:#9B9890;margin-top:24px;">You can upload more documents anytime from your dashboard.</p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /onboard-wrap -->
+
+<script>
+  lucide.createIcons();
+
+  /* ── STEPPER ── */
+  let currentStep = 1;
+  let uploadedFiles = [];
+
+  function goTo(n) {
+    // Validate step 1
+    if(n > 1 && currentStep === 1) {
+      if(!document.getElementById('company-name').value.trim()) {
+        document.getElementById('company-name').focus();
+        document.getElementById('company-name').style.borderColor = '#C0392B';
+        setTimeout(()=>document.getElementById('company-name').style.borderColor='',2000);
+        return;
+      }
+    }
+
+    // Hide current
+    document.getElementById('panel-'+currentStep).classList.remove('active');
+
+    // Update stepper
+    for(let i=1;i<=4;i++){
+      const sc = document.getElementById('sc-'+i);
+      const sl = document.getElementById('sl-'+i);
+      if(!sc) continue;
+      sc.className = 'step-circle ' + (i < n ? 'done' : i === n ? 'active' : 'idle');
+      sl.className = 'step-label' + (i < n ? ' done' : i === n ? ' active' : '');
+      if(i < 4){
+        const line = document.getElementById('line-'+i);
+        if(line) line.classList.toggle('done', i < n);
+      }
+      if(i < n && sc.className.includes('done')) {
+        sc.innerHTML = '<svg width="14" height="11" viewBox="0 0 14 11" fill="none"><path d="M1 5l4 4 8-8" stroke="#FAF8F5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      } else if(i >= n) {
+        sc.textContent = i;
+      }
+    }
+
+    currentStep = n;
+    document.getElementById('panel-'+n).classList.add('active');
+
+    // Sync brain data on step 3
+    if(n === 3) {
+      document.getElementById('brain-doc-count').textContent = uploadedFiles.length;
+      document.getElementById('brain-company-name').textContent = document.getElementById('company-name').value || 'Your Company';
+    }
+
+    // Sync finish data on step 4
+    if(n === 4) {
+      document.getElementById('fin-docs').textContent = uploadedFiles.length;
+      document.getElementById('fin-company').textContent = document.getElementById('company-name').value || '—';
+      document.getElementById('fin-company').style.fontSize = '18px';
+      // simulate activation
+      simulateActivation();
+    }
+
+    // Animate reveal
+    setTimeout(()=>{
+      document.querySelectorAll('#panel-'+n+' .rv').forEach(el=>el.classList.add('in'));
+    }, 80);
+
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  /* ── FILE HANDLING ── */
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('dragover', e=>{e.preventDefault();zone.classList.add('dragover');});
+  zone.addEventListener('dragleave', ()=>zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e=>{e.preventDefault();zone.classList.remove('dragover');handleFiles(e.dataTransfer.files);});
+
+  function handleFiles(files) {
+    Array.from(files).forEach(f => {
+      if(uploadedFiles.find(x=>x.name===f.name)) return;
+      uploadedFiles.push(f);
+      renderFile(f);
+    });
+    updateSummary();
+  }
+
+  function renderFile(f) {
+    const ext = f.name.split('.').pop().toLowerCase();
+    const size = f.size < 1024*1024 ? (f.size/1024).toFixed(0)+' KB' : (f.size/1024/1024).toFixed(1)+' MB';
+    const list = document.getElementById('file-list');
+    const item = document.createElement('div');
+    item.className = 'file-item';
+    item.id = 'fi-'+f.name.replace(/[^a-z0-9]/gi,'_');
+    item.innerHTML = `
+      <div class="file-icon ${ext}">${ext.toUpperCase()}</div>
+      <span class="file-name">${f.name}</span>
+      <span class="file-size">${size}</span>
+      <span class="file-status uploading"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#C8A96E" stroke-width="1.5" stroke-dasharray="10 20" stroke-linecap="round"><animateTransform attributeName="transform" type="rotate" from="0 6 6" to="360 6 6" dur=".8s" repeatCount="indefinite"/></circle></svg> Processing</span>
+      <button class="file-remove" onclick="removeFile('${f.name.replace(/'/g,"\\'")}')"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2 2l10 10M12 2L2 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>
+    `;
+    list.appendChild(item);
+    // Simulate processing → ready
+    setTimeout(()=>{
+      const statusEl = item.querySelector('.file-status');
+      if(statusEl){
+        statusEl.className='file-status ready';
+        statusEl.innerHTML='<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg> Ready';
+      }
+    }, 800 + Math.random()*1200);
+  }
+
+  function removeFile(name) {
+    uploadedFiles = uploadedFiles.filter(f=>f.name!==name);
+    const id = 'fi-'+name.replace(/[^a-z0-9]/gi,'_');
+    const el = document.getElementById(id);
+    if(el){el.style.opacity='0';el.style.transform='translateX(20px)';el.style.transition='all .3s';setTimeout(()=>el.remove(),300);}
+    updateSummary();
+  }
+
+  function updateSummary() {
+    const summary = document.getElementById('upload-summary');
+    const total = uploadedFiles.reduce((s,f)=>s+f.size,0);
+    const totalMB = (total/1024/1024).toFixed(1);
+    const prog = Math.min(100, uploadedFiles.length * 12);
+    document.getElementById('summary-text').textContent = uploadedFiles.length + ' file' + (uploadedFiles.length!==1?'s':'') + ' ready';
+    document.getElementById('summary-size').textContent = totalMB + ' MB total';
+    document.getElementById('upload-prog').style.width = prog+'%';
+    summary.style.display = uploadedFiles.length > 0 ? 'block' : 'none';
+  }
+
+  /* ── CATEGORIES ── */
+  function toggleCat(el) {
+    el.classList.toggle('selected');
+    el.querySelector('input').checked = el.classList.contains('selected');
+  }
+
+  /* ── TOPICS ── */
+  let topics = [];
+  function addTopic() {
+    const inp = document.getElementById('topic-input');
+    const val = inp.value.trim();
+    if(!val || topics.includes(val)) return;
+    topics.push(val);
+    const wrap = document.getElementById('topics-wrap');
+    const tag = document.createElement('span');
+    tag.className = 'topic-tag';
+    tag.innerHTML = val + `<button class="topic-x" onclick="removeTopic('${val.replace(/'/g,"\\'")}',this.parentElement)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></button>`;
+    wrap.appendChild(tag);
+    inp.value = '';
+  }
+  function removeTopic(val, el) {
+    topics = topics.filter(t=>t!==val);
+    if(el) el.remove();
+  }
+
+  /* ── TOGGLE ── */
+  function updateToggle(el) {
+    document.getElementById('toggle-track').style.background = el.checked ? '#C8A96E' : 'rgba(26,26,26,0.15)';
+    document.getElementById('toggle-thumb').style.transform = el.checked ? 'translateX(20px)' : 'translateX(0)';
+  }
+
+  /* ── ACTIVATION ANIMATION ── */
+  function simulateActivation() {
+    let count = 0;
+    const target = uploadedFiles.length;
+    const el = document.getElementById('fin-docs');
+    if(target === 0) return;
+    const interval = setInterval(()=>{
+      count++;
+      el.textContent = count;
+      if(count >= target) clearInterval(interval);
+    }, 60);
+  }
+
+  /* ── SCROLL HEADER ── */
+  window.addEventListener('scroll',()=>{
+    document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 20);
+  });
+
+  /* ── MOBILE MENU ── */
+  const btn=document.getElementById('ham-btn'),
+        menu=document.getElementById('mobile-menu'),
+        overlay=document.getElementById('mob-overlay'),
+        close=document.getElementById('mob-close');
+  function openMenu(){menu.classList.add('open');overlay.classList.add('open');btn.classList.add('open');}
+  function closeMenu(){menu.classList.remove('open');overlay.classList.remove('open');btn.classList.remove('open');}
+  btn.addEventListener('click',openMenu);
+  close.addEventListener('click',closeMenu);
+  overlay.addEventListener('click',closeMenu);
+
+  /* ── ENTER KEY for company form ── */
+  document.getElementById('company-name').addEventListener('keydown', e=>{ if(e.key==='Enter') goTo(2); });
+
+  /* init scroll reveal */
+  setTimeout(()=>document.querySelectorAll('.rv').forEach(el=>el.classList.add('in')), 100);
+
+  /* re-create icons after dynamic content */
+  setTimeout(()=>lucide.createIcons(), 200);
+</script>
+</body>
+</html>

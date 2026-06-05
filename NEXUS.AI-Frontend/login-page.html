@@ -28,7 +28,7 @@
             align-items: center; 
             justify-content: center;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
         }
 
@@ -143,8 +143,135 @@
         }
         .forgot-link:hover { color: var(--accent); }
     </style>
+<style id="nexus-mobile-patch">
+/* NEXUS.AI MOBILE RESPONSIVE PATCH */
+
+@media (max-width: 768px), (hover: none) {
+  #cursor, #cursor-ring, .trail-dot { display: none !important; }
+  body, a, button, .tab-btn, .try-btn, .modal-btn, .chip, .kpi-card, .qa-btn, .nav-item, input[type=range] { cursor: auto !important; }
+}
+
+@media (max-width: 768px) {
+  html, body { overflow-x: hidden !important; }
+  * { max-width: 100%; }
+  .header-inner, .hdr-inner { padding: 0 16px !important; height: 60px !important; }
+  .ham-btn { display: flex !important; }
+  .site-header nav, .nav-actions { display: none !important; }
+  .page { padding: 0 16px 80px !important; }
+  .section { padding-left: 16px !important; padding-right: 16px !important; }
+  .hero { padding: 60px 16px 50px !important; min-height: auto !important; }
+  .hero-inner { width: 100% !important; }
+  .hero-title, h1.hero-title { font-size: clamp(2rem, 9vw, 3rem) !important; }
+  .bento-grid, .row.r3, .row.r2a, .row.r2b, .rep-grid, .kpi-grid, .lib-grid, .sol-grid, .process-grid, .pricing-grid, .contact-grid { grid-template-columns: 1fr !important; }
+  .bento-card.large { grid-column: span 1 !important; }
+  .section { padding-bottom: 60px !important; margin-bottom: 60px !important; }
+  .divider { margin-bottom: 48px !important; }
+  .hero-badges { flex-wrap: wrap !important; justify-content: center !important; }
+  .scroll-hint { display: none !important; }
+  .ticker-inner { font-size: 10px !important; gap: 1.5rem !important; }
+  .footer-inner { flex-direction: column !important; text-align: center !important; }
+  .footer-links { flex-wrap: wrap !important; justify-content: center !important; }
+  .final-cta, .cta-section { padding: 60px 16px !important; }
+  .cta-inner { width: 100% !important; }
+  .hero-stats { flex-direction: column !important; gap: 8px !important; }
+  .stat { border-right: none !important; border-bottom: 1px solid rgba(28,28,30,0.1) !important; padding: 10px 0 !important; }
+  .stat:last-child { border-bottom: none !important; }
+  .settings-grid { grid-template-columns: 1fr !important; }
+  .settings-nav { flex-direction: row !important; flex-wrap: wrap !important; gap: 4px !important; overflow-x: auto !important; }
+  .orb-row { width: 92% !important; }
+  .roi-body { grid-template-columns: 1fr !important; }
+  .roi-sep { display: none !important; }
+  .roi-left, .roi-right { padding: 24px 20px !important; }
+  .masthead-meta { display: none !important; }
+  .block-body, .featured-box, .pull-quote { padding-left: 0 !important; margin-left: 0 !important; }
+  .block-num { display: none !important; }
+  .block-header { gap: 0.75rem !important; }
+  .table-wrap, .cmp-table { overflow-x: auto !important; display: block !important; }
+  .tab-row { flex-wrap: wrap !important; padding: 12px 16px 0 !important; }
+  .tab-btn { font-size: 11px !important; padding: 6px 13px !important; }
+  .try-btn { margin-left: 0 !important; }
+  .progress-nav { overflow-x: auto !important; }
+  .pnav-item { font-size: 0.6rem !important; padding: 0.15rem 0.6rem !important; }
+  .iso-stage { height: 200px !important; }
+  .flow-svg { height: auto !important; }
+  .modal { padding: 28px 20px !important; width: 95% !important; }
+  .section-title, .sec-title, .cta-title { word-break: break-word !important; }
+  .stats-row { flex-direction: column !important; border-radius: 16px !important; }
+  .stat-item { padding: 18px 16px !important; }
+  .process-grid::before { display: none !important; }
+}
+
+@media (max-width: 600px) {
+  .hero-title { font-size: 3rem !important; }
+}
+
+@media (max-width: 480px) {
+  .hero-title, .cta-title, .sec-title, .section-title { font-size: clamp(1.6rem, 8vw, 2.4rem) !important; }
+  .hero-badge { font-size: 0.65rem !important; padding: 4px 10px !important; }
+  .btn-primary, .btn-outline2, .cta-btn, .confirm-btn { padding: 12px 22px !important; font-size: 12px !important; }
+  .hero-btns { flex-direction: column !important; width: 100% !important; }
+  .hero-btns > * { width: 100% !important; text-align: center !important; justify-content: center !important; }
+  .plan-card, .ent-outer { width: 100% !important; }
+  .pricing-grid { grid-template-columns: 1fr !important; }
+  .contact-grid { grid-template-columns: 1fr !important; }
+  .roi-number { font-size: 40px !important; }
+  .kpi-val { font-size: 36px !important; }
+  .card-val { font-size: 20px !important; }
+  .hdr-inner { padding: 0 12px !important; }
+  .lib-grid { grid-template-columns: 1fr !important; }
+  .alert-card { flex-direction: column !important; }
+  .resolve-btn { align-self: flex-start !important; }
+  .sim-row { flex-wrap: wrap !important; }
+  .toggle-row { flex-wrap: wrap !important; gap: 10px !important; }
+  .toggle-shell { padding: 20px 16px !important; }
+  .page { padding: 0 12px 60px !important; }
+}
+
+@media (min-width: 481px) and (max-width: 768px) {
+  .bento-grid { grid-template-columns: 1fr 1fr !important; }
+  .bento-card.large { grid-column: span 2 !important; }
+  .lib-grid { grid-template-columns: 1fr 1fr !important; }
+  .kpi-grid { grid-template-columns: 1fr 1fr !important; }
+}
+
+@media (max-width: 768px) {
+  .card.flow-card, .flow-card { overflow-x: auto !important; }
+  .flow-svg { min-width: 700px !important; }
+}
+
+@media (max-width: 768px) {
+  #shell { grid-template-rows: 52px 1fr 38px !important; grid-template-columns: 1fr !important; width: 100vw !important; }
+  #sidebar { display: none !important; }
+  #header { padding: 0 12px !important; grid-column: 1 !important; }
+  #main { padding: 14px 12px !important; grid-row: 2 !important; grid-column: 1 !important; }
+  #footer { grid-column: 1 !important; padding: 0 12px !important; font-size: 10.5px !important; }
+  #shell.sidebar-open #sidebar { display: flex !important; position: fixed !important; top: 0 !important; left: 0 !important; width: 220px !important; height: 100vh !important; z-index: 150 !important; background: rgba(250,248,245,0.98) !important; box-shadow: 4px 0 24px rgba(0,0,0,0.12) !important; }
+  .search-wrap { max-width: 160px !important; }
+  .h-actions { gap: 4px !important; }
+  .pg-title { font-size: 15px !important; }
+  .pg-sub { font-size: 11px !important; }
+  .action-btn { padding: 7px 12px !important; font-size: 11px !important; }
+  #toast { width: 90vw !important; font-size: 12px !important; }
+  .s-input { width: 140px !important; }
+}
+
+@media (max-width: 768px) {
+  body.login-body { overflow-y: auto !important; align-items: flex-start !important; padding-top: 60px !important; }
+  .login-page { flex-direction: column !important; padding: 20px 20px 40px !important; gap: 28px !important; align-items: stretch !important; max-width: 100% !important; overflow: visible !important; }
+  .login-page .left { flex: none !important; width: 100% !important; }
+  .login-page .headline { font-size: clamp(1.8rem, 8vw, 2.8rem) !important; line-height: 1.1 !important; }
+  .login-page .right { width: 100% !important; flex-shrink: 1 !important; }
+  .login-page .card { min-height: auto !important; padding: 28px 20px !important; }
+  .back-btn { top: 12px !important; left: 12px !important; }
+}
+@media (max-width: 360px) {
+  .login-page .headline { font-size: 1.6rem !important; }
+  .login-page .card { padding: 20px 14px !important; }
+}
+
+</style>
 </head>
-<body>
+<body class="login-body">
 
 <canvas id="bgCanvas"></canvas>
 
@@ -156,7 +283,7 @@
     Back
 </a>
 
-<div class="page">
+<div class="page login-page">
     <div class="left">
         <div class="logo"><div class="logo-box">🧠</div> AI-Brain</div>
         <h1 class="headline">Operational<br>excellence<br><span>starts here.</span></h1>
