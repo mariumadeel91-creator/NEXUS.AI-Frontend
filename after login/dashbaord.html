@@ -597,6 +597,181 @@
     /* ══ TILT CARD 3D ══ */
     .tilt-card{transform-style:preserve-3d;transition:transform .4s ease;}
   </style>
+<style>
+
+/* ════════════════════════════════════════════
+   DASHBOARD — MOBILE RESPONSIVE FIX
+   ════════════════════════════════════════════ */
+
+/* Hide custom cursor on touch */
+@media (hover: none) {
+  #cur, #cur-ring, #cursor, #cursor-ring { display: none !important; }
+  body { cursor: auto !important; }
+}
+
+@media (max-width: 900px) {
+  /* Allow page to scroll normally */
+  html, body {
+    overflow: auto !important;
+    height: auto !important;
+    min-height: 100vh !important;
+  }
+
+  /* Header */
+  .header-inner {
+    padding: 0 16px !important;
+    height: 60px !important;
+  }
+  .header-search {
+    display: none !important;
+  }
+
+  /* Layout: sidebar + main side-by-side → stacked */
+  .dash-wrap {
+    flex-direction: column !important;
+    min-height: auto !important;
+  }
+
+  /* Sidebar hidden on mobile — hamburger approach */
+  .sidebar {
+    display: none !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 260px !important;
+    height: 100vh !important;
+    z-index: 300 !important;
+    padding: 20px 14px !important;
+    box-shadow: 4px 0 30px rgba(0,0,0,0.12) !important;
+    transform: translateX(-100%) !important;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1) !important;
+  }
+  .sidebar.mob-open {
+    display: flex !important;
+    transform: translateX(0) !important;
+  }
+
+  /* Mobile menu toggle button */
+  .mob-menu-btn {
+    display: flex !important;
+  }
+
+  /* Main content full width */
+  .main {
+    padding: 20px 16px !important;
+    width: 100% !important;
+    overflow-x: hidden !important;
+  }
+  .main-inner {
+    max-width: 100% !important;
+  }
+
+  /* Stats grid: 4-col → 2-col */
+  .stats-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 12px !important;
+  }
+
+  /* Main content grid: sidebar-style column → single */
+  .main-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Top bar wrap */
+  .top-bar {
+    margin-bottom: 20px !important;
+  }
+  .top-actions {
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  /* Cards */
+  .card {
+    padding: 18px 16px !important;
+  }
+
+  /* Employee table: hide less important columns */
+  .emp-table th:nth-child(3),
+  .emp-table td:nth-child(3),
+  .emp-table th:nth-child(4),
+  .emp-table td:nth-child(4) {
+    display: none !important;
+  }
+
+  /* Chart bars shrink to fit */
+  .chart-bars {
+    gap: 4px !important;
+  }
+
+  /* Brain health row → column */
+  .brain-health {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 12px !important;
+  }
+
+  /* Toast notification */
+  #toast {
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 20px !important;
+    transform: none !important;
+    width: auto !important;
+  }
+
+  /* Notification panel */
+  #notif-panel {
+    right: 8px !important;
+    width: calc(100vw - 16px) !important;
+    max-width: 380px !important;
+  }
+
+  /* User dropdown */
+  .user-dropdown {
+    right: 0 !important;
+    left: auto !important;
+  }
+
+  /* Background orbs — hide on mobile for performance */
+  .bg-orb, .aurora-line, .scan-grid {
+    display: none !important;
+  }
+}
+
+/* Mobile hamburger button — inject it via JS if not present */
+@media (max-width: 900px) {
+  .mob-menu-btn {
+    display: flex !important;
+    flex-direction: column;
+    gap: 5px;
+    padding: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-right: 4px;
+  }
+  .mob-menu-btn span {
+    display: block;
+    width: 20px;
+    height: 2px;
+    background: #1C1C1E;
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+  }
+}
+
+@media (max-width: 500px) {
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .stat-card {
+    padding: 18px 16px !important;
+  }
+}
+
+</style>
 </head>
 <body>
 
@@ -1363,5 +1538,57 @@ window.addEventListener('load',function(){
   });
 });
 </script>
+
+<script>
+// Mobile sidebar toggle
+(function() {
+  function addMobToggle() {
+    var headerInner = document.querySelector('.header-inner');
+    if (!headerInner) return;
+    if (document.querySelector('.mob-menu-btn')) return;
+
+    var btn = document.createElement('button');
+    btn.className = 'mob-menu-btn';
+    btn.setAttribute('aria-label', 'Toggle menu');
+    btn.innerHTML = '<span></span><span></span><span></span>';
+
+    var sidebar = document.querySelector('.sidebar');
+    var overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:299;background:rgba(26,26,26,0.4);backdrop-filter:blur(4px);display:none;';
+    document.body.appendChild(overlay);
+
+    btn.addEventListener('click', function() {
+      if (sidebar) {
+        sidebar.style.display = 'flex';
+        setTimeout(function(){ sidebar.classList.toggle('mob-open'); }, 10);
+        overlay.style.display = sidebar.classList.contains('mob-open') ? 'block' : 'none';
+      }
+    });
+    overlay.addEventListener('click', function() {
+      if (sidebar) sidebar.classList.remove('mob-open');
+      overlay.style.display = 'none';
+    });
+
+    var logo = headerInner.querySelector('.logo');
+    if (logo) {
+      headerInner.insertBefore(btn, logo);
+    } else {
+      headerInner.prepend(btn);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addMobToggle);
+  } else {
+    addMobToggle();
+  }
+
+  // Only show on mobile
+  var style = document.createElement('style');
+  style.textContent = '@media(min-width:901px){.mob-menu-btn{display:none!important;}}';
+  document.head.appendChild(style);
+})();
+</script>
+
 </body>
 </html>
