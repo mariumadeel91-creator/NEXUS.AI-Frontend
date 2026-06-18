@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee AI Chat — Nexus.AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #FAF8F5;
+    --ink: #1C1C1E;
+    --gold: #C8A96E;
+    --gold-light: #e8d5aa;
+    --gold-dim: rgba(200,169,110,0.12);
+    --muted: #6B6B70;
+    --surface: #F0EDE8;
+    --border: rgba(200,169,110,0.25);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 40px;
+    background: rgba(250,248,245,0.9);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+    animation: slideDown 0.5s ease;
+    z-index: 10;
+  }
+  @keyframes slideDown { from { transform: translateY(-100%); opacity: 0; } to { transform: none; opacity: 1; } }
+  .nav-logo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+  .logo-mark { width: 34px; height: 34px; background: #1C1C1E; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.4s; }
+  .nav-logo:hover .logo-mark { transform: rotate(15deg) scale(1.08); box-shadow: 0 4px 20px rgba(200,169,110,0.35); }
+  .logo-text { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: .18em; color: #1C1C1E; }
+  .nav-badge { display: flex; align-items: center; gap: 8px; font-size: 0.72rem; font-family: 'JetBrains Mono', monospace; color: var(--muted); }
+  .sidebar-back {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 14px 20px 0;
+    text-decoration: none;
+    color: var(--muted);
+    font-size: 0.78rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    transition: color 0.2s;
+    width: fit-content;
+  }
+  .sidebar-back:hover { color: var(--gold); }
+  .sidebar-back svg { width: 15px; height: 15px; transition: transform 0.2s; flex-shrink: 0; }
+  .sidebar-back:hover svg { transform: translateX(-3px); }
+  .sidebar-back-divider { height: 1px; background: var(--border); margin: 12px 20px 0; }
+  .online-dot { width: 7px; height: 7px; border-radius: 50%; background: #22c55e; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{ box-shadow: 0 0 0 0 rgba(34,197,94,0.4);} 70%{ box-shadow: 0 0 0 7px rgba(34,197,94,0);} }
+
+  .chat-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    background: white;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeIn 0.6s ease 0.2s both;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+  .sidebar-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sidebar-title {
+    font-size: 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--gold);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.82rem;
+    color: var(--muted);
+  }
+
+  .topic-list { flex: 1; overflow-y: auto; padding: 12px; }
+  .topic-list::-webkit-scrollbar { width: 4px; }
+  .topic-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+  .topic-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 2px;
+  }
+  .topic-item:hover { background: var(--surface); }
+  .topic-item.active { background: var(--gold-dim); }
+  .topic-icon { font-size: 1rem; width: 24px; text-align: center; flex-shrink: 0; }
+  .topic-name { font-size: 0.82rem; font-weight: 500; color: var(--ink); }
+  .topic-sub { font-size: 0.7rem; color: var(--muted); }
+
+  /* Chat area */
+  .chat-area {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: fadeIn 0.6s ease 0.3s both;
+  }
+
+  .chat-header {
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-shrink: 0;
+    background: rgba(250,248,245,0.6);
+  }
+  .ai-avatar {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ink), #3c3c3e);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    border: 2px solid var(--border);
+    flex-shrink: 0;
+  }
+  .chat-header-info { flex: 1; }
+  .chat-header-name { font-weight: 600; font-size: 0.92rem; }
+  .chat-header-sub { font-size: 0.75rem; color: var(--muted); }
+  .chat-header-tag {
+    font-size: 0.68rem;
+    padding: 4px 10px;
+    background: var(--gold-dim);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .messages::-webkit-scrollbar { width: 4px; }
+  .messages::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+  .msg { display: flex; gap: 12px; animation: msgIn 0.3s ease; }
+  @keyframes msgIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+  .msg.user { flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+  .msg.ai .msg-avatar { background: linear-gradient(135deg, var(--ink), #3c3c3e); color: var(--gold); }
+  .msg.user .msg-avatar { background: var(--gold-dim); color: var(--gold); border: 1px solid var(--border); }
+
+  .msg-bubble {
+    max-width: 62%;
+    padding: 14px 18px;
+    border-radius: 16px;
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+  .msg.ai .msg-bubble {
+    background: white;
+    border: 1px solid var(--border);
+    border-top-left-radius: 4px;
+    color: var(--ink);
+  }
+  .msg.user .msg-bubble {
+    background: var(--ink);
+    color: var(--bg);
+    border-top-right-radius: 4px;
+  }
+
+  .msg-time {
+    font-size: 0.68rem;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 5px;
+    display: block;
+  }
+  .msg.user .msg-time { text-align: right; }
+
+  .policy-ref {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.72rem;
+    background: var(--gold-dim);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 3px 10px;
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+    margin-top: 8px;
+    cursor: pointer;
+  }
+
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 14px 18px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    border-top-left-radius: 4px;
+    width: fit-content;
+  }
+  .typing-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+    animation: typingBounce 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes typingBounce { 0%,60%,100%{ transform: translateY(0); } 30%{ transform: translateY(-5px); } }
+
+  /* Input area */
+  .chat-input-area {
+    padding: 20px 28px;
+    border-top: 1px solid var(--border);
+    background: rgba(250,248,245,0.7);
+    backdrop-filter: blur(10px);
+    flex-shrink: 0;
+  }
+
+  .quick-prompts {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .quick-btn {
+    font-size: 0.75rem;
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: white;
+    color: var(--ink);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .quick-btn:hover { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+  .input-row {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  .chat-input {
+    flex: 1;
+    resize: none;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    background: white;
+    color: var(--ink);
+    outline: none;
+    line-height: 1.5;
+    min-height: 44px;
+    max-height: 120px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .chat-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(200,169,110,0.1); }
+  .chat-input::placeholder { color: #A8A8B0; }
+
+  .send-btn {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    background: var(--ink);
+    border: none;
+    color: var(--gold);
+    font-size: 1.1rem;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .send-btn:hover { background: var(--gold); color: var(--ink); transform: translateY(-1px); }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
+        <path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="#FAF8F5" stroke-width="1.2"/>
+        <circle cx="7" cy="7" r="2" fill="#C8A96E"/>
+      </svg>
+    </div>
+    <span class="logo-text">NEXUS.AI</span>
+  </a>
+  <div class="nav-badge">
+    <div class="online-dot"></div>
+    POLICY ASSISTANT ONLINE
+  </div>
+</nav>
+
+<div class="chat-layout">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="javascript:history.back()" class="sidebar-back">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+      Back
+    </a>
+    <div class="sidebar-back-divider"></div>
+    <div class="sidebar-header">
+      <div class="sidebar-title">Topics</div>
+      <div class="search-box" style="padding:0; background:var(--surface); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; gap:8px; padding-left:12px;">
+        <span style="font-size:0.85rem; flex-shrink:0;">🔍</span>
+        <input id="policy-search" type="text" placeholder="Search policies..." oninput="filterTopics(this.value)" style="flex:1; border:none; background:transparent; outline:none; font-size:0.82rem; color:var(--ink); font-family:'DM Sans',sans-serif; padding:8px 12px 8px 0;" />
+      </div>
+    </div>
+    <div class="topic-list">
+      <div class="topic-item active" onclick="switchTopic(this, 'Compliance & Legal', '⚖️', '8 policies', 'compliance')">
+        <div class="topic-icon">⚖️</div>
+        <div>
+          <div class="topic-name">Compliance & Legal</div>
+          <div class="topic-sub">8 policies</div>
+        </div>
+      </div>
+      <div class="topic-item" onclick="switchTopic(this, 'HR & Employee Relations', '🤝', '12 policies', 'hr')">
+        <div class="topic-icon">🤝</div>
+        <div>
+          <div class="topic-name">HR & Employee Relations</div>
+          <div class="topic-sub">12 policies</div>
+        </div>
+      </div>
+      <div class="topic-item" onclick="switchTopic(this, 'Data Privacy', '🔒', '5 policies', 'privacy')">
+        <div class="topic-icon">🔒</div>
+        <div>
+          <div class="topic-name">Data Privacy</div>
+          <div class="topic-sub">5 policies</div>
+        </div>
+      </div>
+      <div class="topic-item" onclick="switchTopic(this, 'Leave & Benefits', '💼', '7 policies', 'leave')">
+        <div class="topic-icon">💼</div>
+        <div>
+          <div class="topic-name">Leave & Benefits</div>
+          <div class="topic-sub">7 policies</div>
+        </div>
+      </div>
+      <div class="topic-item" onclick="switchTopic(this, 'Health & Safety', '🛡️', '6 policies', 'safety')">
+        <div class="topic-icon">🛡️</div>
+        <div>
+          <div class="topic-name">Health & Safety</div>
+          <div class="topic-sub">6 policies</div>
+        </div>
+      </div>
+      <div class="topic-item" onclick="switchTopic(this, 'IT & Device Policy', '💻', '4 policies', 'it')">
+        <div class="topic-icon">💻</div>
+        <div>
+          <div class="topic-name">IT & Device Policy</div>
+          <div class="topic-sub">4 policies</div>
+        </div>
+      </div>
+      <div class="topic-item" onclick="switchTopic(this, 'Performance Reviews', '📊', '3 policies', 'performance')">
+        <div class="topic-icon">📊</div>
+        <div>
+          <div class="topic-name">Performance Reviews</div>
+          <div class="topic-sub">3 policies</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chat -->
+  <div class="chat-area">
+    <div class="chat-header">
+      <div class="ai-avatar">⬡</div>
+      <div class="chat-header-info">
+        <div class="chat-header-name">Nexus Policy Assistant</div>
+        <div class="chat-header-sub">Instant answers to company policy questions</div>
+      </div>
+      <span class="chat-header-tag">employee-chat.html</span>
+    </div>
+
+    <div class="messages" id="messages">
+      <!-- AI greeting -->
+      <div class="msg ai">
+        <div class="msg-avatar">⬡</div>
+        <div>
+          <div class="msg-bubble">
+            Hello! I'm your Nexus Policy Assistant. I can answer any questions about company policies, compliance guidelines, leave policies, code of conduct, and more. <br><br>What would you like to know today?
+          </div>
+          <span class="msg-time">09:00 AM</span>
+        </div>
+      </div>
+
+      <!-- User msg -->
+      <div class="msg user">
+        <div class="msg-avatar">JK</div>
+        <div>
+          <div class="msg-bubble">What is the company's policy on remote work and working from home?</div>
+          <span class="msg-time">09:02 AM</span>
+        </div>
+      </div>
+
+      <!-- AI response -->
+      <div class="msg ai">
+        <div class="msg-avatar">⬡</div>
+        <div>
+          <div class="msg-bubble">
+            Great question! Here's a summary of our Remote Work Policy:<br><br>
+            <strong>Eligibility:</strong> Full-time employees who have completed their 90-day probation are eligible.<br><br>
+            <strong>Frequency:</strong> Up to 3 days per week remote, minimum 2 days in-office.<br><br>
+            <strong>Requirements:</strong> Stable internet connection, dedicated workspace, and available during core hours (10AM–4PM local time).<br><br>
+            Your manager must approve the arrangement, and it's reviewed quarterly.
+            <br><br>
+            <span class="policy-ref">📄 Remote Work Policy — Section 4.2</span>
+          </div>
+          <span class="msg-time">09:02 AM</span>
+        </div>
+      </div>
+
+      <!-- User msg 2 -->
+      <div class="msg user">
+        <div class="msg-avatar">JK</div>
+        <div>
+          <div class="msg-bubble">Can I take unpaid leave if I run out of annual leave days?</div>
+          <span class="msg-time">09:05 AM</span>
+        </div>
+      </div>
+
+      <!-- Typing indicator -->
+      <div class="msg ai" id="typing-msg">
+        <div class="msg-avatar">⬡</div>
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input-area">
+      <div class="quick-prompts">
+        <button class="quick-btn" onclick="sendQuick(this)">📋 Maternity/Paternity leave</button>
+        <button class="quick-btn" onclick="sendQuick(this)">⚕️ Medical leave policy</button>
+        <button class="quick-btn" onclick="sendQuick(this)">🎓 Training reimbursement</button>
+        <button class="quick-btn" onclick="sendQuick(this)">🚨 Report misconduct</button>
+      </div>
+      <div class="input-row">
+        <textarea class="chat-input" id="chat-input" placeholder="Ask about any company policy..." rows="1"></textarea>
+        <button class="send-btn" onclick="sendMsg()">→</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Show response after delay
+  setTimeout(() => {
+    const typing = document.getElementById('typing-msg');
+    const ai = document.createElement('div');
+    ai.className = 'msg ai';
+    ai.innerHTML = `
+      <div class="msg-avatar">⬡</div>
+      <div>
+        <div class="msg-bubble">
+          Yes, unpaid leave is available under certain circumstances:<br><br>
+          <strong>Eligibility:</strong> Employees who have exhausted all paid leave balances.<br><br>
+          <strong>Duration:</strong> Up to 30 calendar days per year with manager approval. Extended leave (30+ days) requires HR Director sign-off.<br><br>
+          <strong>Process:</strong> Submit a formal request through the HR portal at least 5 working days in advance.<br><br>
+          Note: Benefits remain active during unpaid leave, but salary accruals are paused.
+          <br><br>
+          <span class="policy-ref">📄 Leave Policy — Section 7.1 &amp; 7.3</span>
+        </div>
+        <span class="msg-time">09:05 AM</span>
+      </div>
+    `;
+    typing.replaceWith(ai);
+    scrollBottom();
+  }, 2000);
+
+  function scrollBottom() {
+    const m = document.getElementById('messages');
+    m.scrollTop = m.scrollHeight;
+  }
+
+  function sendMsg() {
+    const input = document.getElementById('chat-input');
+    const text = input.value.trim();
+    if (!text) return;
+    addUserMsg(text);
+    input.value = '';
+    addTyping();
+    setTimeout(() => {
+      replaceTyping("I'm processing your policy question about: <em>" + text + "</em>. Let me look that up in the company policy database...<br><br>For detailed answers, I'd recommend connecting this to the live policy database backend.");
+    }, 1500);
+  }
+
+  function sendQuick(btn) {
+    addUserMsg(btn.textContent.slice(2).trim());
+    addTyping();
+    setTimeout(() => replaceTyping("I'll look that up for you right away..."), 1200);
+  }
+
+  function addUserMsg(text) {
+    const msgs = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'msg user';
+    div.innerHTML = `<div class="msg-avatar">JK</div><div><div class="msg-bubble">${text}</div><span class="msg-time">Now</span></div>`;
+    msgs.appendChild(div);
+    scrollBottom();
+  }
+
+  function addTyping() {
+    const msgs = document.getElementById('messages');
+    const div = document.createElement('div');
+    div.className = 'msg ai';
+    div.id = 'latest-typing';
+    div.innerHTML = `<div class="msg-avatar">⬡</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+    msgs.appendChild(div);
+    scrollBottom();
+  }
+
+  function replaceTyping(text) {
+    const t = document.getElementById('latest-typing');
+    if (!t) return;
+    const ai = document.createElement('div');
+    ai.className = 'msg ai';
+    ai.innerHTML = `<div class="msg-avatar">⬡</div><div><div class="msg-bubble">${text}</div><span class="msg-time">Now</span></div>`;
+    t.replaceWith(ai);
+    scrollBottom();
+  }
+
+  document.getElementById('chat-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(); }
+  });
+
+  const topicData = {
+    compliance: {
+      headerName: 'Compliance & Legal Assistant',
+      headerSub: 'Regulatory, legal & ethics policy guidance',
+      tag: 'compliance-legal',
+      greeting: "Hello! I'm your <strong>Compliance & Legal</strong> specialist. I can help with regulatory requirements, code of conduct, legal obligations, ethics guidelines, and more.<br><br>What compliance or legal question can I help you with today?",
+      quickBtns: ['📋 Code of Conduct', '⚖️ Anti-bribery policy', '🚨 Report misconduct', '📜 Legal obligations'],
+      convo: [
+        { role: 'user', text: 'What does our Code of Conduct say about conflicts of interest?', time: '10:14 AM' },
+        { role: 'ai', text: `Our Code of Conduct defines a <strong>conflict of interest</strong> as any situation where personal interests could improperly influence professional decisions.<br><br><strong>Key obligations:</strong><br>• Disclose any potential conflict to your manager and the Legal team in writing.<br>• Recuse yourself from decisions where a conflict exists.<br>• Never use company resources, information, or relationships for personal gain.<br><br><strong>Examples:</strong> Hiring a family member, owning shares in a supplier, accepting gifts above PKR 5,000 in value.<br><br>Violations are treated as gross misconduct and may lead to termination.<br><br><span class="policy-ref">📄 Code of Conduct — Section 3.1 & 3.4</span>`, time: '10:14 AM' },
+        { role: 'user', text: 'How do I report a compliance violation anonymously?', time: '10:17 AM' },
+        { role: 'ai', text: `You have two confidential reporting channels:<br><br><strong>1. Ethics Hotline:</strong> Available 24/7 at the number listed on the intranet. Calls are handled by a third-party provider — Nexus.AI does not receive caller ID.<br><br><strong>2. Online Whistleblower Portal:</strong> Submit reports at <em>compliance.nexusai.internal</em>. You can track your case with an anonymous case number.<br><br>All reports are investigated by the Chief Compliance Officer. Retaliation against reporters is strictly prohibited and itself constitutes a policy violation.<br><br><span class="policy-ref">📄 Whistleblower Policy — Section 2.0</span>`, time: '10:17 AM' }
+      ]
+    },
+    hr: {
+      headerName: 'HR & Employee Relations',
+      headerSub: 'People, culture & workplace policy guidance',
+      tag: 'hr-relations',
+      greeting: "Hi there! I'm your <strong>HR & Employee Relations</strong> assistant. Ask me anything about onboarding, workplace conduct, grievance procedures, employee rights, and more.<br><br>How can I help you today?",
+      quickBtns: ['👋 Onboarding process', '💬 Grievance procedure', '🤝 Conflict resolution', '📝 Employment contract'],
+      convo: [
+        { role: 'user', text: 'What is the grievance procedure if I have an issue with my manager?', time: '09:30 AM' },
+        { role: 'ai', text: `We take workplace concerns seriously. Here's the formal grievance process:<br><br><strong>Step 1 — Informal Resolution:</strong> Try to resolve the issue directly with your manager within 5 working days.<br><br><strong>Step 2 — HR Referral:</strong> If unresolved, submit a written grievance to HR via the employee portal. HR will acknowledge within 48 hours.<br><br><strong>Step 3 — Formal Hearing:</strong> A neutral HR officer conducts a hearing within 10 working days. You may bring a colleague as support.<br><br><strong>Step 4 — Appeal:</strong> If unsatisfied, escalate to the HR Director within 5 days of the decision.<br><br>All grievances are handled with full confidentiality.<br><br><span class="policy-ref">📄 Grievance Policy — Section 5.2 to 5.6</span>`, time: '09:31 AM' },
+        { role: 'user', text: 'Can HR help with team conflicts between colleagues?', time: '09:34 AM' },
+        { role: 'ai', text: `Absolutely. HR offers a <strong>Mediation Service</strong> for interpersonal workplace conflicts:<br><br>• Either party can request mediation through the HR portal.<br>• A trained mediator (internal or external) is assigned within 5 days.<br>• Sessions are voluntary, confidential, and without prejudice.<br>• If mediation fails, formal disciplinary or grievance procedures may be invoked.<br><br>HR also runs quarterly <strong>Conflict Resolution Workshops</strong> — check the Learning Hub for upcoming dates.<br><br><span class="policy-ref">📄 Mediation & Conflict Policy — Section 6.1</span>`, time: '09:34 AM' }
+      ]
+    },
+    privacy: {
+      headerName: 'Data Privacy Assistant',
+      headerSub: 'GDPR, data handling & privacy policy guidance',
+      tag: 'data-privacy',
+      greeting: "Hello! I specialize in <strong>Data Privacy</strong> policies. I can answer questions about GDPR compliance, data handling procedures, personal data rights, breach reporting, and more.<br><br>What would you like to know?",
+      quickBtns: ['🔒 GDPR basics', '📁 Data retention', '🚨 Breach reporting', '👤 Personal data rights'],
+      convo: [
+        { role: 'user', text: 'What are our obligations when handling employee personal data?', time: '11:00 AM' },
+        { role: 'ai', text: `Under our Data Privacy Policy (aligned with GDPR), all employees who handle personal data must:<br><br><strong>Lawful Basis:</strong> Only process data with a valid legal basis — consent, contract, or legitimate interest.<br><br><strong>Data Minimisation:</strong> Collect only what is strictly necessary for the defined purpose.<br><br><strong>Access Control:</strong> Share data on a need-to-know basis only. Never store personal data on personal devices or unsecured drives.<br><br><strong>Retention:</strong> Employee records are retained for 7 years post-employment, then securely deleted.<br><br><strong>Third Parties:</strong> Never share personal data with external vendors without a signed Data Processing Agreement (DPA).<br><br><span class="policy-ref">📄 Data Privacy Policy — Section 2.1, 4.3 & 5.0</span>`, time: '11:01 AM' },
+        { role: 'user', text: 'What do I do if I accidentally send data to the wrong person?', time: '11:04 AM' },
+        { role: 'ai', text: `This is classified as a <strong>Data Breach</strong> and must be reported immediately:<br><br><strong>Within 1 hour:</strong> Notify your line manager and the Data Protection Officer (DPO) via <em>dpo@nexusai.internal</em>.<br><br><strong>Within 24 hours:</strong> Complete the Data Breach Report Form on the intranet with full details of what was sent, to whom, and the sensitivity level.<br><br><strong>Within 72 hours:</strong> If personal data of third parties is involved, the DPO must assess whether regulatory notification (e.g. to the ICO) is required.<br><br>Do not attempt to recall the email or contact the recipient without DPO guidance first.<br><br><span class="policy-ref">📄 Data Breach Response Policy — Section 7.2</span>`, time: '11:04 AM' }
+      ]
+    },
+    leave: {
+      headerName: 'Leave & Benefits Assistant',
+      headerSub: 'Annual leave, benefits & entitlements guidance',
+      tag: 'leave-benefits',
+      greeting: "Hello! I'm your <strong>Leave & Benefits</strong> guide. I can help with annual leave, sick leave, maternity/paternity policies, employee benefits, and entitlements.<br><br>What would you like to know?",
+      quickBtns: ['🗓️ Annual leave policy', '🤱 Maternity/Paternity', '🏥 Sick leave rules', '💰 Benefits package'],
+      convo: [
+        { role: 'user', text: 'How many annual leave days do I get and can I carry them over?', time: '02:10 PM' },
+        { role: 'ai', text: `Annual leave entitlements are based on tenure:<br><br>• <strong>0–2 years:</strong> 18 days per year<br>• <strong>2–5 years:</strong> 22 days per year<br>• <strong>5+ years:</strong> 26 days per year<br><br>Leave accrues monthly from your start date. Public holidays are in addition to this allowance.<br><br><strong>Carry-over:</strong> Up to 5 unused days may be carried into Q1 of the next year. Carried days expire on 31st March if unused. No cash-in-out is permitted for unused leave.<br><br>All leave must be requested via the HR portal with at least 5 working days' notice (longer during peak periods).<br><br><span class="policy-ref">📄 Annual Leave Policy — Section 2.0 & 3.3</span>`, time: '02:11 PM' },
+        { role: 'user', text: 'What maternity leave am I entitled to?', time: '02:15 PM' },
+        { role: 'ai', text: `Congratulations! Our Maternity Leave policy provides the following:<br><br><strong>Duration:</strong> 26 weeks (6 months) of maternity leave.<br><br><strong>Pay:</strong><br>• Weeks 1–12: Full pay<br>• Weeks 13–26: 50% pay<br>• Statutory Maternity Pay (SMP) applies where eligible<br><br><strong>Eligibility:</strong> Employees with 6+ months of continuous service by the expected week of childbirth.<br><br><strong>Notice:</strong> Inform HR at least 15 weeks before the expected due date, along with a MATB1 certificate from your midwife.<br><br><strong>Return to work:</strong> You have the right to return to the same role, or a suitable alternative if reorganisation occurred during your leave.<br><br><span class="policy-ref">📄 Maternity & Parental Leave Policy — Section 1.0 to 1.6</span>`, time: '02:15 PM' }
+      ]
+    },
+    safety: {
+      headerName: 'Health & Safety Assistant',
+      headerSub: 'Workplace safety & wellbeing policy guidance',
+      tag: 'health-safety',
+      greeting: "Hi! I'm your <strong>Health & Safety</strong> assistant. Ask me about workplace safety procedures, incident reporting, mental health support, emergency protocols, and wellbeing programs.<br><br>What can I help you with?",
+      quickBtns: ['🚨 Incident reporting', '🧠 Mental health support', '🔥 Emergency protocol', '⚠️ Risk assessment'],
+      convo: [
+        { role: 'user', text: 'What should I do if I witness an accident in the office?', time: '03:45 PM' },
+        { role: 'ai', text: `In the event of a workplace accident, follow this immediate response sequence:<br><br><strong>1. Ensure Safety:</strong> Do not put yourself at risk. If the area is dangerous, evacuate first.<br><br><strong>2. Call for Help:</strong> Dial <strong>ext. 999</strong> (internal emergency line) or 1122 for external emergency services if required.<br><br><strong>3. First Aid:</strong> Contact your floor's First Aider — names are posted on each floor's notice board and in the intranet directory.<br><br><strong>4. Report:</strong> All incidents, no matter how minor, must be logged in the <strong>Incident Report System</strong> within 2 hours via the H&S portal.<br><br><strong>5. Preserve the Scene:</strong> Do not move equipment or disturb the area until the H&S officer has assessed it.<br><br><span class="policy-ref">📄 Incident Reporting Procedure — Section 4.1</span>`, time: '03:46 PM' },
+        { role: 'user', text: 'Is there mental health support available for employees?', time: '03:50 PM' },
+        { role: 'ai', text: `Yes — Nexus.AI is committed to employee wellbeing. The following support is available:<br><br><strong>Employee Assistance Programme (EAP):</strong> Free, confidential counselling — up to 8 sessions per year. Available 24/7 via phone or video. Completely separate from HR records.<br><br><strong>Mental Health First Aiders:</strong> Every department has at least one trained Mental Health First Aider. Find yours on the Wellbeing Hub intranet page.<br><br><strong>Wellbeing Days:</strong> All employees receive 2 paid Wellbeing Days per year (in addition to annual leave) to use for mental health, rest, or personal needs — no explanation required.<br><br><strong>Flexible Working:</strong> Reasonable adjustments for mental health conditions are considered under our Reasonable Adjustments Policy.<br><br><span class="policy-ref">📄 Employee Wellbeing Policy — Section 3.0 & 3.5</span>`, time: '03:51 PM' }
+      ]
+    },
+    it: {
+      headerName: 'IT & Device Policy Assistant',
+      headerSub: 'Tech usage, devices & cybersecurity guidance',
+      tag: 'it-device',
+      greeting: "Hello! I handle <strong>IT & Device Policy</strong> questions. I can help with acceptable use policies, device management, software guidelines, cybersecurity rules, and remote access.<br><br>What do you need help with?",
+      quickBtns: ['💻 Device usage policy', '🔐 Password guidelines', '📶 Remote access', '📲 BYOD policy'],
+      convo: [
+        { role: 'user', text: 'Can I use my company laptop for personal use after hours?', time: '01:20 PM' },
+        { role: 'ai', text: `Company devices are primarily for business use, but limited personal use is permitted under our Acceptable Use Policy:<br><br><strong>Permitted:</strong><br>• Occasional personal browsing during breaks or after hours<br>• Personal email access (non-work accounts) in moderation<br>• Streaming or entertainment outside business hours<br><br><strong>Strictly Prohibited:</strong><br>• Installing unauthorised software or apps<br>• Accessing torrent sites, gambling, or adult content<br>• Using the device for secondary employment or freelance work<br>• Sharing the device with family members or third parties<br><br>All activity on company devices is subject to monitoring in accordance with our Privacy Notice.<br><br><span class="policy-ref">📄 Acceptable Use Policy — Section 2.2 & 2.5</span>`, time: '01:21 PM' },
+        { role: 'user', text: 'What are the password requirements for company systems?', time: '01:25 PM' },
+        { role: 'ai', text: `Our cybersecurity policy mandates the following password standards:<br><br><strong>Complexity:</strong> Minimum 12 characters, including uppercase, lowercase, a number, and a special character.<br><br><strong>Rotation:</strong> Passwords must be changed every 90 days. The system will prompt you automatically.<br><br><strong>No Reuse:</strong> The last 10 passwords cannot be reused.<br><br><strong>MFA:</strong> Multi-Factor Authentication is mandatory for all systems — especially VPN, email, and the HR portal.<br><br><strong>Password Manager:</strong> Use the company-approved password manager (1Password — available via IT self-service) to generate and store credentials. Never write passwords down or share them.<br><br><span class="policy-ref">📄 Cybersecurity Policy — Section 5.1 & 5.3</span>`, time: '01:25 PM' }
+      ]
+    },
+    performance: {
+      headerName: 'Performance Reviews Assistant',
+      headerSub: 'Appraisals, goals & performance guidance',
+      tag: 'performance',
+      greeting: "Hi! I'm your <strong>Performance Reviews</strong> guide. Ask me about appraisal cycles, goal-setting frameworks, performance improvement plans, promotion criteria, and feedback processes.<br><br>What would you like to know?",
+      quickBtns: ['📊 Review cycle dates', '🎯 Goal setting (OKRs)', '📈 Promotion criteria', '🔄 PIP process'],
+      convo: [
+        { role: 'user', text: 'When are performance reviews held and what is the format?', time: '04:00 PM' },
+        { role: 'ai', text: `Nexus.AI runs a <strong>bi-annual performance review cycle</strong>:<br><br><strong>Mid-Year Review (July):</strong> Progress check-in against OKRs. Informal format — 30-minute conversation with your manager, logged in the performance portal.<br><br><strong>Annual Review (December):</strong> Full appraisal covering goal achievement, competency ratings, career development, and compensation discussion.<br><br><strong>Format:</strong><br>• Self-assessment (completed 1 week before the meeting)<br>• Manager assessment<br>• 360° feedback from peers (for Senior roles and above)<br>• Calibration session within the department<br><br>Ratings: Exceeds / Meets / Partially Meets / Does Not Meet Expectations.<br><br><span class="policy-ref">📄 Performance Management Policy — Section 1.0 & 2.3</span>`, time: '04:01 PM' },
+        { role: 'user', text: 'What happens if I am put on a Performance Improvement Plan?', time: '04:05 PM' },
+        { role: 'ai', text: `A <strong>Performance Improvement Plan (PIP)</strong> is a structured, supportive process — not an automatic precursor to dismissal.<br><br><strong>Trigger:</strong> A PIP is initiated when an employee receives a "Does Not Meet Expectations" rating or following a pattern of underperformance.<br><br><strong>Duration:</strong> Typically 30, 60, or 90 days depending on the severity of concerns.<br><br><strong>Contents:</strong><br>• Specific, measurable improvement targets<br>• Support resources (coaching, training, mentoring)<br>• Weekly check-ins with your manager and HR<br><br><strong>Outcomes:</strong><br>• <strong>Success:</strong> PIP concludes, you return to standard performance management<br>• <strong>Partial improvement:</strong> PIP may be extended<br>• <strong>No improvement:</strong> May escalate to formal disciplinary action<br><br>You have the right to be accompanied by a colleague or union rep at all PIP meetings.<br><br><span class="policy-ref">📄 Performance Improvement Policy — Section 4.1 to 4.5</span>`, time: '04:06 PM' }
+      ]
+    }
+  };
+
+  function switchTopic(el, name, icon, sub, key) {
+    document.querySelectorAll('.topic-item').forEach(i => i.classList.remove('active'));
+    el.classList.add('active');
+
+    const data = topicData[key];
+
+    document.querySelector('.chat-header-name').textContent = data.headerName;
+    document.querySelector('.chat-header-sub').textContent = data.headerSub;
+    document.querySelector('.chat-header-tag').textContent = data.tag;
+
+    const qp = document.querySelector('.quick-prompts');
+    qp.innerHTML = data.quickBtns.map(b => `<button class="quick-btn" onclick="sendQuick(this)">${b}</button>`).join('');
+
+    const msgs = document.getElementById('messages');
+    msgs.innerHTML = '';
+
+    // Greeting
+    const greetDiv = document.createElement('div');
+    greetDiv.className = 'msg ai';
+    greetDiv.innerHTML = `<div class="msg-avatar">⬡</div><div><div class="msg-bubble">${data.greeting}</div><span class="msg-time">${data.convo[0]?.time || '09:00 AM'}</span></div>`;
+    msgs.appendChild(greetDiv);
+
+    // Pre-loaded conversation
+    if (data.convo) {
+      data.convo.forEach(msg => {
+        const div = document.createElement('div');
+        if (msg.role === 'user') {
+          div.className = 'msg user';
+          div.innerHTML = `<div class="msg-avatar">JK</div><div><div class="msg-bubble">${msg.text}</div><span class="msg-time">${msg.time}</span></div>`;
+        } else {
+          div.className = 'msg ai';
+          div.innerHTML = `<div class="msg-avatar">⬡</div><div><div class="msg-bubble">${msg.text}</div><span class="msg-time">${msg.time}</span></div>`;
+        }
+        msgs.appendChild(div);
+      });
+    }
+
+    // Typing indicator at end
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'msg ai';
+    typingDiv.id = 'latest-typing';
+    typingDiv.innerHTML = `<div class="msg-avatar">⬡</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+    msgs.appendChild(typingDiv);
+    scrollBottom();
+
+    setTimeout(() => {
+      const t = document.getElementById('latest-typing');
+      if (t) t.remove();
+      scrollBottom();
+    }, 1800);
+  }
+
+  function getCurrentTime() {
+    return new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function filterTopics(query) {
+    const q = query.toLowerCase().trim();
+    document.querySelectorAll('.topic-item').forEach(item => {
+      const name = item.querySelector('.topic-name').textContent.toLowerCase();
+      const sub = item.querySelector('.topic-sub').textContent.toLowerCase();
+      item.style.display = (!q || name.includes(q) || sub.includes(q)) ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

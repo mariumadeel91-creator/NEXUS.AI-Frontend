@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NEXUS.AI | API Documentation</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --bg:#FAF8F5;
+      --surface:rgba(255,255,255,0.72);
+      --surface2:#F0EDE8;
+      --surface3:#E8E4DE;
+      --border:rgba(26,26,26,0.09);
+      --border2:rgba(26,26,26,0.15);
+      --ink:#1C1C1E;
+      --soft:#6B6860;
+      --ghost:#9B9890;
+      --gold:#C8A96E;
+      --gold-dim:rgba(200,169,110,0.18);
+      --gold-bright:#8B6B2E;
+      --green:#2D7A4F;
+      --green-dim:rgba(45,122,79,0.1);
+      --red:#C0392B;
+      --blue:#1A5CA8;
+      --blue-dim:rgba(26,92,168,0.1);
+      --purple:#6D4FC2;
+      --orange:#B45309;
+      --method-get:#2D7A4F;
+      --method-post:#1A5CA8;
+      --method-put:#B45309;
+      --method-delete:#C0392B;
+      --glow:rgba(200,169,110,0.18);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;overflow-x:hidden;min-height:100vh;}
+    h1,h2,h3,h4,h5{font-family:'Syne',sans-serif;}
+    code,pre,.mono{font-family:'JetBrains Mono',monospace;}
+    ::-webkit-scrollbar{width:4px;height:4px;}
+    ::-webkit-scrollbar-track{background:transparent;}
+    ::-webkit-scrollbar-thumb{background:var(--ghost);border-radius:2px;}
+    a{color:var(--gold-bright);text-decoration:none;}
+    a:hover{text-decoration:underline;}
+
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background:radial-gradient(ellipse 70% 50% at 80% 0%,rgba(200,169,110,0.12) 0%,transparent 60%),
+                 radial-gradient(ellipse 50% 40% at 5% 90%,rgba(26,92,168,0.06) 0%,transparent 60%);}
+    .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:linear-gradient(rgba(26,26,26,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(26,26,26,0.04) 1px,transparent 1px);
+      background-size:52px 52px;}
+
+    .layout{display:grid;grid-template-columns:260px 1fr;min-height:100vh;position:relative;z-index:2;}
+    @media(max-width:960px){.layout{grid-template-columns:1fr;}}
+
+    .sidebar{background:rgba(255,255,255,0.85);border-right:1px solid var(--border2);display:flex;flex-direction:column;padding:28px 14px 40px;position:sticky;top:0;height:100vh;overflow-y:auto;}
+    @media(max-width:960px){.sidebar{display:none;}}
+    .sb-brand{display:flex;align-items:center;gap:10px;padding:4px 10px 20px;border-bottom:1px solid var(--border2);margin-bottom:20px;}
+    .sb-mark{width:30px;height:30px;background:var(--ink);border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .sb-mark svg{width:14px;height:14px;stroke:#FAF8F5;}
+    .sb-name{font-family:'Syne',sans-serif;font-size:14px;font-weight:800;letter-spacing:.14em;color:var(--ink);}
+    .sb-api-badge{font-size:9px;font-weight:700;padding:2px 6px;background:var(--blue-dim);color:var(--blue);border-radius:4px;letter-spacing:.06em;margin-top:1px;}
+    .sb-section{font-size:9px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ghost);padding:10px 10px 5px;margin-top:8px;}
+    .sb-link{display:flex;align-items:center;gap:9px;padding:7px 10px;border-radius:7px;font-size:12px;font-weight:500;color:var(--soft);text-decoration:none;transition:all .18s;cursor:pointer;border:none;background:transparent;width:100%;text-align:left;}
+    .sb-link:hover{background:var(--surface2);color:var(--ink);}
+    .sb-link.active{background:var(--surface3);color:var(--ink);font-weight:600;}
+    .sb-link:hover{text-decoration:none;}
+    .method-pill{font-size:8px;font-weight:800;padding:1px 5px;border-radius:3px;font-family:'JetBrains Mono',monospace;flex-shrink:0;}
+    .mp-get{background:rgba(45,122,79,0.12);color:var(--method-get);}
+    .mp-post{background:rgba(26,92,168,0.12);color:var(--method-post);}
+    .mp-put{background:rgba(180,83,9,0.12);color:var(--method-put);}
+    .mp-del{background:rgba(192,57,43,0.12);color:var(--method-delete);}
+    .sb-version{margin-top:auto;padding:12px 10px 0;border-top:1px solid var(--border2);font-size:10px;color:var(--ghost);font-family:'JetBrains Mono',monospace;}
+
+    .main{padding:48px 52px 100px;max-width:900px;}
+    @media(max-width:1100px){.main{padding:36px 28px 80px;}}
+    @media(max-width:640px){.main{padding:28px 16px 60px;}}
+
+    .hero{margin-bottom:56px;}
+    .hero-eyebrow{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+    .hero-eyebrow::before{content:'';display:inline-block;width:24px;height:1px;background:var(--gold);}
+    .hero-title{font-family:'Syne',sans-serif;font-size:42px;font-weight:800;line-height:1.05;margin-bottom:16px;color:var(--ink);}
+    .hero-sub{font-size:16px;color:var(--soft);line-height:1.7;max-width:620px;margin-bottom:28px;}
+    .hero-pills{display:flex;gap:10px;flex-wrap:wrap;}
+    .hero-pill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;padding:7px 14px;border-radius:100px;background:rgba(255,255,255,0.85);border:1px solid var(--border2);color:var(--soft);}
+    .hero-pill svg{width:13px;height:13px;flex-shrink:0;}
+
+    .doc-section{margin-bottom:60px;scroll-margin-top:32px;}
+    .section-label{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-bright);margin-bottom:10px;}
+    .section-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--ink);margin-bottom:10px;}
+    .section-desc{font-size:14px;color:var(--soft);line-height:1.75;margin-bottom:24px;}
+    .divider{height:1px;background:var(--border2);margin-bottom:40px;}
+
+    .base-url{display:flex;align-items:center;gap:0;border:1px solid var(--border2);border-radius:10px;overflow:hidden;margin-bottom:24px;font-family:'JetBrains Mono',monospace;font-size:13px;background:rgba(255,255,255,0.85);}
+    .base-url-label{padding:12px 16px;background:var(--surface2);color:var(--gold-bright);font-weight:700;font-size:11px;letter-spacing:.06em;border-right:1px solid var(--border2);white-space:nowrap;}
+    .base-url-val{padding:12px 16px;color:var(--ink);flex:1;}
+    .base-url-copy{padding:12px 14px;background:var(--surface2);border-left:1px solid var(--border2);cursor:pointer;color:var(--soft);transition:color .2s;}
+    .base-url-copy:hover{color:var(--gold-bright);}
+    .base-url-copy svg{width:14px;height:14px;}
+
+    .code-block{background:rgba(255,255,255,0.85);border:1px solid var(--border2);border-radius:12px;overflow:hidden;margin-bottom:20px;position:relative;}
+    .code-header{display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--border);background:var(--surface2);}
+    .code-lang{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--ghost);font-family:'JetBrains Mono',monospace;text-transform:uppercase;}
+    .code-filename{font-size:11px;color:var(--soft);font-family:'JetBrains Mono',monospace;}
+    .code-copy{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--soft);background:none;border:1px solid var(--border2);border-radius:6px;padding:4px 10px;cursor:pointer;transition:all .2s;font-family:'Syne',sans-serif;}
+    .code-copy:hover{color:var(--gold-bright);border-color:rgba(200,169,110,0.5);}
+    .code-copy svg{width:12px;height:12px;}
+    pre{padding:20px;font-size:12.5px;line-height:1.7;overflow-x:auto;color:var(--ink);}
+    pre .kw{color:var(--purple);}
+    pre .str{color:var(--green);}
+    pre .num{color:var(--orange);}
+    pre .cmt{color:var(--ghost);}
+    pre .key{color:var(--blue);}
+    pre .gold{color:var(--gold-bright);}
+    pre .method{color:var(--method-get);}
+    pre .method-post{color:var(--method-post);}
+    pre .url{color:var(--ink);}
+
+    .endpoint{background:rgba(255,255,255,0.85);border:1px solid var(--border2);border-radius:14px;overflow:hidden;margin-bottom:20px;transition:border-color .25s;}
+    .endpoint:hover{border-color:var(--gold);}
+    .ep-header{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;user-select:none;}
+    .ep-method{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:800;padding:4px 10px;border-radius:6px;min-width:60px;text-align:center;flex-shrink:0;}
+    .ep-get{background:rgba(45,122,79,0.1);color:var(--method-get);}
+    .ep-post{background:rgba(26,92,168,0.1);color:var(--method-post);}
+    .ep-put{background:rgba(180,83,9,0.1);color:var(--method-put);}
+    .ep-del{background:rgba(192,57,43,0.1);color:var(--method-delete);}
+    .ep-path{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;color:var(--ink);flex:1;}
+    .ep-path .ep-param{color:var(--gold-bright);}
+    .ep-desc{font-size:12px;color:var(--soft);margin-left:auto;text-align:right;flex-shrink:0;}
+    .ep-body{padding:0 20px;border-top:1px solid var(--border);display:none;}
+    .ep-body.open{display:block;padding:20px;}
+    .ep-toggle{width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;background:var(--surface2);color:var(--soft);transition:transform .25s,background .2s;flex-shrink:0;}
+    .ep-toggle.open{transform:rotate(180deg);background:var(--surface3);}
+    .ep-toggle svg{width:12px;height:12px;}
+
+    .params-title{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ghost);margin-bottom:10px;margin-top:4px;}
+    .params-table{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:16px;}
+    .params-table th{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ghost);padding:8px 12px;text-align:left;border-bottom:1px solid var(--border2);}
+    .params-table td{padding:10px 12px;border-bottom:1px solid rgba(26,26,26,0.05);vertical-align:top;}
+    .params-table tr:last-child td{border-bottom:none;}
+    .param-name{font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--gold-bright);}
+    .param-type{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--blue);background:var(--blue-dim);padding:2px 6px;border-radius:4px;}
+    .param-req{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px;}
+    .req-yes{background:rgba(192,57,43,0.1);color:var(--red);}
+    .req-no{background:var(--surface3);color:var(--ghost);}
+    .param-desc{font-size:12px;color:var(--soft);line-height:1.5;}
+
+    .response-badge{display:inline-flex;align-items:center;gap:6px;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;padding:4px 10px;border-radius:6px;margin-bottom:10px;}
+    .rb-200{background:rgba(45,122,79,0.1);color:var(--green);}
+    .rb-400{background:rgba(180,83,9,0.1);color:var(--orange);}
+    .rb-401{background:rgba(192,57,43,0.1);color:var(--red);}
+    .rb-429{background:rgba(109,79,194,0.1);color:var(--purple);}
+
+    .auth-box{background:rgba(255,255,255,0.85);border:1px solid var(--border2);border-radius:12px;padding:20px 22px;margin-bottom:20px;}
+    .auth-box-title{font-family:'Syne',sans-serif;font-size:13px;font-weight:700;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+    .auth-box-title svg{width:15px;height:15px;stroke:var(--gold-bright);}
+    .auth-desc{font-size:13px;color:var(--soft);line-height:1.6;}
+
+    .api-key-display{display:flex;align-items:center;gap:0;border:1px solid var(--border2);border-radius:10px;overflow:hidden;font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:14px;}
+    .akd-label{padding:11px 14px;background:var(--surface2);color:var(--gold-bright);font-weight:700;font-size:10px;letter-spacing:.06em;border-right:1px solid var(--border2);white-space:nowrap;}
+    .akd-val{padding:11px 16px;color:var(--soft);flex:1;letter-spacing:.08em;}
+    .akd-copy{padding:11px 14px;background:var(--surface2);border-left:1px solid var(--border2);cursor:pointer;color:var(--soft);transition:color .2s;}
+    .akd-copy:hover{color:var(--gold-bright);}
+    .akd-copy svg{width:14px;height:14px;}
+
+    .info-box{display:flex;gap:12px;padding:14px 16px;background:var(--gold-dim);border:1px solid rgba(200,169,110,0.3);border-radius:10px;margin-bottom:20px;}
+    .info-box svg{width:16px;height:16px;stroke:var(--gold-bright);flex-shrink:0;margin-top:2px;}
+    .info-box p{font-size:13px;color:var(--soft);line-height:1.6;}
+    .info-box strong{color:var(--ink);}
+    .warn-box{background:rgba(192,57,43,0.06);border-color:rgba(192,57,43,0.18);}
+    .warn-box svg{stroke:var(--red);}
+
+    .lang-tabs{display:flex;gap:3px;background:var(--surface3);border-radius:8px;padding:3px;margin-bottom:0;border-bottom:none;}
+    .ltab{padding:6px 14px;border-radius:6px;font-size:11px;font-weight:600;color:var(--soft);cursor:pointer;border:none;background:transparent;font-family:'Syne',sans-serif;transition:all .2s;}
+    .ltab.on{background:rgba(255,255,255,0.9);color:var(--ink);}
+
+    .rl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
+    @media(max-width:600px){.rl-grid{grid-template-columns:1fr;}}
+    .rl-card{background:rgba(255,255,255,0.85);border:1px solid var(--border2);border-radius:10px;padding:16px 18px;}
+    .rl-plan{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+    .rl-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--ink);}
+    .rl-per{font-size:11px;color:var(--soft);margin-top:3px;}
+
+    .toast{position:fixed;bottom:28px;right:28px;background:var(--ink);color:#FAF8F5;border:1px solid rgba(26,26,26,0.2);padding:10px 18px;border-radius:10px;font-size:12px;font-weight:600;opacity:0;transition:all .3s;z-index:500;pointer-events:none;font-family:'JetBrains Mono',monospace;}
+    .toast.show{opacity:1;}
+
+    @keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+    .a1{animation:fadeUp .55s cubic-bezier(0.23,1,0.32,1) .05s both;}
+    .a2{animation:fadeUp .55s cubic-bezier(0.23,1,0.32,1) .12s both;}
+    .a3{animation:fadeUp .55s cubic-bezier(0.23,1,0.32,1) .19s both;}
+  </style>
+</head>
+<body>
+<div class="grid-bg"></div>
+<div class="toast" id="toast"></div>
+
+<div class="layout">
+
+  <aside class="sidebar">
+    <div class="sb-brand">
+      <div class="sb-mark">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </div>
+      <div>
+        <div class="sb-name">NEXUS.AI</div>
+        <div class="sb-api-badge">API v2.1</div>
+      </div>
+    </div>
+
+    <span class="sb-section">Getting Started</span>
+    <a class="sb-link active" href="#intro">Introduction</a>
+    <a class="sb-link" href="#auth">Authentication</a>
+    <a class="sb-link" href="#errors">Errors & Responses</a>
+    <a class="sb-link" href="#ratelimits">Rate Limits</a>
+
+    <span class="sb-section">AI Brain</span>
+    <a class="sb-link" href="#brain-query"><span class="method-pill mp-post">POST</span> Query AI Brain</a>
+    <a class="sb-link" href="#brain-train"><span class="method-pill mp-post">POST</span> Train Brain</a>
+    <a class="sb-link" href="#brain-status"><span class="method-pill mp-get">GET</span> Brain Status</a>
+
+    <span class="sb-section">Simulations</span>
+    <a class="sb-link" href="#sim-start"><span class="method-pill mp-post">POST</span> Start Simulation</a>
+    <a class="sb-link" href="#sim-submit"><span class="method-pill mp-post">POST</span> Submit Response</a>
+    <a class="sb-link" href="#sim-results"><span class="method-pill mp-get">GET</span> Get Results</a>
+
+    <span class="sb-section">Documents</span>
+    <a class="sb-link" href="#doc-upload"><span class="method-pill mp-post">POST</span> Upload Document</a>
+    <a class="sb-link" href="#doc-list"><span class="method-pill mp-get">GET</span> List Documents</a>
+    <a class="sb-link" href="#doc-delete"><span class="method-pill mp-del">DEL</span> Delete Document</a>
+
+    <span class="sb-section">Employees</span>
+    <a class="sb-link" href="#emp-create"><span class="method-pill mp-post">POST</span> Create Employee</a>
+    <a class="sb-link" href="#emp-progress"><span class="method-pill mp-get">GET</span> Training Progress</a>
+
+    <span class="sb-section">Webhooks</span>
+    <a class="sb-link" href="#webhooks"><span class="method-pill mp-post">POST</span> Register Webhook</a>
+    <a class="sb-link" href="#webhook-events">Event Reference</a>
+
+    <div class="sb-version">
+      v2.1.0 · Updated May 2025<br/>
+      <a href="#" style="color:var(--ghost);">Changelog</a> · <a href="#" style="color:var(--ghost);">SDKs</a>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <div class="hero a1" id="intro">
+      <div class="hero-eyebrow">API Reference</div>
+      <h1 class="hero-title">NEXUS.AI<br/>Developer API</h1>
+      <p class="hero-sub">Embed the AI Brain directly into your tools. Query company policy, trigger simulations, monitor employee training — all through a simple REST API.</p>
+      <div class="hero-pills">
+        <div class="hero-pill"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>REST API</div>
+        <div class="hero-pill"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Bearer Auth</div>
+        <div class="hero-pill"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>~120ms latency</div>
+        <div class="hero-pill"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>JSON responses</div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="doc-section a2">
+      <div class="section-label">Base URL</div>
+      <div class="base-url">
+        <div class="base-url-label">HTTPS</div>
+        <div class="base-url-val">https://api.nexus.ai/v2</div>
+        <button class="base-url-copy" onclick="copyText('https://api.nexus.ai/v2')">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        </button>
+      </div>
+      <p style="font-size:13px;color:var(--soft);line-height:1.7;">All API requests must be made over HTTPS. Requests made over plain HTTP will fail. All request and response bodies are encoded as <code style="font-size:12px;background:var(--surface2);padding:2px 6px;border-radius:4px;color:var(--gold-bright);">application/json</code>.</p>
+    </div>
+
+    <div class="doc-section a3" id="auth">
+      <div class="section-label">Authentication</div>
+      <div class="section-title">API Keys</div>
+      <p class="section-desc">The NEXUS.AI API uses Bearer token authentication. Pass your API key in the <code style="background:var(--surface2);padding:2px 7px;border-radius:4px;font-size:12px;color:var(--gold-bright);">Authorization</code> header on every request.</p>
+
+      <div class="auth-box">
+        <div class="auth-box-title">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+          Your API Key
+        </div>
+        <p class="auth-desc">Keys are scoped to your company. Each key carries the permissions of the company it was issued to. Never expose keys in client-side code.</p>
+        <div class="api-key-display">
+          <div class="akd-label">API KEY</div>
+          <div class="akd-val">nxs_live_••••••••••••••••••••••••••••••••</div>
+          <button class="akd-copy" onclick="showToast('// API key copied to clipboard')">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">HTTP Header</span>
+          <button class="code-copy" onclick="copyBlock(this)">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <pre>Authorization: Bearer nxs_live_your_api_key_here
+Content-Type: application/json</pre>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="doc-section" id="quickstart">
+      <div class="section-label">Quick Start</div>
+      <div class="section-title">Query the AI Brain in 3 lines</div>
+      <p class="section-desc">The most common use case — ask your company's AI Brain a policy question and get a structured answer.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <div style="display:flex;align-items:center;gap:12px;flex:1;">
+            <div class="lang-tabs">
+              <button class="ltab on" onclick="switchLang(this,'js')">JavaScript</button>
+              <button class="ltab" onclick="switchLang(this,'python')">Python</button>
+              <button class="ltab" onclick="switchLang(this,'curl')">cURL</button>
+            </div>
+          </div>
+          <button class="code-copy" onclick="copyBlock(this)">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <pre id="qs-code-js"><span class="kw">const</span> response = <span class="kw">await</span> fetch(<span class="str">'https://api.nexus.ai/v2/brain/query'</span>, {
+  method: <span class="str">'POST'</span>,
+  headers: {
+    <span class="str">'Authorization'</span>: <span class="str">'Bearer nxs_live_your_api_key'</span>,
+    <span class="str">'Content-Type'</span>: <span class="str">'application/json'</span>,
+  },
+  body: JSON.stringify({
+    question: <span class="str">'What is the escalation procedure when a customer complaint is not resolved in 24 hours?'</span>,
+    employee_id: <span class="str">'emp_7k2m9p'</span>,  <span class="cmt">// optional — tracks per-employee queries</span>
+    language: <span class="str">'en'</span>,
+  }),
+});
+
+<span class="kw">const</span> data = <span class="kw">await</span> response.json();
+console.log(data.answer);  <span class="cmt">// "According to SOP-12 section 4.2, escalate to..."</span>
+console.log(data.sources); <span class="cmt">// ["Customer_Complaint_SOP_v3.pdf", "HR_Policy_Manual.docx"]</span></pre>
+        <pre id="qs-code-python" style="display:none;"><span class="kw">import</span> requests
+
+response = requests.post(
+    <span class="str">"https://api.nexus.ai/v2/brain/query"</span>,
+    headers={
+        <span class="str">"Authorization"</span>: <span class="str">"Bearer nxs_live_your_api_key"</span>,
+        <span class="str">"Content-Type"</span>: <span class="str">"application/json"</span>,
+    },
+    json={
+        <span class="str">"question"</span>: <span class="str">"What is the escalation procedure for unresolved complaints?"</span>,
+        <span class="str">"employee_id"</span>: <span class="str">"emp_7k2m9p"</span>,
+        <span class="str">"language"</span>: <span class="str">"en"</span>,
+    }
+)
+
+data = response.json()
+<span class="kw">print</span>(data[<span class="str">"answer"</span>])   <span class="cmt"># According to SOP-12 section 4.2...</span>
+<span class="kw">print</span>(data[<span class="str">"sources"</span>]) <span class="cmt"># ["Customer_Complaint_SOP_v3.pdf"]</span></pre>
+        <pre id="qs-code-curl" style="display:none;"><span class="method">curl</span> -X POST https://api.nexus.ai/v2/brain/query \
+  -H <span class="str">"Authorization: Bearer nxs_live_your_api_key"</span> \
+  -H <span class="str">"Content-Type: application/json"</span> \
+  -d <span class="str">'{
+    "question": "What is the escalation procedure for unresolved complaints?",
+    "employee_id": "emp_7k2m9p",
+    "language": "en"
+  }'</span></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Response · 200 OK</span>
+          <div class="response-badge rb-200" style="margin-left:auto;margin-bottom:0;">200 OK</div>
+        </div>
+        <pre>{
+  <span class="key">"success"</span>: <span class="kw">true</span>,
+  <span class="key">"answer"</span>: <span class="str">"According to SOP-12 section 4.2, if a customer complaint is not resolved within 24 hours, the handling agent must escalate to the department supervisor immediately. The supervisor has 4 hours to review and respond..."</span>,
+  <span class="key">"confidence"</span>: <span class="num">0.94</span>,
+  <span class="key">"sources"</span>: [
+    <span class="str">"Customer_Complaint_SOP_v3.pdf"</span>,
+    <span class="str">"Escalation_Policy_2025.pdf"</span>
+  ],
+  <span class="key">"tokens_used"</span>: <span class="num">312</span>,
+  <span class="key">"latency_ms"</span>: <span class="num">118</span>
+}</pre>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="doc-section" id="brain-query">
+      <div class="section-label">AI Brain</div>
+      <div class="section-title">Endpoints</div>
+
+      <div class="endpoint">
+        <div class="ep-header" onclick="toggleEp(this)">
+          <div class="ep-method ep-post">POST</div>
+          <div class="ep-path">/brain/<span class="ep-param">query</span></div>
+          <div class="ep-desc">Ask the AI Brain a question</div>
+          <div class="ep-toggle"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="ep-body">
+          <p style="font-size:13px;color:var(--soft);margin-bottom:16px;line-height:1.7;">Queries the company's AI Brain with a natural language question. Returns an answer grounded in uploaded SOPs and policy documents.</p>
+          <p class="params-title">Body Parameters</p>
+          <table class="params-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><span class="param-name">question</span></td><td><span class="param-type">string</span></td><td><span class="param-req req-yes">required</span></td><td class="param-desc">Natural language question to ask the AI Brain. Max 2000 characters.</td></tr>
+              <tr><td><span class="param-name">employee_id</span></td><td><span class="param-type">string</span></td><td><span class="param-req req-no">optional</span></td><td class="param-desc">Track which employee asked the question. Logs to audit trail.</td></tr>
+              <tr><td><span class="param-name">language</span></td><td><span class="param-type">string</span></td><td><span class="param-req req-no">optional</span></td><td class="param-desc">ISO 639-1 language code. Defaults to <code style="font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px;">"en"</code>.</td></tr>
+              <tr><td><span class="param-name">context</span></td><td><span class="param-type">string</span></td><td><span class="param-req req-no">optional</span></td><td class="param-desc">Additional context string injected into the query (e.g. current task description).</td></tr>
+            </tbody>
+          </table>
+          <div class="response-badge rb-200">200 OK</div>
+          <div class="response-badge rb-400" style="margin-left:6px;">400 Bad Request</div>
+          <div class="response-badge rb-401" style="margin-left:6px;">401 Unauthorized</div>
+        </div>
+      </div>
+
+      <div class="endpoint" id="brain-train">
+        <div class="ep-header" onclick="toggleEp(this)">
+          <div class="ep-method ep-post">POST</div>
+          <div class="ep-path">/brain/<span class="ep-param">train</span></div>
+          <div class="ep-desc">Trigger retraining with new docs</div>
+          <div class="ep-toggle"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="ep-body">
+          <p style="font-size:13px;color:var(--soft);margin-bottom:16px;line-height:1.7;">Triggers an asynchronous retraining job for the company's AI Brain. Returns a <code style="font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px;">job_id</code> you can poll for status.</p>
+          <p class="params-title">Body Parameters</p>
+          <table class="params-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><span class="param-name">document_ids</span></td><td><span class="param-type">string[]</span></td><td><span class="param-req req-no">optional</span></td><td class="param-desc">Specific document IDs to retrain on. If omitted, retrains on all company documents.</td></tr>
+              <tr><td><span class="param-name">priority</span></td><td><span class="param-type">string</span></td><td><span class="param-req req-no">optional</span></td><td class="param-desc"><code style="font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px;">"normal"</code> or <code style="font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px;">"high"</code>. High priority uses dedicated capacity.</td></tr>
+            </tbody>
+          </table>
+          <div class="code-block" style="margin-top:12px;">
+            <div class="code-header"><span class="code-lang">Response · 202 Accepted</span></div>
+            <pre>{
+  <span class="key">"job_id"</span>: <span class="str">"job_9xkm2p4q"</span>,
+  <span class="key">"status"</span>: <span class="str">"queued"</span>,
+  <span class="key">"estimated_duration_seconds"</span>: <span class="num">45</span>,
+  <span class="key">"poll_url"</span>: <span class="str">"https://api.nexus.ai/v2/brain/status/job_9xkm2p4q"</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint" id="brain-status">
+        <div class="ep-header" onclick="toggleEp(this)">
+          <div class="ep-method ep-get">GET</div>
+          <div class="ep-path">/brain/status/<span class="ep-param">{job_id}</span></div>
+          <div class="ep-desc">Poll training job status</div>
+          <div class="ep-toggle"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="ep-body">
+          <p style="font-size:13px;color:var(--soft);margin-bottom:16px;line-height:1.7;">Returns the current status of a training job. Poll this endpoint every few seconds until <code style="font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px;">status === "complete"</code>.</p>
+          <div class="code-block">
+            <div class="code-header"><span class="code-lang">Response · 200 OK</span></div>
+            <pre>{
+  <span class="key">"job_id"</span>: <span class="str">"job_9xkm2p4q"</span>,
+  <span class="key">"status"</span>: <span class="str">"complete"</span>,     <span class="cmt">// queued | processing | complete | failed</span>
+  <span class="key">"progress"</span>: <span class="num">100</span>,
+  <span class="key">"documents_trained"</span>: <span class="num">12</span>,
+  <span class="key">"accuracy_score"</span>: <span class="num">0.94</span>,
+  <span class="key">"completed_at"</span>: <span class="str">"2025-05-22T14:23:11Z"</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="doc-section" id="sim-start">
+      <div class="section-label">Simulations</div>
+      <div class="section-title">Trigger & Score AI Simulations</div>
+      <p class="section-desc">Use the Simulations API to start training scenarios for employees, receive their responses, and get AI-generated scores and feedback — all programmatically.</p>
+
+      <div class="endpoint">
+        <div class="ep-header" onclick="toggleEp(this)">
+          <div class="ep-method ep-post">POST</div>
+          <div class="ep-path">/simulations/<span class="ep-param">start</span></div>
+          <div class="ep-desc">Generate a new scenario for an employee</div>
+          <div class="ep-toggle"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="ep-body">
+          <p class="params-title">Body Parameters</p>
+          <table class="params-table">
+            <thead><tr><th>Parameter</th><th>Type</th><th>Required</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td><span class="param-name">employee_id</span></td><td><span class="param-type">string</span></td><td><span class="param-req req-yes">required</span></td><td class="param-desc">ID of the employee to run the simulation for.</td></tr>
+              <tr><td><span class="param-name">module</span></td><td><span class="param-type">string</span></td><td><span class="param-req req-no">optional</span></td><td class="param-desc">SOP module to test. If omitted, AI picks based on weakest area.</td></tr>
+              <tr><td><span class="param-name">difficulty</span></td><td><span class="param-type">string</span></td><td><span class="param-req req-no">optional</span></td><td class="param-desc"><code style="font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px;">"easy"</code> · <code style="font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px;">"medium"</code> · <code style="font-size:11px;background:var(--surface2);padding:1px 5px;border-radius:3px;">"hard"</code>. Default: adaptive.</td></tr>
+            </tbody>
+          </table>
+          <div class="code-block" style="margin-top:12px;">
+            <div class="code-header"><span class="code-lang">Response · 201 Created</span></div>
+            <pre>{
+  <span class="key">"simulation_id"</span>: <span class="str">"sim_4p8nk2xq"</span>,
+  <span class="key">"scenario"</span>: <span class="str">"A customer calls in extremely upset. Their transaction failed and they have been waiting 3 days for a resolution. What are the exact steps you take according to company policy?"</span>,
+  <span class="key">"module"</span>: <span class="str">"customer_complaints"</span>,
+  <span class="key">"time_limit_seconds"</span>: <span class="num">300</span>,
+  <span class="key">"expires_at"</span>: <span class="str">"2025-05-22T15:00:00Z"</span>
+}</pre>
+          </div>
+        </div>
+      </div>
+
+      <div class="endpoint" id="sim-submit">
+        <div class="ep-header" onclick="toggleEp(this)">
+          <div class="ep-method ep-post">POST</div>
+          <div class="ep-path">/simulations/<span class="ep-param">{sim_id}</span>/submit</div>
+          <div class="ep-desc">Submit employee answer and get score</div>
+          <div class="ep-toggle"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg></div>
+        </div>
+        <div class="ep-body">
+          <div class="code-block" style="margin-top:4px;">
+            <div class="code-header"><span class="code-lang">Response · 200 OK</span></div>
+            <pre>{
+  <span class="key">"simulation_id"</span>: <span class="str">"sim_4p8nk2xq"</span>,
+  <span class="key">"score"</span>: <span class="num">78</span>,
+  <span class="key">"passed"</span>: <span class="kw">true</span>,
+  <span class="key">"feedback"</span>: <span class="str">"Good — you identified the escalation path correctly. However, you missed Step 3: logging the incident ticket before contacting the supervisor. This is required per SOP-12 section 2.1."</span>,
+  <span class="key">"steps_correct"</span>: [<span class="num">1</span>, <span class="num">2</span>, <span class="num">4</span>, <span class="num">5</span>],
+  <span class="key">"steps_missed"</span>: [<span class="num">3</span>],
+  <span class="key">"sop_references"</span>: [<span class="str">"SOP-12 §2.1"</span>, <span class="str">"Complaint_Procedure §4"</span>]
+}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="doc-section" id="webhooks">
+      <div class="section-label">Webhooks</div>
+      <div class="section-title">Event-driven Integration</div>
+      <p class="section-desc">Register a HTTPS endpoint to receive real-time POST notifications when compliance events occur in NEXUS.AI.</p>
+
+      <div class="info-box">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <p>All webhook payloads are signed with <strong>HMAC-SHA256</strong> using your webhook secret. Always verify the <code style="font-size:11px;background:rgba(200,169,110,0.15);padding:1px 5px;border-radius:3px;">X-Nexus-Signature</code> header before processing.</p>
+      </div>
+
+      <p class="params-title">Available Events</p>
+      <table class="params-table" id="webhook-events">
+        <thead><tr><th>Event</th><th>Description</th><th>Fired when</th></tr></thead>
+        <tbody>
+          <tr><td><span class="param-name">violation.detected</span></td><td class="param-desc">Employee missed a required SOP step</td><td style="font-size:11px;color:var(--ghost);">Real-time</td></tr>
+          <tr><td><span class="param-name">simulation.completed</span></td><td class="param-desc">Employee finished a simulation session</td><td style="font-size:11px;color:var(--ghost);">On submit</td></tr>
+          <tr><td><span class="param-name">simulation.failed</span></td><td class="param-desc">Score fell below the configured threshold</td><td style="font-size:11px;color:var(--ghost);">On submit</td></tr>
+          <tr><td><span class="param-name">certificate.issued</span></td><td class="param-desc">Employee earned full certification</td><td style="font-size:11px;color:var(--ghost);">On 100%</td></tr>
+          <tr><td><span class="param-name">brain.trained</span></td><td class="param-desc">AI Brain training job completed</td><td style="font-size:11px;color:var(--ghost);">Async</td></tr>
+          <tr><td><span class="param-name">employee.created</span></td><td class="param-desc">New employee added to the platform</td><td style="font-size:11px;color:var(--ghost);">Instant</td></tr>
+          <tr><td><span class="param-name">document.uploaded</span></td><td class="param-desc">New SOP document uploaded</td><td style="font-size:11px;color:var(--ghost);">Instant</td></tr>
+        </tbody>
+      </table>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span class="code-lang">Webhook Payload Example · violation.detected</span>
+          <button class="code-copy" onclick="copyBlock(this)">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            Copy
+          </button>
+        </div>
+        <pre>{
+  <span class="key">"event"</span>: <span class="str">"violation.detected"</span>,
+  <span class="key">"timestamp"</span>: <span class="str">"2025-05-22T14:12:09Z"</span>,
+  <span class="key">"company_id"</span>: <span class="str">"co_9a2b3c"</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"employee_id"</span>: <span class="str">"emp_7k2m9p"</span>,
+    <span class="key">"employee_name"</span>: <span class="str">"Sara Khan"</span>,
+    <span class="key">"sop_id"</span>: <span class="str">"doc_complaint_v3"</span>,
+    <span class="key">"step_missed"</span>: <span class="num">4</span>,
+    <span class="key">"step_description"</span>: <span class="str">"Log incident ticket before escalation"</span>,
+    <span class="key">"severity"</span>: <span class="str">"high"</span>,
+    <span class="key">"context"</span>: <span class="str">"Customer complaint workflow — Finance dept"</span>
+  }
+}</pre>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="doc-section" id="ratelimits">
+      <div class="section-label">Rate Limits</div>
+      <div class="section-title">Request Limits by Plan</div>
+      <p class="section-desc">Rate limits are applied per API key per minute. If exceeded, the API returns <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:12px;color:var(--gold-bright);">429 Too Many Requests</code>.</p>
+      <div class="rl-grid">
+        <div class="rl-card">
+          <div class="rl-plan" style="color:var(--soft);">STARTER</div>
+          <div class="rl-num" style="color:var(--soft);">60</div>
+          <div class="rl-per">requests / minute</div>
+        </div>
+        <div class="rl-card" style="border-color:rgba(200,169,110,0.5);">
+          <div class="rl-plan" style="color:var(--gold-bright);">PRO</div>
+          <div class="rl-num" style="color:var(--gold-bright);">300</div>
+          <div class="rl-per">requests / minute</div>
+        </div>
+        <div class="rl-card" style="border-color:rgba(109,79,194,0.3);">
+          <div class="rl-plan" style="color:var(--purple);">ENTERPRISE</div>
+          <div class="rl-num" style="color:var(--purple);">Unlimited</div>
+          <div class="rl-per">custom SLA</div>
+        </div>
+      </div>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Rate Limit Headers</span></div>
+        <pre>X-RateLimit-Limit: 300
+X-RateLimit-Remaining: 247
+X-RateLimit-Reset: 1716393600    <span class="cmt"># Unix timestamp of next window reset</span>
+Retry-After: 14                  <span class="cmt"># Seconds to wait (only on 429 response)</span></pre>
+      </div>
+    </div>
+
+    <div class="doc-section" id="errors">
+      <div class="section-label">Error Handling</div>
+      <div class="section-title">Error Response Format</div>
+      <p class="section-desc">All errors follow a consistent JSON structure with a machine-readable <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:12px;color:var(--gold-bright);">code</code> and a human-readable <code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:12px;color:var(--gold-bright);">message</code>.</p>
+      <div class="code-block">
+        <div class="code-header"><span class="code-lang">Error Response</span></div>
+        <pre>{
+  <span class="key">"success"</span>: <span class="kw">false</span>,
+  <span class="key">"error"</span>: {
+    <span class="key">"code"</span>: <span class="str">"BRAIN_NOT_TRAINED"</span>,
+    <span class="key">"message"</span>: <span class="str">"Your AI Brain has no documents trained yet. Upload at least one SOP before querying."</span>,
+    <span class="key">"docs_url"</span>: <span class="str">"https://docs.nexus.ai/errors/BRAIN_NOT_TRAINED"</span>
+  },
+  <span class="key">"request_id"</span>: <span class="str">"req_8b2k4n9q"</span>
+}</pre>
+      </div>
+      <table class="params-table">
+        <thead><tr><th>HTTP Status</th><th>Code</th><th>Meaning</th></tr></thead>
+        <tbody>
+          <tr><td><span class="response-badge rb-400" style="margin:0;">400</span></td><td><span class="param-name">INVALID_REQUEST</span></td><td class="param-desc">Missing or malformed request body</td></tr>
+          <tr><td><span class="response-badge rb-401" style="margin:0;">401</span></td><td><span class="param-name">UNAUTHORIZED</span></td><td class="param-desc">Invalid or missing API key</td></tr>
+          <tr><td><span class="response-badge rb-400" style="margin:0;">403</span></td><td><span class="param-name">FORBIDDEN</span></td><td class="param-desc">API key lacks permission for this resource</td></tr>
+          <tr><td><span class="response-badge rb-400" style="margin:0;">404</span></td><td><span class="param-name">NOT_FOUND</span></td><td class="param-desc">Resource not found</td></tr>
+          <tr><td><span class="response-badge rb-429" style="margin:0;">429</span></td><td><span class="param-name">RATE_LIMITED</span></td><td class="param-desc">Too many requests — back off and retry</td></tr>
+          <tr><td><span class="response-badge rb-401" style="margin:0;">500</span></td><td><span class="param-name">INTERNAL_ERROR</span></td><td class="param-desc">Unexpected server error — contact support</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+
+<script>
+function toggleEp(header) {
+  var body = header.nextElementSibling;
+  var toggle = header.querySelector('.ep-toggle');
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  toggle.classList.toggle('open', !isOpen);
+}
+
+function switchLang(btn, lang) {
+  document.querySelectorAll('.ltab').forEach(function(b){b.classList.remove('on');});
+  btn.classList.add('on');
+  ['js','python','curl'].forEach(function(l){
+    var el = document.getElementById('qs-code-'+l);
+    if(el) el.style.display = l===lang ? 'block' : 'none';
+  });
+}
+
+function copyText(text) {
+  navigator.clipboard.writeText(text).catch(function(){});
+  showToast('// Copied to clipboard');
+}
+function copyBlock(btn) {
+  var pre = btn.closest('.code-block').querySelector('pre[style="display: block;"], pre:not([style*="none"])');
+  if(pre) copyText(pre.textContent);
+  else showToast('// Copied');
+}
+
+var sections = document.querySelectorAll('.doc-section[id], .endpoint[id]');
+window.addEventListener('scroll', function(){
+  var scrollY = window.scrollY + 80;
+  sections.forEach(function(sec){
+    if(sec.offsetTop <= scrollY){
+      document.querySelectorAll('.sb-link').forEach(function(l){l.classList.remove('active');});
+      var match = document.querySelector('.sb-link[href="#'+sec.id+'"]');
+      if(match) match.classList.add('active');
+    }
+  });
+}, {passive:true});
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2200);
+}
+</script>
+</body>
+</html>

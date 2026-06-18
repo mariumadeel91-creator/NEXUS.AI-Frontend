@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NEXUS.AI | Referral & Affiliate Program</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    :root{
+      --ink:#1C1C1E; --ink-soft:#6B6860; --ink-ghost:#9B9890;
+      --bg:#FAF8F5; --gold:#C8A96E; --glow:rgba(200,169,110,0.18);
+      --border:rgba(26,26,26,0.09); --card:rgba(255,255,255,0.72);
+      --green:#2D7A4F; --red:#C0392B;
+      /* surface aliases mapped to light */
+      --s1:rgba(255,255,255,0.72); --s2:rgba(255,255,255,0.55);
+      --s3:rgba(26,26,26,0.04);
+      --border2:rgba(26,26,26,0.14);
+      --soft:#6B6860; --ghost:#9B9890;
+      --gold-bright:#D4B47A; --gold-dim:rgba(200,169,110,0.13);
+      --green-dim:rgba(45,122,79,0.1);
+      --purple:#7C5CBF; --purple-dim:rgba(124,92,191,0.1);
+      --blue:#2B5FC4; --blue-dim:rgba(43,95,196,0.1);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--ink);font-family:'DM Sans',sans-serif;overflow-x:hidden;min-height:100vh;}
+    h1,h2,h3,h4{font-family:'Syne',sans-serif;}
+    ::-webkit-scrollbar{width:4px;} ::-webkit-scrollbar-track{background:transparent;} ::-webkit-scrollbar-thumb{background:rgba(26,26,26,0.2);border-radius:2px;}
+
+    /* ── BG LAYERS ── */
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.032'/%3E%3C/svg%3E");
+      background-size:200px;mix-blend-mode:multiply;}
+    .bg-orb{position:fixed;border-radius:50%;filter:blur(90px);pointer-events:none;z-index:0;}
+    .orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(200,169,110,0.13) 0%,transparent 70%);top:-180px;left:50%;transform:translateX(-50%);animation:o1 22s ease-in-out infinite;}
+    .orb2{width:440px;height:440px;background:radial-gradient(circle,rgba(26,26,26,0.04) 0%,transparent 70%);bottom:10%;right:-100px;animation:o2 28s ease-in-out infinite;}
+    .orb3{width:320px;height:320px;background:radial-gradient(circle,rgba(200,169,110,0.07) 0%,transparent 70%);top:40%;left:-80px;animation:o3 20s ease-in-out infinite;}
+    @keyframes o1{0%,100%{transform:translateX(-50%) scale(1);}50%{transform:translateX(-50%) scale(1.1);}}
+    @keyframes o2{0%,100%{transform:translate(0,0);}50%{transform:translate(-40px,-50px);}}
+    @keyframes o3{0%,100%{transform:translate(0,0);}50%{transform:translate(30px,40px);}}
+    .grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+      background-image:linear-gradient(rgba(26,26,26,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(26,26,26,0.025) 1px,transparent 1px);
+      background-size:56px 56px;mask-image:radial-gradient(ellipse 100% 100% at 50% 0%,black 30%,transparent 100%);}
+    .scan{position:fixed;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(200,169,110,0.3),transparent);z-index:1;animation:scan 10s linear infinite;pointer-events:none;}
+    @keyframes scan{0%{top:0;opacity:0;}5%{opacity:1;}95%{opacity:1;}100%{top:100%;opacity:0;}}
+
+    /* ── PAGE ── */
+    .page{position:relative;z-index:2;}
+    section{max-width:1100px;margin:0 auto;padding:0 32px;}
+    @media(max-width:640px){section{padding:0 18px;}}
+
+    /* ── HERO ── */
+    .hero{padding:88px 32px 80px;text-align:center;max-width:1100px;margin:0 auto;}
+    @media(max-width:640px){.hero{padding:60px 18px 60px;}}
+    .hero-badge{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);padding:7px 16px;border:1px solid rgba(200,169,110,0.3);border-radius:100px;background:var(--gold-dim);margin-bottom:24px;animation:fadeUp .6s cubic-bezier(0.23,1,0.32,1) .05s both;}
+    .hero-badge-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse 2s ease-in-out infinite;}
+    @keyframes pulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(200,169,110,0.4);}50%{transform:scale(1.3);box-shadow:0 0 0 6px rgba(200,169,110,0);}}
+    .hero-title{font-family:'Syne',sans-serif;font-size:clamp(38px,6vw,72px);font-weight:800;line-height:1.0;margin-bottom:20px;
+      background:linear-gradient(135deg,#1C1C1E 0%,#1C1C1E 38%,#C8A96E 52%,#1C1C1E 66%,#1C1C1E 100%);
+      background-size:250% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+      animation:fadeUp .6s cubic-bezier(0.23,1,0.32,1) .1s both,shimmer 8s linear 1s infinite;}
+    @keyframes shimmer{0%{background-position:250%;}100%{background-position:-250%;}}
+    .hero-sub{font-size:18px;color:var(--ink-soft);line-height:1.7;max-width:560px;margin:0 auto 36px;animation:fadeUp .6s cubic-bezier(0.23,1,0.32,1) .18s both;}
+    .hero-ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;animation:fadeUp .6s cubic-bezier(0.23,1,0.32,1) .25s both;}
+    .btn-gold{display:inline-flex;align-items:center;gap:9px;padding:14px 30px;background:var(--gold);color:var(--bg);border:none;border-radius:100px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;cursor:pointer;transition:all .3s;position:relative;overflow:hidden;}
+    .btn-gold::before{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);animation:shim 3s ease-in-out infinite;}
+    @keyframes shim{0%{left:-100%;}60%,100%{left:160%;}}
+    .btn-gold:hover{box-shadow:0 10px 36px rgba(200,169,110,0.4);transform:translateY(-2px);}
+    .btn-gold svg{width:16px;height:16px;}
+    .btn-outline-light{display:inline-flex;align-items:center;gap:9px;padding:13px 28px;background:transparent;color:var(--ink-soft);border:1.5px solid rgba(26,26,26,0.18);border-radius:100px;font-family:'Syne',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:all .3s;}
+    .btn-outline-light:hover{border-color:var(--gold);color:var(--ink);}
+    .hero-stats{display:flex;gap:48px;justify-content:center;flex-wrap:wrap;margin-top:56px;padding-top:40px;border-top:1px solid rgba(26,26,26,0.1);animation:fadeUp .6s cubic-bezier(0.23,1,0.32,1) .35s both;}
+    .hstat-num{font-family:'Syne',sans-serif;font-size:36px;font-weight:800;color:var(--ink);}
+    .hstat-label{font-size:12px;color:var(--ink-ghost);margin-top:4px;}
+
+    /* ── HOW IT WORKS ── */
+    .section-eyebrow{font-size:11px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+    .section-heading{font-family:'Syne',sans-serif;font-size:clamp(26px,4vw,40px);font-weight:800;line-height:1.1;margin-bottom:14px;}
+    .section-sub{font-size:15px;color:var(--ink-soft);line-height:1.7;max-width:520px;}
+    .steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:44px;}
+    @media(max-width:860px){.steps-grid{grid-template-columns:repeat(2,1fr);}}
+    @media(max-width:480px){.steps-grid{grid-template-columns:1fr;}}
+    .step-card{background:var(--card);border:1.5px solid var(--border);border-radius:16px;backdrop-filter:blur(8px);padding:26px 22px;position:relative;overflow:hidden;transition:border-color .3s,transform .3s;}
+    .step-card:hover{border-color:var(--border2);transform:translateY(-4px);}
+    .step-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .3s;}
+    .step-card:hover::before{opacity:1;}
+    .step-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--ink-ghost);margin-bottom:14px;}
+    .step-icon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;font-size:20px;}
+    .step-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:8px;}
+    .step-desc{font-size:12px;color:var(--ink-soft);line-height:1.6;}
+    .connector{display:none;}
+    @media(min-width:860px){
+      .steps-grid{position:relative;}
+      .step-card:not(:last-child)::after{content:'→';position:absolute;top:38px;right:-14px;font-size:16px;color:var(--ghost);z-index:10;}
+    }
+
+    /* ── COMMISSION TIERS ── */
+    .tiers-wrap{padding:80px 32px;}
+    @media(max-width:640px){.tiers-wrap{padding:60px 18px;}}
+    .tiers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:44px;}
+    @media(max-width:760px){.tiers-grid{grid-template-columns:1fr;max-width:400px;margin-left:auto;margin-right:auto;}}
+    .tier-card{background:var(--card);border:1.5px solid var(--border);border-radius:20px;backdrop-filter:blur(8px);padding:30px 26px;position:relative;overflow:hidden;transition:all .3s;cursor:default;}
+    .tier-card:hover{transform:translateY(-5px);}
+    .tier-card.featured{border-color:rgba(200,169,110,0.4);background:rgba(255,255,255,0.92);}
+    .tier-card.featured::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(200,169,110,0.09) 0%,transparent 70%);pointer-events:none;}
+    .tier-badge{position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-family:'Syne',sans-serif;font-size:9px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;background:var(--gold);color:var(--bg);padding:4px 14px;border-radius:100px;white-space:nowrap;}
+    .tier-icon{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px;}
+    .tier-name{font-family:'Syne',sans-serif;font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;}
+    .tier-commission{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;line-height:1;margin-bottom:4px;}
+    .tier-period{font-size:13px;color:var(--ink-soft);margin-bottom:20px;}
+    .tier-divider{height:1px;background:rgba(26,26,26,0.08);margin:16px 0;}
+    .tier-perks{display:flex;flex-direction:column;gap:9px;margin-bottom:22px;}
+    .perk{display:flex;align-items:center;gap:9px;font-size:13px;color:var(--ink-soft);}
+    .perk svg{width:14px;height:14px;stroke:var(--green);flex-shrink:0;}
+    .perk.yes{color:var(--ink);}
+    .tier-req{font-size:11px;color:var(--ink-ghost);margin-top:12px;padding-top:12px;border-top:1px solid var(--border);}
+    .tier-btn{width:100%;padding:12px;border-radius:100px;font-family:'Syne',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .3s;border:none;}
+    .tier-btn.gold{background:var(--gold);color:var(--bg);}
+    .tier-btn.gold:hover{box-shadow:0 8px 28px rgba(200,169,110,0.4);}
+    .tier-btn.outline{background:transparent;border:1.5px solid rgba(26,26,26,0.15);color:var(--ink-soft);}
+    .tier-btn.outline:hover{border-color:var(--gold);color:var(--gold);}
+
+    /* ── DASHBOARD PREVIEW ── */
+    .dash-section{padding:80px 32px;background:linear-gradient(180deg,transparent,rgba(200,169,110,0.04),transparent);}
+    @media(max-width:640px){.dash-section{padding:60px 18px;}}
+    .dash-preview{background:var(--card);border:1.5px solid var(--border);backdrop-filter:blur(8px);border-radius:20px;padding:28px;margin-top:44px;position:relative;overflow:hidden;}
+    .dash-preview::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+    .dash-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+    .dash-title{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--ink);}
+    .dash-period{font-size:12px;color:var(--ink-ghost);font-family:'JetBrains Mono',monospace;}
+    .dash-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+    @media(max-width:700px){.dash-kpis{grid-template-columns:repeat(2,1fr);}}
+    .dk{background:rgba(26,26,26,0.03);border:1px solid var(--border);border-radius:12px;padding:16px;}
+    .dk-num{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--ink);}
+    .dk-label{font-size:11px;color:var(--ink-ghost);margin-top:4px;}
+    .dk-delta{font-size:10px;font-weight:700;color:var(--green);margin-top:6px;}
+    .ref-table{width:100%;border-collapse:collapse;}
+    .ref-table th{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-ghost);padding:8px 14px;text-align:left;border-bottom:1px solid var(--border);}
+    .ref-table td{padding:11px 14px;font-size:12px;color:var(--ink);border-bottom:1px solid rgba(26,26,26,0.04);}
+    .ref-table tr:last-child td{border-bottom:none;}
+    .ref-status{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;}
+    .rs-active{background:#EAF5EE;color:var(--green);}
+    .rs-trial{background:rgba(200,169,110,0.12);color:#8B6B2E;}
+    .rs-pending{background:rgba(26,26,26,0.06);color:var(--ink-ghost);}
+    .ref-link-box{background:rgba(26,26,26,0.04);border:1.5px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:12px;margin-top:20px;flex-wrap:wrap;}
+    .ref-link-val{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--gold);flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .copy-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;background:var(--gold);color:var(--bg);border:none;border-radius:8px;font-family:'Syne',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .3s;flex-shrink:0;}
+    .copy-btn:hover{box-shadow:0 4px 16px rgba(200,169,110,0.4);}
+    .copy-btn svg{width:13px;height:13px;}
+    .share-btns{display:flex;gap:8px;flex-wrap:wrap;}
+    .share-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1.5px solid var(--border);border-radius:8px;font-size:12px;font-weight:600;color:var(--ink-soft);cursor:pointer;background:transparent;transition:all .3s;font-family:'Syne',sans-serif;}
+    .share-btn:hover{border-color:var(--gold);color:var(--gold);}
+
+    /* ── FAQ ── */
+    .faq-section{padding:80px 32px;}
+    @media(max-width:640px){.faq-section{padding:60px 18px;}}
+    .faq-grid{max-width:720px;margin:44px auto 0;}
+    .faq-item{border-bottom:1px solid rgba(26,26,26,0.08);padding:20px 0;cursor:pointer;}
+    .faq-q{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+    .faq-q-text{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;color:var(--ink);}
+    .faq-icon{width:24px;height:24px;border-radius:6px;background:rgba(26,26,26,0.06);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .3s,background .2s;}
+    .faq-icon svg{width:12px;height:12px;stroke:var(--ink-soft);}
+    .faq-item.open .faq-icon{transform:rotate(45deg);background:rgba(200,169,110,0.12);}
+    .faq-item.open .faq-icon svg{stroke:var(--gold);}
+    .faq-a{font-size:14px;color:var(--ink-soft);line-height:1.7;max-height:0;overflow:hidden;transition:max-height .4s ease,padding .3s;}
+    .faq-item.open .faq-a{max-height:200px;padding-top:14px;}
+
+    /* ── CTA BANNER ── */
+    .cta-section{padding:80px 32px 100px;}
+    @media(max-width:640px){.cta-section{padding:60px 18px 80px;}}
+    .cta-banner{background:var(--card);border:1.5px solid var(--border);backdrop-filter:blur(8px);border-radius:24px;padding:56px 48px;text-align:center;position:relative;overflow:hidden;}
+    @media(max-width:640px){.cta-banner{padding:40px 24px;}}
+    .cta-banner::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(200,169,110,0.12) 0%,transparent 70%);pointer-events:none;}
+    .cta-banner::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);}
+    .cta-title{font-family:'Syne',sans-serif;font-size:clamp(26px,4vw,44px);font-weight:800;margin-bottom:14px;position:relative;}
+    .cta-sub{font-size:15px;color:var(--ink-soft);line-height:1.7;max-width:480px;margin:0 auto 32px;position:relative;}
+    .cta-btns{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;}
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+    .av{opacity:0;transform:translateY(16px);transition:opacity .55s ease,transform .55s ease;}
+    .av.in{opacity:1;transform:translateY(0);}
+    .av.d1{transition-delay:.06s;}.av.d2{transition-delay:.12s;}.av.d3{transition-delay:.18s;}.av.d4{transition-delay:.24s;}.av.d5{transition-delay:.30s;}.av.d6{transition-delay:.36s;}
+
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:28px;right:28px;background:#1C1C1E;color:#FAF8F5;border:1px solid rgba(255,255,255,0.1);padding:10px 18px;border-radius:100px;font-size:12px;font-weight:600;opacity:0;transition:all .3s;z-index:500;pointer-events:none;white-space:nowrap;}
+    .toast.show{opacity:1;}
+  </style>
+</head>
+<body>
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+<div class="bg-orb orb3"></div>
+<div class="grid-bg"></div>
+<div class="scan"></div>
+<div class="toast" id="toast"></div>
+
+<div class="page">
+
+  <!-- ── HERO ── -->
+  <div class="hero">
+    <div class="hero-badge"><div class="hero-badge-dot"></div>Referral & Affiliate Program</div>
+    <h1 class="hero-title">Earn While You<br/>Grow With Us</h1>
+    <p class="hero-sub">Refer companies to NEXUS.AI and earn up to 30% recurring commission for every paying customer you bring in — forever.</p>
+    <div class="hero-ctas">
+      <button class="btn-gold" onclick="document.getElementById('join').scrollIntoView({behavior:'smooth'})">
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+        Join the Program
+      </button>
+      <button class="btn-outline-light" onclick="document.getElementById('tiers').scrollIntoView({behavior:'smooth'})">
+        View Commission Tiers →
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div>
+        <div class="hstat-num" id="stat-payout">$0</div>
+        <div class="hstat-label">Paid out to affiliates</div>
+      </div>
+      <div>
+        <div class="hstat-num" id="stat-partners">0</div>
+        <div class="hstat-label">Active affiliates</div>
+      </div>
+      <div>
+        <div class="hstat-num">30%</div>
+        <div class="hstat-label">Max recurring commission</div>
+      </div>
+      <div>
+        <div class="hstat-num">Forever</div>
+        <div class="hstat-label">Commission duration</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── HOW IT WORKS ── -->
+  <section style="padding:80px 32px;" id="how">
+    <div class="av">
+      <p class="section-eyebrow">How It Works</p>
+      <h2 class="section-heading">Simple. Transparent.<br/>Recurring.</h2>
+      <p class="section-sub">No complex rules. Share your link, companies sign up, you earn — every single month they stay.</p>
+    </div>
+    <div class="steps-grid av d2">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <div class="step-icon" style="background:var(--gold-dim);">🔗</div>
+        <div class="step-title">Get Your Link</div>
+        <div class="step-desc">Sign up and receive a unique referral link with a 90-day cookie window. Share it anywhere.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <div class="step-icon" style="background:var(--blue-dim);">📢</div>
+        <div class="step-title">Share & Promote</div>
+        <div class="step-desc">Post on LinkedIn, blog about it, add to your newsletter, or DM your network directly.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <div class="step-icon" style="background:var(--green-dim);">🏢</div>
+        <div class="step-title">Company Signs Up</div>
+        <div class="step-desc">When a company subscribes via your link, they're automatically attributed to you — permanently.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-num">04</div>
+        <div class="step-icon" style="background:var(--purple-dim);">💰</div>
+        <div class="step-title">Earn Every Month</div>
+        <div class="step-desc">You earn a percentage of their subscription every single billing cycle — for as long as they stay.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── COMMISSION TIERS ── -->
+  <div class="tiers-wrap" id="tiers">
+    <section style="padding:0;">
+      <div class="av">
+        <p class="section-eyebrow">Commission Tiers</p>
+        <h2 class="section-heading">The More You Refer,<br/>The More You Earn</h2>
+        <p class="section-sub">Tiers are based on total active paying companies referred. Upgrade is automatic.</p>
+      </div>
+      <div class="tiers-grid av d2">
+
+        <!-- Starter -->
+        <div class="tier-card">
+          <div class="tier-icon" style="background:rgba(90,90,110,0.2);">🌱</div>
+          <div class="tier-name">Starter</div>
+          <div class="tier-commission" style="color:var(--soft);">15%</div>
+          <div class="tier-period">recurring / month</div>
+          <div class="tier-divider"></div>
+          <div class="tier-perks">
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>15% on all plans</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>90-day cookie window</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>Real-time dashboard</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>Monthly payouts</div>
+            <div class="perk"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Co-marketing materials</div>
+            <div class="perk"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Dedicated partner manager</div>
+          </div>
+          <div class="tier-req">Requirement: 1–4 active referrals</div>
+          <button class="tier-btn outline" style="margin-top:16px;" onclick="joinProgram()">Get Started</button>
+        </div>
+
+        <!-- Pro (Featured) -->
+        <div class="tier-card featured" id="join">
+          <div class="tier-badge">Most Popular</div>
+          <div class="tier-icon" style="background:var(--gold-dim);">⭐</div>
+          <div class="tier-name">Pro Affiliate</div>
+          <div class="tier-commission" style="color:var(--gold);">25%</div>
+          <div class="tier-period">recurring / month</div>
+          <div class="tier-divider"></div>
+          <div class="tier-perks">
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>25% on all plans</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>90-day cookie window</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>Real-time dashboard</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>Weekly payouts</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>Co-marketing materials</div>
+            <div class="perk"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Dedicated partner manager</div>
+          </div>
+          <div class="tier-req">Requirement: 5–19 active referrals</div>
+          <button class="tier-btn gold" style="margin-top:16px;" onclick="joinProgram()">Join Now →</button>
+        </div>
+
+        <!-- Elite -->
+        <div class="tier-card">
+          <div class="tier-icon" style="background:var(--purple-dim);">💎</div>
+          <div class="tier-name">Elite Partner</div>
+          <div class="tier-commission" style="color:var(--purple);">30%</div>
+          <div class="tier-period">recurring / month</div>
+          <div class="tier-divider"></div>
+          <div class="tier-perks">
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>30% on all plans</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>90-day cookie window</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>Real-time dashboard</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>Daily payouts</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>Co-marketing materials</div>
+            <div class="perk yes"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/></svg>Dedicated partner manager</div>
+          </div>
+          <div class="tier-req">Requirement: 20+ active referrals</div>
+          <button class="tier-btn outline" style="margin-top:16px;border-color:rgba(167,139,250,0.3);color:var(--purple);" onclick="joinProgram()">Apply Now</button>
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <!-- ── EARNINGS CALCULATOR ── -->
+  <section style="padding:80px 32px;" id="calculator">
+    <div class="av" style="text-align:center;margin-bottom:44px;">
+      <p class="section-eyebrow">Earnings Calculator</p>
+      <h2 class="section-heading">See What You Could Earn</h2>
+    </div>
+    <div class="av d2" style="background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:36px;max-width:680px;margin:0 auto;position:relative;overflow:hidden;backdrop-filter:blur(8px);">
+      <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:28px;">
+        <div>
+          <label style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:10px;">Companies Referred</label>
+          <input type="range" id="calc-companies" min="1" max="50" value="10" oninput="calcEarnings()" style="width:100%;accent-color:var(--gold);cursor:pointer;"/>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;color:var(--gold);margin-top:8px;" id="calc-co-num">10 companies</div>
+        </div>
+        <div>
+          <label style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:10px;">Average Plan</label>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="share-btn on-plan" onclick="setPlan(29,this)" style="border-color:var(--border2);color:var(--soft);">Starter $29</button>
+            <button class="share-btn on-plan active-plan" onclick="setPlan(79,this)" style="border-color:var(--gold);color:var(--gold);">Pro $79</button>
+            <button class="share-btn on-plan" onclick="setPlan(199,this)" style="border-color:var(--border2);color:var(--soft);">Enterprise $199</button>
+          </div>
+        </div>
+      </div>
+      <div style="background:rgba(26,26,26,0.04);border:1px solid rgba(26,26,26,0.08);border-radius:14px;padding:24px;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center;">
+        <div>
+          <div style="font-size:11px;color:var(--ink-ghost);margin-bottom:6px;font-family:'JetBrains Mono',monospace;">MONTHLY</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--green);" id="calc-monthly">$0</div>
+        </div>
+        <div style="border-left:1px solid var(--border);border-right:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--ink-ghost);margin-bottom:6px;font-family:'JetBrains Mono',monospace;">ANNUAL</div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--gold);" id="calc-annual">$0</div>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--ink-ghost);margin-bottom:6px;font-family:'JetBrains Mono',monospace;">YOUR TIER</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--purple);" id="calc-tier">Pro</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--ink-ghost);text-align:center;margin-top:14px;">*Estimates based on monthly subscription, 0% churn. Actual earnings may vary.</p>
+    </div>
+  </section>
+
+  <!-- ── DASHBOARD PREVIEW ── -->
+  <div class="dash-section">
+    <section style="padding:0;">
+      <div class="av" style="text-align:center;margin-bottom:0;">
+        <p class="section-eyebrow">Affiliate Dashboard</p>
+        <h2 class="section-heading">Full Transparency,<br/>Real-time Tracking</h2>
+        <p class="section-sub" style="margin:0 auto;">See every click, signup, and commission in real time. Your referral link, payout history, and performance — all in one place.</p>
+      </div>
+      <div class="dash-preview av d2">
+        <div class="dash-top">
+          <div class="dash-title">Your Affiliate Dashboard</div>
+          <div class="dash-period">May 2025 · Pro Affiliate</div>
+        </div>
+        <div class="dash-kpis">
+          <div class="dk">
+            <div class="dk-num" id="dk1">$0</div>
+            <div class="dk-label">Earned this month</div>
+            <div class="dk-delta">↑ +18% vs last month</div>
+          </div>
+          <div class="dk">
+            <div class="dk-num" id="dk2">0</div>
+            <div class="dk-label">Active referrals</div>
+            <div class="dk-delta">↑ +3 this month</div>
+          </div>
+          <div class="dk">
+            <div class="dk-num" id="dk3">0</div>
+            <div class="dk-label">Total clicks</div>
+            <div class="dk-delta">↑ +22% this week</div>
+          </div>
+          <div class="dk">
+            <div class="dk-num" id="dk4">0%</div>
+            <div class="dk-label">Conversion rate</div>
+            <div class="dk-delta">↑ +2.1pp</div>
+          </div>
+        </div>
+        <table class="ref-table">
+          <thead>
+            <tr>
+              <th>Company</th>
+              <th>Plan</th>
+              <th>Monthly Commission</th>
+              <th>Status</th>
+              <th>Since</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Acme Corp</td><td style="color:#8B6B2E;font-family:'JetBrains Mono',monospace;font-size:11px;">Pro $79</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:700;">$19.75</td><td><span class="ref-status rs-active">✓ Active</span></td><td style="font-size:11px;color:var(--ink-ghost);">Jan 2025</td></tr>
+            <tr><td>BuildMax Ltd</td><td style="color:#8B6B2E;font-family:'JetBrains Mono',monospace;font-size:11px;">Pro $79</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:700;">$19.75</td><td><span class="ref-status rs-active">✓ Active</span></td><td style="font-size:11px;color:var(--ink-ghost);">Feb 2025</td></tr>
+            <tr><td>GrandHotel Co</td><td style="color:var(--ink-ghost);font-family:'JetBrains Mono',monospace;font-size:11px;">Starter $29</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:700;">$7.25</td><td><span class="ref-status rs-trial">⏳ Trial</span></td><td style="font-size:11px;color:var(--ink-ghost);">Apr 2025</td></tr>
+            <tr><td>SwiftLogistics</td><td style="color:#8B6B2E;font-family:'JetBrains Mono',monospace;font-size:11px;">Pro $79</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:700;">$19.75</td><td><span class="ref-status rs-active">✓ Active</span></td><td style="font-size:11px;color:var(--ink-ghost);">Mar 2025</td></tr>
+            <tr><td>NovaPharma</td><td style="color:#7C5CBF;font-family:'JetBrains Mono',monospace;font-size:11px;">Enterprise $199</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-weight:700;">$49.75</td><td><span class="ref-status rs-active">✓ Active</span></td><td style="font-size:11px;color:var(--ink-ghost);">Dec 2024</td></tr>
+          </tbody>
+        </table>
+        <div style="margin-top:20px;">
+          <div style="font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-ghost);margin-bottom:10px;">Your Referral Link</div>
+          <div class="ref-link-box">
+            <div class="ref-link-val">https://nexus.ai/ref/your_username_here</div>
+            <button class="copy-btn" onclick="copyLink()">
+              <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              Copy
+            </button>
+          </div>
+          <div class="share-btns" style="margin-top:12px;">
+            <button class="share-btn" onclick="showToast('Opening LinkedIn…')">🔷 LinkedIn</button>
+            <button class="share-btn" onclick="showToast('Opening Twitter…')">✖ Twitter / X</button>
+            <button class="share-btn" onclick="showToast('Opening WhatsApp…')">💬 WhatsApp</button>
+            <button class="share-btn" onclick="showToast('Copying email template…')">✉️ Email Template</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── FAQ ── -->
+  <div class="faq-section">
+    <section style="padding:0;">
+      <div class="av" style="text-align:center;">
+        <p class="section-eyebrow">FAQ</p>
+        <h2 class="section-heading">Common Questions</h2>
+      </div>
+      <div class="faq-grid av d2">
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q"><span class="faq-q-text">When do I get paid?</span><div class="faq-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+          <div class="faq-a">Payouts happen monthly (Starter), weekly (Pro), or daily (Elite) via bank transfer, PayPal, or Wise. Minimum payout threshold is $50.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q"><span class="faq-q-text">How long does the cookie last?</span><div class="faq-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+          <div class="faq-a">Your referral cookie lasts 90 days. If someone clicks your link and subscribes within 90 days, you earn commission — even if they came back directly.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q"><span class="faq-q-text">Do I earn on plan upgrades?</span><div class="faq-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+          <div class="faq-a">Yes! Commission is calculated on the actual plan value. If your referral upgrades from Pro ($79) to Enterprise ($199), your earnings increase automatically that same billing cycle.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q"><span class="faq-q-text">Can I refer my own company?</span><div class="faq-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+          <div class="faq-a">Self-referrals are not permitted and will be flagged by our fraud detection system. Affiliate accounts found self-referring will be permanently suspended.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q"><span class="faq-q-text">What happens if a referral cancels?</span><div class="faq-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+          <div class="faq-a">Commission stops when a referred company cancels. If they resubscribe within 60 days, you resume earning. After 60 days, the attribution resets.</div>
+        </div>
+        <div class="faq-item" onclick="toggleFaq(this)">
+          <div class="faq-q"><span class="faq-q-text">Is there a limit on how much I can earn?</span><div class="faq-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div></div>
+          <div class="faq-a">No cap, no limit. Some of our top affiliates earn over $10,000/month. The more companies you refer, the more you earn — with no ceiling.</div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ── CTA ── -->
+  <div class="cta-section">
+    <section style="padding:0;">
+      <div class="cta-banner av">
+        <h2 class="cta-title">Ready to Start Earning?</h2>
+        <p class="cta-sub">Join 340+ affiliates already earning recurring commissions. Takes 2 minutes to set up.</p>
+        <div class="cta-btns">
+          <button class="btn-gold" onclick="joinProgram()">
+            <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+            Create Affiliate Account
+          </button>
+          <button class="btn-outline-light" onclick="showToast('Opening partner documentation…')">Read Partner Docs →</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+</div><!-- /page -->
+
+<script>
+/* ═══ CALCULATOR ═══ */
+var calcPlan = 79;
+
+function setPlan(price, btn) {
+  calcPlan = price;
+  document.querySelectorAll('.on-plan').forEach(function(b){
+    b.style.borderColor='var(--border2)';b.style.color='var(--soft)';
+  });
+  btn.style.borderColor='var(--gold)';btn.style.color='var(--gold)';
+  calcEarnings();
+}
+
+function calcEarnings() {
+  var cos = parseInt(document.getElementById('calc-companies').value);
+  document.getElementById('calc-co-num').textContent = cos + ' companies';
+  var pct = cos >= 20 ? 0.30 : cos >= 5 ? 0.25 : 0.15;
+  var tierName = cos >= 20 ? 'Elite' : cos >= 5 ? 'Pro' : 'Starter';
+  var tierColor = cos >= 20 ? 'var(--purple)' : cos >= 5 ? 'var(--gold)' : 'var(--soft)';
+  var monthly = Math.round(cos * calcPlan * pct);
+  var annual  = monthly * 12;
+  document.getElementById('calc-monthly').textContent = '$' + monthly.toLocaleString();
+  document.getElementById('calc-annual').textContent  = '$' + annual.toLocaleString();
+  document.getElementById('calc-tier').textContent   = tierName;
+  document.getElementById('calc-tier').style.color   = tierColor;
+}
+
+/* ═══ COUNTERS ═══ */
+function countUp(id, target, prefix, suffix, dur) {
+  var el = document.getElementById(id), s = 0, step = target/(dur/16);
+  var t = setInterval(function(){
+    s = Math.min(s+step, target);
+    el.textContent = (prefix||'') + Math.round(s).toLocaleString() + (suffix||'');
+    if(s>=target) clearInterval(t);
+  },16);
+}
+
+/* ═══ FAQ ═══ */
+function toggleFaq(item) {
+  var wasOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(function(i){i.classList.remove('open');});
+  if(!wasOpen) item.classList.add('open');
+}
+
+/* ═══ SCROLL REVEAL ═══ */
+var observer = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting) e.target.classList.add('in');});
+},{threshold:0.1});
+document.querySelectorAll('.av').forEach(function(el){observer.observe(el);});
+
+/* ═══ JOIN ═══ */
+function joinProgram() {
+  showToast('Redirecting to affiliate signup…');
+}
+
+/* ═══ COPY LINK ═══ */
+function copyLink() {
+  navigator.clipboard.writeText('https://nexus.ai/ref/your_username_here').catch(function(){});
+  showToast('Referral link copied!');
+}
+
+/* ═══ TOAST ═══ */
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2500);
+}
+
+/* ═══ INIT ═══ */
+window.addEventListener('load',function(){
+  calcEarnings();
+  setTimeout(function(){
+    countUp('stat-payout',142600,'$','',1600);
+    countUp('stat-partners',340,'','',1000);
+    countUp('dk1',1975,'$','',1200);
+    countUp('dk2',11,'','',900);
+    countUp('dk3',2840,'','',1100);
+    countUp('dk4',8,'','%',800);
+  },400);
+});
+</script>
+</body>
+</html>
