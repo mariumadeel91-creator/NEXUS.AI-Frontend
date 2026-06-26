@@ -363,6 +363,73 @@
     flex-shrink: 0;
   }
   .send-btn:hover { background: var(--gold); color: var(--ink); transform: translateY(-1px); }
+
+  .sidebar-toggle {
+    display: none;
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: white;
+    color: var(--ink);
+    align-items: center; justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .sidebar-toggle svg { width: 18px; height: 18px; }
+
+  .sidebar-overlay {
+    display: none;
+  }
+
+  /* ══ MOBILE RESPONSIVE (phones & tablets) ══ */
+  @media(max-width: 768px) {
+    nav { padding: 14px 16px; }
+    .logo-text { font-size: 14px; letter-spacing: .1em; }
+    .nav-badge { font-size: 0.62rem; }
+
+    .chat-layout { grid-template-columns: 1fr; position: relative; }
+
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: 80vw; max-width: 300px;
+      z-index: 400;
+      transform: translateX(-100%);
+      transition: transform .3s cubic-bezier(0.16,1,0.3,1);
+      box-shadow: 0 0 40px rgba(0,0,0,0.15);
+    }
+    .sidebar.open { transform: translateX(0); }
+
+    .sidebar-overlay {
+      display: block;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 390;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .3s;
+    }
+    .sidebar-overlay.open { opacity: 1; pointer-events: all; }
+
+    .sidebar-toggle { display: flex; }
+
+    .chat-header { padding: 14px 16px; gap: 10px; }
+    .chat-header-name { font-size: 0.85rem; }
+    .chat-header-sub { font-size: 0.7rem; }
+    .chat-header-tag { display: none; }
+
+    .messages { padding: 16px; gap: 14px; }
+    .msg-bubble { max-width: 82%; font-size: 0.85rem; padding: 12px 14px; }
+
+    .chat-input-area { padding: 14px 16px; }
+    .quick-prompts { gap: 6px; }
+    .quick-btn { font-size: 0.7rem; padding: 5px 11px; }
+  }
+
+  @media(max-width: 420px) {
+    .msg-bubble { max-width: 88%; }
+    .nav-badge { display: none; }
+  }
 </style>
 </head>
 <body>
@@ -384,8 +451,9 @@
 </nav>
 
 <div class="chat-layout">
+  <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
   <!-- Sidebar -->
-  <div class="sidebar">
+  <div class="sidebar" id="sidebar">
     <a href="javascript:history.back()" class="sidebar-back">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"/>
@@ -463,6 +531,9 @@
   <!-- Chat -->
   <div class="chat-area">
     <div class="chat-header">
+      <button class="sidebar-toggle" onclick="toggleSidebar()" aria-label="Toggle topics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <div class="ai-avatar">⬡</div>
       <div class="chat-header-info">
         <div class="chat-header-name">Nexus Policy Assistant</div>
@@ -724,6 +795,8 @@
     document.querySelectorAll('.topic-item').forEach(i => i.classList.remove('active'));
     el.classList.add('active');
 
+    if (window.innerWidth <= 768) toggleSidebar();
+
     const data = topicData[key];
 
     document.querySelector('.chat-header-name').textContent = data.headerName;
@@ -783,6 +856,11 @@
       const sub = item.querySelector('.topic-sub').textContent.toLowerCase();
       item.style.display = (!q || name.includes(q) || sub.includes(q)) ? '' : 'none';
     });
+  }
+
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebar-overlay').classList.toggle('open');
   }
 </script>
 
