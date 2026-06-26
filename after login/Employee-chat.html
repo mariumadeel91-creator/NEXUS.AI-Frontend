@@ -5,6 +5,41 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Employee AI Chat — Nexus.AI</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=JetBrains+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<script src="i18n.js"></script>
+  <!-- ══ NEXUS THEME ENGINE — reads localStorage set by settings.html ══ -->
+  <script>
+  (function(){
+    const ACCENTS = {
+      '#C8A96E': { gold:'#C8A96E', soft:'rgba(200,169,110,0.12)', glow:'rgba(200,169,110,0.18)' },
+      '#2D7A4F': { gold:'#2D7A4F', soft:'rgba(45,122,79,0.12)',   glow:'rgba(45,122,79,0.18)'   },
+      '#3B6FD8': { gold:'#3B6FD8', soft:'rgba(59,111,216,0.12)',  glow:'rgba(59,111,216,0.18)'  },
+      '#8E5BD8': { gold:'#8E5BD8', soft:'rgba(142,91,216,0.12)',  glow:'rgba(142,91,216,0.18)'  },
+      '#C0392B': { gold:'#C0392B', soft:'rgba(192,57,43,0.12)',   glow:'rgba(192,57,43,0.18)'   },
+      '#1C1C1E': { gold:'#1C1C1E', soft:'rgba(26,26,26,0.12)',    glow:'rgba(26,26,26,0.18)'    },
+    };
+
+    const LIGHT= { '--bg':'#FAF8F5','--ink':'#1C1C1E','--ink-soft':'#6B6860','--ink-ghost':'#9B9890','--card':'rgba(255,255,255,0.72)','--border':'rgba(26,26,26,0.09)' };
+    try {
+      const hex   = localStorage.getItem('nxs_accent') || '#C8A96E';
+
+      const p = ACCENTS[hex] || ACCENTS['#C8A96E'];
+      const r = document.documentElement.style;
+      r.setProperty('--gold', p.gold);
+      r.setProperty('--gold-soft', p.soft);
+      r.setProperty('--glow', p.glow);
+
+
+      Object.entries(LIGHT).forEach(([k,v])=>r.setProperty(k,v));
+      document.documentElement.setAttribute('data-theme', 'light');
+      const html = document.documentElement;
+      html.setAttribute('data-compact', localStorage.getItem('nxs_compact') === '1' ? '1' : '0');
+      html.setAttribute('data-reduce-motion', localStorage.getItem('nxs_reduce_motion') === '1' ? '1' : '0');
+      html.setAttribute('data-tooltips', localStorage.getItem('nxs_tooltips') === '0' ? '0' : '1');
+      html.setAttribute('data-density', localStorage.getItem('nxs_density') || 'comfortable');
+      html.setAttribute('data-fontsize', localStorage.getItem('nxs_fontsize') || 'medium');
+    } catch(e){}
+  })();
+  </script>
 <style>
   :root {
     --bg: #FAF8F5;
@@ -123,6 +158,12 @@
   }
   .topic-item:hover { background: var(--surface); }
   .topic-item.active { background: var(--gold-dim); }
+  .topic-arrow {
+    margin-left: auto; flex-shrink: 0;
+    color: #9B9890; font-size: 14px;
+    transition: transform .3s cubic-bezier(0.34,1.56,0.64,1), color .3s;
+  }
+  .topic-item:hover .topic-arrow { transform: translateX(4px); color: var(--gold); }
   .topic-icon { font-size: 1rem; width: 24px; text-align: center; flex-shrink: 0; }
   .topic-name { font-size: 0.82rem; font-weight: 500; color: var(--ink); }
   .topic-sub { font-size: 0.7rem; color: var(--muted); }
@@ -349,14 +390,14 @@
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
         <polyline points="15 18 9 12 15 6"/>
       </svg>
-      Back
+      <span data-i18n="common.back">Back</span>
     </a>
     <div class="sidebar-back-divider"></div>
     <div class="sidebar-header">
       <div class="sidebar-title">Topics</div>
       <div class="search-box" style="padding:0; background:var(--surface); border:1px solid var(--border); border-radius:8px; display:flex; align-items:center; gap:8px; padding-left:12px;">
         <span style="font-size:0.85rem; flex-shrink:0;">🔍</span>
-        <input id="policy-search" type="text" placeholder="Search policies..." oninput="filterTopics(this.value)" style="flex:1; border:none; background:transparent; outline:none; font-size:0.82rem; color:var(--ink); font-family:'DM Sans',sans-serif; padding:8px 12px 8px 0;" />
+        <input id="policy-search" type="text" placeholder="Search policies..." data-i18n-placeholder="common.search" oninput="filterTopics(this.value)" style="flex:1; border:none; background:transparent; outline:none; font-size:0.82rem; color:var(--ink); font-family:'DM Sans',sans-serif; padding:8px 12px 8px 0;" />
       </div>
     </div>
     <div class="topic-list">
@@ -366,6 +407,7 @@
           <div class="topic-name">Compliance & Legal</div>
           <div class="topic-sub">8 policies</div>
         </div>
+        <span class="topic-arrow">→</span>
       </div>
       <div class="topic-item" onclick="switchTopic(this, 'HR & Employee Relations', '🤝', '12 policies', 'hr')">
         <div class="topic-icon">🤝</div>
@@ -373,6 +415,7 @@
           <div class="topic-name">HR & Employee Relations</div>
           <div class="topic-sub">12 policies</div>
         </div>
+        <span class="topic-arrow">→</span>
       </div>
       <div class="topic-item" onclick="switchTopic(this, 'Data Privacy', '🔒', '5 policies', 'privacy')">
         <div class="topic-icon">🔒</div>
@@ -380,6 +423,7 @@
           <div class="topic-name">Data Privacy</div>
           <div class="topic-sub">5 policies</div>
         </div>
+        <span class="topic-arrow">→</span>
       </div>
       <div class="topic-item" onclick="switchTopic(this, 'Leave & Benefits', '💼', '7 policies', 'leave')">
         <div class="topic-icon">💼</div>
@@ -387,6 +431,7 @@
           <div class="topic-name">Leave & Benefits</div>
           <div class="topic-sub">7 policies</div>
         </div>
+        <span class="topic-arrow">→</span>
       </div>
       <div class="topic-item" onclick="switchTopic(this, 'Health & Safety', '🛡️', '6 policies', 'safety')">
         <div class="topic-icon">🛡️</div>
@@ -394,6 +439,7 @@
           <div class="topic-name">Health & Safety</div>
           <div class="topic-sub">6 policies</div>
         </div>
+        <span class="topic-arrow">→</span>
       </div>
       <div class="topic-item" onclick="switchTopic(this, 'IT & Device Policy', '💻', '4 policies', 'it')">
         <div class="topic-icon">💻</div>
@@ -401,6 +447,7 @@
           <div class="topic-name">IT & Device Policy</div>
           <div class="topic-sub">4 policies</div>
         </div>
+        <span class="topic-arrow">→</span>
       </div>
       <div class="topic-item" onclick="switchTopic(this, 'Performance Reviews', '📊', '3 policies', 'performance')">
         <div class="topic-icon">📊</div>
@@ -408,6 +455,7 @@
           <div class="topic-name">Performance Reviews</div>
           <div class="topic-sub">3 policies</div>
         </div>
+        <span class="topic-arrow">→</span>
       </div>
     </div>
   </div>
@@ -490,7 +538,7 @@
         <button class="quick-btn" onclick="sendQuick(this)">🚨 Report misconduct</button>
       </div>
       <div class="input-row">
-        <textarea class="chat-input" id="chat-input" placeholder="Ask about any company policy..." rows="1"></textarea>
+        <textarea class="chat-input" id="chat-input" placeholder="Ask about any company policy..." data-i18n-placeholder="chat.placeholder" rows="1"></textarea>
         <button class="send-btn" onclick="sendMsg()">→</button>
       </div>
     </div>
@@ -737,5 +785,43 @@
     });
   }
 </script>
+
+<!-- ══ NEXUS CUSTOM CURSOR ══ -->
+<style>
+  #nxs-cur{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--gold);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform .1s,opacity .3s,width .25s cubic-bezier(0.34,1.56,0.64,1),height .25s cubic-bezier(0.34,1.56,0.64,1),background .2s;mix-blend-mode:multiply;will-change:transform;}
+  #nxs-cur-ring{position:fixed;width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(200,169,110,0.5);pointer-events:none;z-index:9997;transform:translate(-50%,-50%);transition:transform .08s,opacity .3s,width .35s cubic-bezier(0.16,1,0.3,1),height .35s cubic-bezier(0.16,1,0.3,1),border-color .2s;will-change:transform;}
+  body:has(a:hover) #nxs-cur,body:has(button:hover) #nxs-cur{width:6px;height:6px;}
+  body:has(a:hover) #nxs-cur-ring,body:has(button:hover) #nxs-cur-ring{width:44px;height:44px;border-color:rgba(200,169,110,0.7);}
+  @media(hover:none){#nxs-cur,#nxs-cur-ring{display:none;}}
+</style>
+<script>
+(function(){
+  if(window.matchMedia('(hover:hover)').matches){
+    const cur=document.createElement('div');cur.id='nxs-cur';
+    const ring=document.createElement('div');ring.id='nxs-cur-ring';
+    document.body.appendChild(cur);document.body.appendChild(ring);
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';},{passive:true});
+    function animRing(){rx+=(mx-rx)*.15;ry+=(my-ry)*.15;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);}
+    animRing();
+  }
+})();
+</script>
+
+<!-- ══ NEXUS CHAT FAB ══ -->
+<style>
+  .chat-fab{position:fixed;bottom:32px;right:32px;z-index:500;width:56px;height:56px;border-radius:50%;background:#1C1C1E;border:1.5px solid rgba(200,169,110,0.35);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(28,28,30,0.2),0 4px 12px rgba(28,28,30,0.12);transition:all .4s cubic-bezier(0.34,1.56,0.64,1);animation:fabBreathe 4s ease-in-out infinite;outline:none;text-decoration:none;}
+  @keyframes fabBreathe{0%,100%{box-shadow:0 8px 32px rgba(28,28,30,0.2),0 0 0 0 rgba(200,169,110,0);}50%{box-shadow:0 8px 32px rgba(28,28,30,0.2),0 0 0 8px rgba(200,169,110,0.1);}}
+  .chat-fab:hover{transform:scale(1.12) rotate(-5deg);box-shadow:0 16px 48px rgba(28,28,30,0.28),0 6px 18px rgba(200,169,110,0.2);animation:none;}
+  .chat-fab:active{transform:scale(0.95);}
+  .chat-fab-badge{position:absolute;top:-3px;right:-3px;width:18px;height:18px;border-radius:50%;background:#E24B4A;color:#fff;font-family:'Syne',sans-serif;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FAF8F5;animation:badgeBounce 2s ease-in-out infinite;}
+  @keyframes badgeBounce{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+  @media(max-width:600px){.chat-fab{bottom:20px;right:20px;}}
+</style>
+
+<a class="chat-fab" href="dashbaord.html" aria-label="Back to Dashboard">
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+  <span class="chat-fab-badge">2</span>
+</a>
 </body>
 </html>

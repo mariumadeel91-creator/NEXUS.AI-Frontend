@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NEXUS.AI | My Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,700;1,600;1,700&display=swap" rel="stylesheet"/>
+  <script src="i18n.js"></script>
+  <!-- ══ NEXUS THEME ENGINE — reads localStorage set by settings.html ══ -->
+  <script>
+  (function(){
+    const ACCENTS = {
+      '#C8A96E': { gold:'#C8A96E', soft:'rgba(200,169,110,0.12)', glow:'rgba(200,169,110,0.18)' },
+      '#2D7A4F': { gold:'#2D7A4F', soft:'rgba(45,122,79,0.12)',   glow:'rgba(45,122,79,0.18)'   },
+      '#3B6FD8': { gold:'#3B6FD8', soft:'rgba(59,111,216,0.12)',  glow:'rgba(59,111,216,0.18)'  },
+      '#8E5BD8': { gold:'#8E5BD8', soft:'rgba(142,91,216,0.12)',  glow:'rgba(142,91,216,0.18)'  },
+      '#C0392B': { gold:'#C0392B', soft:'rgba(192,57,43,0.12)',   glow:'rgba(192,57,43,0.18)'   },
+      '#1C1C1E': { gold:'#1C1C1E', soft:'rgba(26,26,26,0.12)',    glow:'rgba(26,26,26,0.18)'    },
+    };
+
+    const LIGHT= { '--bg':'#FAF8F5','--ink':'#1C1C1E','--ink-soft':'#6B6860','--ink-ghost':'#9B9890','--card':'rgba(255,255,255,0.72)','--border':'rgba(26,26,26,0.09)' };
+    try {
+      const hex   = localStorage.getItem('nxs_accent') || '#C8A96E';
+
+      const p = ACCENTS[hex] || ACCENTS['#C8A96E'];
+      const r = document.documentElement.style;
+      r.setProperty('--gold', p.gold);
+      r.setProperty('--gold-soft', p.soft);
+      r.setProperty('--glow', p.glow);
+
+
+      Object.entries(LIGHT).forEach(([k,v])=>r.setProperty(k,v));
+      document.documentElement.setAttribute('data-theme', 'light');
+      const html = document.documentElement;
+      html.setAttribute('data-compact', localStorage.getItem('nxs_compact') === '1' ? '1' : '0');
+      html.setAttribute('data-reduce-motion', localStorage.getItem('nxs_reduce_motion') === '1' ? '1' : '0');
+      html.setAttribute('data-tooltips', localStorage.getItem('nxs_tooltips') === '0' ? '0' : '1');
+      html.setAttribute('data-density', localStorage.getItem('nxs_density') || 'comfortable');
+      html.setAttribute('data-fontsize', localStorage.getItem('nxs_fontsize') || 'medium');
+    } catch(e){}
+  })();
+  </script>
+  <style>
+    :root {
+      --ink: #1C1C1E; --ink-soft: #6B6860; --ink-ghost: #9B9890;
+      --bg: #FAF8F5; --gold: #C8A96E; --glow: rgba(200,169,110,0.18);
+      --border: rgba(26,26,26,0.09); --card: rgba(255,255,255,0.72);
+      --green:#2D7A4F; --red:#C0392B;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;overflow-x:hidden;min-height:100vh;}
+    h1,h2,h3,h4{font-family:'Bricolage Grotesque',sans-serif;}
+
+    /* ── LUXURY BACKGROUND ── */
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.038'/%3E%3C/svg%3E");background-repeat:repeat;background-size:200px 200px;mix-blend-mode:multiply;}
+    .bg-orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;will-change:transform;}
+    .bg-orb-1{width:700px;height:700px;background:radial-gradient(circle,rgba(200,169,110,0.07) 0%,transparent 70%);top:-200px;right:-200px;animation:orbDrift1 18s ease-in-out infinite alternate;}
+    .bg-orb-2{width:500px;height:500px;background:radial-gradient(circle,rgba(45,122,79,0.04) 0%,transparent 70%);bottom:-100px;left:-100px;animation:orbDrift2 22s ease-in-out infinite alternate;}
+    .bg-orb-3{width:400px;height:400px;background:radial-gradient(circle,rgba(200,169,110,0.04) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:orbDrift3 15s ease-in-out infinite alternate;}
+    @keyframes orbDrift1{from{transform:translate(0,0)scale(1);}to{transform:translate(-60px,40px)scale(1.15);}}
+    @keyframes orbDrift2{from{transform:translate(0,0)scale(1);}to{transform:translate(50px,-60px)scale(1.2);}}
+    @keyframes orbDrift3{from{transform:translate(-50%,-50%)scale(1);}to{transform:translate(-50%,-50%)scale(1.1)rotate(10deg);}}
+    .aurora-line{position:fixed;pointer-events:none;z-index:0;height:1px;width:200%;opacity:0.06;}
+    .aurora-line-1{top:20%;background:linear-gradient(90deg,transparent,rgba(200,169,110,0.8),transparent);animation:auroraFlow1 8s ease-in-out infinite;}
+    .aurora-line-2{top:50%;background:linear-gradient(90deg,transparent,rgba(45,122,79,0.6),transparent);animation:auroraFlow2 12s ease-in-out infinite 2s;}
+    @keyframes auroraFlow1{0%,100%{transform:translateX(-50%)scaleY(1);}50%{transform:translateX(-25%)scaleY(3);}}
+    @keyframes auroraFlow2{0%,100%{transform:translateX(-60%);}50%{transform:translateX(-30%)scaleY(2);}}
+    .scan-grid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.018;background-image:linear-gradient(rgba(200,169,110,0.5) 1px,transparent 1px),linear-gradient(90deg,rgba(200,169,110,0.5) 1px,transparent 1px);background-size:60px 60px;animation:gridPulse 6s ease-in-out infinite;}
+    @keyframes gridPulse{0%,100%{opacity:0.018;}50%{opacity:0.032;}}
+
+    /* ── PRELOADER ── */
+    #preloader{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .6s ease,transform .6s ease;}
+    #preloader.hide{opacity:0;pointer-events:none;transform:scale(1.03);}
+    .preloader-logo{width:56px;height:56px;background:#1C1C1E;border-radius:14px;display:flex;align-items:center;justify-content:center;animation:preloaderPulse 1.2s ease-in-out infinite;}
+    @keyframes preloaderPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(200,169,110,0);}50%{transform:scale(1.08);box-shadow:0 0 0 12px rgba(200,169,110,0.15);}}
+    .preloader-bar-wrap{width:140px;height:3px;background:rgba(26,26,26,0.1);border-radius:2px;overflow:hidden;}
+    .preloader-bar{height:100%;width:0;background:linear-gradient(90deg,var(--gold),rgba(200,169,110,0.5));border-radius:2px;animation:preloaderLoad 1.4s cubic-bezier(0.16,1,0.3,1) forwards;}
+    @keyframes preloaderLoad{0%{width:0;}60%{width:80%;}100%{width:100%;}}
+    .preloader-text{font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:700;letter-spacing:.15em;color:#9B9890;animation:preloaderFade 1.4s ease-in-out infinite alternate;}
+    @keyframes preloaderFade{from{opacity:.5;}to{opacity:1;}}
+
+    /* ── MAIN WRAPPER ── */
+    .profile-wrap{position:relative;z-index:2;max-width:900px;margin:0 auto;padding:56px 32px 80px;}
+
+    /* ── TOP NAV BAR ── */
+    .top-nav{position:fixed;top:0;left:0;right:0;z-index:150;display:flex;align-items:center;justify-content:space-between;padding:14px 32px;background:rgba(250,248,245,0.82);backdrop-filter:blur(20px) saturate(1.6);border-bottom:1px solid var(--border);animation:fadeSlideDown .5s ease .2s both;}
+    @keyframes fadeSlideDown{from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);}}
+    .top-nav-brand{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .logo-mark{width:32px;height:32px;background:#1C1C1E;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .5s cubic-bezier(0.34,1.56,0.64,1),box-shadow .4s;}
+    .top-nav-brand:hover .logo-mark{transform:rotate(15deg)scale(1.1);box-shadow:0 8px 24px rgba(200,169,110,0.4);}
+    .brand-name{font-family:'Bricolage Grotesque',sans-serif;font-size:14.5px;font-weight:800;color:#1C1C1E;letter-spacing:.04em;}
+    .brand-name span{color:var(--gold);}
+    .back-btn{display:flex;align-items:center;gap:7px;padding:8px 16px;border-radius:100px;border:1px solid var(--border);background:var(--card);backdrop-filter:blur(12px);font-size:13px;font-weight:500;color:var(--ink-soft);cursor:pointer;text-decoration:none;transition:all .25s cubic-bezier(0.4,0,0.2,1);}
+    .back-btn:hover{border-color:rgba(200,169,110,0.4);color:var(--ink);background:rgba(200,169,110,0.08);transform:translateX(-2px);}
+    .back-btn svg{width:15px;height:15px;}
+
+    /* ── HERO CARD ── */
+    .hero-card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:24px;padding:40px;overflow:visible;backdrop-filter:blur(16px) saturate(1.6);box-shadow:0 4px 32px rgba(28,28,30,0.06);margin-bottom:20px;transition:transform .5s cubic-bezier(0.16,1,0.3,1),box-shadow .5s,border-color .4s;}
+    .hero-card:hover{transform:translateY(-4px);box-shadow:0 20px 60px rgba(28,28,30,0.13),0 0 0 1.5px rgba(200,169,110,0.45),0 0 40px rgba(200,169,110,0.08);border-color:rgba(200,169,110,0.5);}
+    @keyframes cardEnter{from{opacity:0;transform:translateY(28px)scale(0.98);}to{opacity:1;transform:translateY(0)scale(1);}}
+    /* Shimmer sweep on hover */
+    .hero-card-inner{position:absolute;inset:0;border-radius:24px;overflow:hidden;pointer-events:none;z-index:1;}
+    .hero-card-inner::before{content:'';position:absolute;inset:0;background:linear-gradient(110deg,rgba(255,255,255,0)0%,rgba(255,255,255,0.45)50%,rgba(255,255,255,0)100%);transform:translateX(-150%);transition:transform .9s cubic-bezier(0.16,1,0.3,1);}
+    .hero-card:hover .hero-card-inner::before{transform:translateX(160%);}
+    /* Gold top border accent — expands on hover */
+    .hero-card::after{content:'';position:absolute;top:0;left:20%;right:20%;height:3px;background:linear-gradient(90deg,transparent,var(--gold),rgba(200,169,110,0.3),transparent);border-radius:0 0 3px 3px;transition:left .45s cubic-bezier(0.16,1,0.3,1),right .45s cubic-bezier(0.16,1,0.3,1);}
+    .hero-card:hover::after{left:0;right:0;}
+
+    /* Cover band */
+    .hero-cover{position:absolute;top:0;left:0;right:0;height:110px;background:linear-gradient(135deg,#1C1C1E 0%,#2e2b26 60%,#3a3320 100%);overflow:hidden;}
+    .hero-cover::before{content:'';position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");opacity:.5;}
+    .hero-cover::after{content:'';position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(to top,var(--card),transparent);}
+    .cover-orb{position:absolute;width:200px;height:200px;background:radial-gradient(circle,rgba(200,169,110,0.25)0%,transparent 70%);top:-80px;right:-40px;animation:coverOrb 6s ease-in-out infinite alternate;}
+    @keyframes coverOrb{from{transform:scale(1);}to{transform:scale(1.2)translate(-20px,10px);}}
+
+    /* Avatar */
+    .hero-body{margin-top:70px;display:flex;align-items:flex-end;gap:24px;flex-wrap:wrap;}
+    .avatar-ring{position:relative;flex-shrink:0;}
+    .avatar-img{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#3a3a3a,#1C1C1E);border:4px solid var(--bg);display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-size:30px;font-weight:800;color:var(--gold);box-shadow:0 8px 28px rgba(0,0,0,0.2);position:relative;overflow:hidden;transition:transform .4s cubic-bezier(0.34,1.56,0.64,1),box-shadow .4s;}
+    .avatar-img:hover{transform:scale(1.07);box-shadow:0 12px 36px rgba(200,169,110,0.28);}
+    .status-dot{position:absolute;bottom:6px;right:6px;width:14px;height:14px;background:#2D7A4F;border-radius:50%;border:2.5px solid var(--bg);animation:statusPulse 2.5s ease-in-out infinite;}
+    @keyframes statusPulse{0%,100%{box-shadow:0 0 0 0 rgba(45,122,79,0);}50%{box-shadow:0 0 0 5px rgba(45,122,79,0.2);}}
+
+    .hero-info{flex:1;min-width:200px;}
+    .hero-name{font-family:'Playfair Display',Georgia,serif;font-weight:700;font-size:clamp(22px,3vw,28px);letter-spacing:-.01em;line-height:1.15;color:var(--ink);margin-bottom:4px;background:linear-gradient(135deg,#1C1C1E 60%,rgba(200,169,110,0.9));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .hero-role{font-size:13.5px;color:var(--ink-soft);font-weight:500;margin-bottom:10px;}
+    .hero-role span{color:var(--gold);font-weight:600;}
+    .hero-tags{display:flex;flex-wrap:wrap;gap:6px;}
+    .tag{padding:4px 11px;border-radius:100px;font-size:11px;font-weight:600;letter-spacing:.02em;}
+    .tag-gold{background:rgba(200,169,110,0.12);color:#7A5E22;border:1px solid rgba(200,169,110,0.25);}
+    .tag-green{background:rgba(45,122,79,0.1);color:#1d5936;border:1px solid rgba(45,122,79,0.2);}
+    .tag-dark{background:rgba(26,26,26,0.07);color:var(--ink-soft);border:1px solid var(--border);}
+
+    .hero-actions{display:flex;gap:10px;margin-left:auto;flex-shrink:0;align-self:center;}
+    .btn-primary{display:flex;align-items:center;gap:7px;padding:10px 20px;border-radius:100px;background:#1C1C1E;color:var(--gold);font-size:13px;font-weight:600;border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .3s cubic-bezier(0.34,1.56,0.64,1);box-shadow:0 4px 16px rgba(28,28,30,0.18);}
+    .btn-primary:hover{background:var(--gold);color:#1C1C1E;transform:translateY(-2px);box-shadow:0 8px 28px rgba(200,169,110,0.35);}
+    .btn-primary:active{transform:scale(.96);}
+    .btn-outline{display:flex;align-items:center;gap:7px;padding:10px 20px;border-radius:100px;background:var(--card);color:var(--ink-soft);font-size:13px;font-weight:600;border:1px solid var(--border);cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;transition:all .25s cubic-bezier(0.4,0,0.2,1);backdrop-filter:blur(8px);}
+    .btn-outline:hover{border-color:rgba(200,169,110,0.4);color:var(--ink);background:rgba(200,169,110,0.08);transform:translateY(-1px);}
+
+    /* ── STATS ROW ── */
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+    .stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:20px;backdrop-filter:blur(8px);position:relative;overflow:hidden;cursor:default;transition:transform .3s cubic-bezier(0.34,1.56,0.64,1),box-shadow .3s;}
+    .stat-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0)0%,rgba(255,255,255,0.45)50%,rgba(255,255,255,0)100%);transform:translateX(-150%);transition:transform .7s ease;pointer-events:none;}
+    .stat-card:hover::before{transform:translateX(150%);}
+    .stat-card:hover{transform:translateY(-3px);box-shadow:0 12px 36px rgba(28,28,30,0.09);}
+    .stat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2.5px;border-radius:0 0 16px 16px;}
+    .stat-card.gold::after{background:var(--gold);}
+    .stat-card.green::after{background:var(--green);}
+    .stat-card.red::after{background:var(--red);}
+    .stat-card.blue::after{background:#4A90D9;}
+    .stat-label{font-size:10.5px;font-weight:700;color:var(--ink-ghost);text-transform:uppercase;letter-spacing:.09em;margin-bottom:8px;}
+    .stat-value{font-family:'Bricolage Grotesque',sans-serif;font-weight:800;font-size:26px;color:var(--ink);margin-bottom:4px;counter-reset:num;}
+    .stat-sub{font-size:11.5px;color:var(--ink-ghost);}
+    .stat-sub.up{color:var(--green);}
+    .stat-sub.warn{color:#B8860B;}
+
+    /* ── TWO COL GRID ── */
+    .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+    .one-col{margin-bottom:20px;}
+
+    /* ── SECTION CARD ── */
+    .sec-card{background:var(--card);border:1px solid var(--border);border-radius:18px;padding:26px;backdrop-filter:blur(8px);position:relative;overflow:hidden;}
+    .sec-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0)0%,rgba(255,255,255,0.4)50%,rgba(255,255,255,0)100%);transform:translateX(-150%);transition:transform .7s ease;pointer-events:none;}
+    .sec-card:hover::before{transform:translateX(150%);}
+    .sec-title{font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:700;color:var(--ink);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
+    .sec-title-icon{width:28px;height:28px;background:rgba(26,26,26,0.05);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .sec-title-icon svg{width:14px;height:14px;color:var(--gold);}
+
+    /* ── INFO ROWS ── */
+    .info-row{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--border);}
+    .info-row:last-child{border-bottom:none;padding-bottom:0;}
+    .info-row:first-child{padding-top:0;}
+    .info-key{font-size:12px;font-weight:600;color:var(--ink-ghost);text-transform:uppercase;letter-spacing:.06em;}
+    .info-val{font-size:13px;font-weight:500;color:var(--ink);text-align:right;}
+    .info-val.mono{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink-soft);}
+    .info-val a{color:var(--gold);text-decoration:none;}
+    .info-val a:hover{text-decoration:underline;}
+
+    /* ── SKILL BARS ── */
+    .skill-item{margin-bottom:16px;}
+    .skill-item:last-child{margin-bottom:0;}
+    .skill-header{display:flex;justify-content:space-between;margin-bottom:7px;}
+    .skill-name{font-size:12.5px;font-weight:500;color:var(--ink-soft);}
+    .skill-pct{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--ink-ghost);}
+    .skill-track{height:6px;background:rgba(26,26,26,0.07);border-radius:100px;overflow:hidden;}
+    .skill-fill{height:100%;border-radius:100px;background:linear-gradient(90deg,rgba(200,169,110,0.5),var(--gold));width:0;transition:width 1.4s cubic-bezier(0.16,1,0.3,1);}
+    .skill-fill.green{background:linear-gradient(90deg,rgba(45,122,79,0.5),var(--green));}
+    .skill-fill.blue{background:linear-gradient(90deg,rgba(74,144,217,0.5),#4A90D9);}
+
+    /* ── ACTIVITY FEED ── */
+    .activity-item{display:flex;gap:13px;padding:12px 0;border-bottom:1px solid var(--border);position:relative;}
+    .activity-item:last-child{border-bottom:none;}
+    .activity-item::before{content:'';position:absolute;left:19px;top:36px;bottom:-12px;width:1px;background:rgba(26,26,26,0.07);}
+    .activity-item:last-child::before{display:none;}
+    .act-dot{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+    .act-dot svg{width:16px;height:16px;}
+    .act-dot.gold{background:rgba(200,169,110,0.12);color:#9A6E1E;}
+    .act-dot.green{background:rgba(45,122,79,0.1);color:#1d5936;}
+    .act-dot.red{background:rgba(192,57,43,0.1);color:#922b21;}
+    .act-dot.blue{background:rgba(74,144,217,0.1);color:#1a5276;}
+    .act-body{flex:1;}
+    .act-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px;}
+    .act-sub{font-size:12px;color:var(--ink-ghost);}
+    .act-time{font-size:11px;color:var(--ink-ghost);font-family:'JetBrains Mono',monospace;flex-shrink:0;margin-top:2px;}
+
+    /* ── CERT BADGES ── */
+    .cert-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    .cert-badge{border-radius:14px;padding:16px 14px;border:1px solid var(--border);background:rgba(255,255,255,0.6);display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;cursor:default;transition:transform .3s cubic-bezier(0.34,1.56,0.64,1),box-shadow .3s,border-color .25s;}
+    .cert-badge:hover{transform:translateY(-4px);box-shadow:0 12px 32px rgba(200,169,110,0.14);border-color:rgba(200,169,110,0.3);}
+    .cert-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;}
+    .cert-icon svg{width:22px;height:22px;}
+    .cert-icon.gold{background:rgba(200,169,110,0.15);color:#9A6E1E;}
+    .cert-icon.green{background:rgba(45,122,79,0.12);color:#1d5936;}
+    .cert-icon.blue{background:rgba(74,144,217,0.12);color:#1a5276;}
+    .cert-name{font-size:11.5px;font-weight:700;color:var(--ink);line-height:1.3;}
+    .cert-date{font-size:10px;color:var(--ink-ghost);}
+
+    /* ── EDIT MODAL ── */
+    .modal-overlay{position:fixed;inset:0;z-index:300;background:rgba(28,28,30,0.4);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .3s ease;}
+    .modal-overlay.open{opacity:1;pointer-events:all;}
+    .modal{background:rgba(250,248,245,0.98);border:1px solid var(--border);border-radius:22px;padding:32px;width:100%;max-width:480px;box-shadow:0 32px 80px rgba(28,28,30,0.2);transform:translateY(20px)scale(0.96);transition:transform .4s cubic-bezier(0.16,1,0.3,1),opacity .3s ease;opacity:0;}
+    .modal-overlay.open .modal{transform:translateY(0)scale(1);opacity:1;}
+    .modal-title{font-family:'Bricolage Grotesque',sans-serif;font-size:18px;font-weight:800;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;}
+    .modal-close{width:30px;height:30px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-ghost);transition:all .2s;}
+    .modal-close:hover{background:rgba(192,57,43,0.07);border-color:rgba(192,57,43,0.2);color:var(--red);}
+    .modal-close svg{width:14px;height:14px;}
+    .field-group{margin-bottom:16px;}
+    .field-label{font-size:11px;font-weight:700;color:var(--ink-ghost);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;display:block;}
+    .field-input{width:100%;height:40px;background:rgba(255,255,255,0.8);border:1.5px solid rgba(26,26,26,0.12);border-radius:10px;padding:0 14px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .25s,box-shadow .25s;}
+    .field-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,169,110,0.12);}
+    .field-input::placeholder{color:var(--ink-ghost);}
+    .modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:24px;}
+
+    /* ── TOAST ── */
+    .toast{position:fixed;bottom:28px;right:28px;z-index:500;display:flex;align-items:center;gap:10px;padding:13px 18px;border-radius:14px;background:#1C1C1E;color:#FAF8F5;font-size:13px;font-weight:500;box-shadow:0 12px 40px rgba(0,0,0,0.25);transform:translateY(20px);opacity:0;pointer-events:none;transition:transform .4s cubic-bezier(0.34,1.56,0.64,1),opacity .3s ease;}
+    .toast.show{transform:translateY(0);opacity:1;pointer-events:all;}
+    .toast-dot{width:8px;height:8px;background:var(--gold);border-radius:50%;flex-shrink:0;}
+
+    /* ── AVATAR RING GLOW ── */
+    .avatar-ring{position:relative;flex-shrink:0;animation:none;}
+    .avatar-ring::before{content:'';position:absolute;inset:-5px;border-radius:50%;background:conic-gradient(from 0deg,transparent 0%,rgba(200,169,110,0.5) 30%,var(--gold) 50%,rgba(200,169,110,0.5) 70%,transparent 100%);animation:ringRotate 3s linear infinite;z-index:-1;opacity:0;transition:opacity .4s;}
+    .avatar-ring:hover::before{opacity:1;}
+    @keyframes ringRotate{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+    /* ── FLOATING PARTICLES ── */
+    .particle{position:fixed;pointer-events:none;z-index:0;border-radius:50%;background:var(--gold);opacity:0;animation:particleFloat linear infinite;}
+    @keyframes particleFloat{0%{opacity:0;transform:translateY(0) scale(0);}10%{opacity:.25;}80%{opacity:.08;}100%{opacity:0;transform:translateY(-120vh) scale(1.5);}}
+
+    /* ── HERO COVER ENHANCED ── */
+    .cover-shimmer{position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(200,169,110,0.08) 50%,transparent 60%);animation:coverShimmer 4s ease-in-out infinite;}
+    @keyframes coverShimmer{0%{transform:translateX(-100%);}100%{transform:translateX(200%);}}
+    .cover-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(200,169,110,0.06) 1px,transparent 1px),linear-gradient(90deg,rgba(200,169,110,0.06) 1px,transparent 1px);background-size:30px 30px;opacity:.5;}
+
+    /* ── STAT CARD ENHANCED HOVER ── */
+    .stat-card{transition:transform .4s cubic-bezier(0.34,1.56,0.64,1),box-shadow .35s,border-color .25s;}
+    .stat-card:hover{transform:translateY(-5px) scale(1.01);box-shadow:0 18px 48px rgba(28,28,30,0.11);border-color:rgba(200,169,110,0.25);}
+    .stat-value{transition:color .3s;}
+
+    /* ── SKILL BAR SHIMMER ── */
+    .skill-fill{position:relative;overflow:hidden;}
+    .skill-fill::after{content:'';position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.4),transparent);animation:skillShimmer 2.5s ease-in-out infinite 1.5s;}
+    @keyframes skillShimmer{0%{left:-100%;}100%{left:200%;}}
+
+    /* ── CERT BADGE ENHANCED ── */
+    .cert-badge{position:relative;overflow:hidden;}
+    .cert-badge::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,169,110,0)0%,rgba(200,169,110,0.04)50%,rgba(200,169,110,0)100%);transform:translateY(100%);transition:transform .5s cubic-bezier(0.16,1,0.3,1);}
+    .cert-badge:hover::before{transform:translateY(0);}
+    .cert-icon{transition:transform .4s cubic-bezier(0.34,1.56,0.64,1);}
+    .cert-badge:hover .cert-icon{transform:scale(1.12) rotate(-5deg);}
+
+    /* ── SEC CARD GOLD BOTTOM HOVER ── */
+    .sec-card{transition:box-shadow .35s,border-color .25s,transform .35s cubic-bezier(0.16,1,0.3,1);}
+    .sec-card::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .4s,left .4s,right .4s;border-radius:0 0 18px 18px;}
+    .sec-card:hover{box-shadow:0 16px 44px rgba(28,28,30,0.09);border-color:rgba(200,169,110,0.2);transform:translateY(-2px);}
+    .sec-card:hover::after{opacity:1;left:5%;right:5%;}
+
+    /* ── ACTIVITY DOT PULSE ── */
+    .act-dot{transition:transform .3s cubic-bezier(0.34,1.56,0.64,1);}
+    .activity-item:hover .act-dot{transform:scale(1.15);}
+
+    /* ── INFO ROW HOVER ── */
+    .info-row{transition:background .2s,padding .2s;border-radius:8px;padding-left:6px;padding-right:6px;margin:0 -6px;}
+    .info-row:hover{background:rgba(200,169,110,0.05);}
+
+
+    /* ── TAG HOVER ── */
+    .tag{transition:transform .25s cubic-bezier(0.34,1.56,0.64,1),box-shadow .25s;}
+    .tag:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(200,169,110,0.15);}
+
+    /* ── TOAST ENHANCED ── */
+    .toast{border-left:3px solid var(--gold);}
+    .toast-dot{animation:toastDotPulse 1s ease-in-out infinite;}
+    @keyframes toastDotPulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+
+    /* ── BACK BTN UNDERLINE ── */
+    .back-btn{position:relative;overflow:hidden;}
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:700px){
+      .stats-row{grid-template-columns:1fr 1fr;}
+      .two-col{grid-template-columns:1fr;}
+      .hero-body{flex-direction:column;align-items:flex-start;}
+      .hero-actions{margin-left:0;}
+      .cert-grid{grid-template-columns:1fr 1fr;}
+      .profile-wrap{padding:56px 16px 60px;}
+    }
+
+    
+    /* ══ UNIFIED SCROLL REVEAL ══ */
+    /* Base state — hidden before JS fires */
+    .sr{opacity:0;will-change:opacity,transform;}
+    .sr-up{transform:translateY(40px);}
+    .sr-left{transform:translateX(-36px);}
+    .sr-right{transform:translateX(36px);}
+    .sr-scale{transform:scale(0.93);}
+    .sr-pop{transform:translateY(24px) scale(0.94);}
+
+    /* Visible state */
+    .sr.visible{
+      opacity:1;
+      transform:none;
+      transition:opacity .65s cubic-bezier(0.16,1,0.3,1),
+                 transform .65s cubic-bezier(0.16,1,0.3,1);
+    }
+    /* Delay helpers */
+    .sr-d1{transition-delay:.06s!important;}
+    .sr-d2{transition-delay:.13s!important;}
+    .sr-d3{transition-delay:.20s!important;}
+    .sr-d4{transition-delay:.27s!important;}
+    .sr-d5{transition-delay:.34s!important;}
+    .sr-d6{transition-delay:.41s!important;}
+
+    /* Info row base */
+    .info-row{transition:background .2s,padding .2s;border-radius:8px;padding-left:6px;padding-right:6px;margin:0 -6px;}
+    .info-row:hover{background:rgba(200,169,110,0.05);}
+
+    /* Activity connector line (needs z fix) */
+    .activity-item{position:relative;}
+    .activity-item::before{content:'';position:absolute;left:19px;top:36px;bottom:-12px;width:1px;background:rgba(26,26,26,0.07);}
+    .activity-item:last-child::before{display:none;}
+</style>
+</head>
+<body>
+
+<!-- Preloader -->
+<div id="preloader">
+  <div class="preloader-logo">
+    <svg width="24" height="24" viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="#FAF8F5" stroke-width="1.2"/><circle cx="7" cy="7" r="2" fill="#C8A96E"/></svg>
+  </div>
+  <div class="preloader-bar-wrap"><div class="preloader-bar"></div></div>
+  <div class="preloader-text">INITIALIZING NEXUS.AI</div>
+</div>
+
+<!-- Background -->
+<div class="bg-orb bg-orb-1"></div>
+<div class="bg-orb bg-orb-2"></div>
+<div class="bg-orb bg-orb-3"></div>
+<div class="aurora-line aurora-line-1"></div>
+<div class="aurora-line aurora-line-2"></div>
+<div class="scan-grid"></div>
+
+<!-- Top Nav -->
+<nav class="top-nav">
+  <a href="dashbaord.html" class="top-nav-brand">
+    <div class="logo-mark">
+      <svg width="16" height="16" viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="#FAF8F5" stroke-width="1.2"/><circle cx="7" cy="7" r="2" fill="#C8A96E"/></svg>
+    </div>
+    <span class="brand-name">NEXUS<span>.</span>AI</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <a href="dashbaord.html" class="back-btn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      <span data-i18n="profile.back">Back to Dashboard</span>
+    </a>
+    <a href="settings.html" class="back-btn" aria-label="Settings" title="Settings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </a>
+  </div>
+</nav>
+
+<!-- Profile Page -->
+<div class="profile-wrap">
+
+  <!-- HERO CARD -->
+  <div class="hero-card sr sr-up" style="transition-delay:.1s">
+    <div class="hero-card-inner"></div>
+    <div class="hero-cover">
+      <div class="cover-grid"></div>
+      <div class="cover-shimmer"></div>
+      <div class="cover-orb"></div>
+    </div>
+    <div class="hero-body">
+      <div class="avatar-ring sr sr-pop" style="transition-delay:.22s">
+        <div class="avatar-img" id="avatarEl">AR</div>
+        <div class="status-dot"></div>
+      </div>
+      <div class="hero-info sr sr-up" style="transition-delay:.32s">
+        <div class="hero-name" id="displayName">Ahmad Raza</div>
+        <div class="hero-role">Chief Compliance Officer &nbsp;·&nbsp; <span>NEXUS.AI</span></div>
+        <div class="hero-tags">
+          <span class="tag tag-gold">✦ Verified</span>
+          <span class="tag tag-green">● Active</span>
+          <span class="tag tag-dark">Pakistan · PKT</span>
+          <span class="tag tag-dark">Joined Jan 2023</span>
+        </div>
+      </div>
+      <div class="hero-actions sr sr-up" style="transition-delay:.42s">
+        <button class="btn-outline" onclick="openEditModal()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span data-i18n="profile.edit">Edit Profile</span>
+        </button>
+        <button class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span data-i18n="profile.message">Message</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS ROW -->
+  <div class="stats-row">
+    <div class="stat-card gold sr sr-pop sr-d1">
+      <div class="stat-label">Compliance Score</div>
+      <div class="stat-value" data-count="94">0%</div>
+      <div class="stat-sub up">↑ +3.2% this month</div>
+    </div>
+    <div class="stat-card green sr sr-pop sr-d2">
+      <div class="stat-label">Training Completed</div>
+      <div class="stat-value" data-count="47">0</div>
+      <div class="stat-sub">modules done</div>
+    </div>
+    <div class="stat-card blue sr sr-pop sr-d3">
+      <div class="stat-label">Certifications</div>
+      <div class="stat-value" data-count="6">0</div>
+      <div class="stat-sub">active badges</div>
+    </div>
+    <div class="stat-card red sr sr-pop sr-d4">
+      <div class="stat-label">Open Alerts</div>
+      <div class="stat-value" data-count="2">0</div>
+      <div class="stat-sub warn">Needs attention</div>
+    </div>
+  </div>
+
+  <!-- TWO COL -->
+  <div class="two-col">
+
+    <!-- Personal Info -->
+    <div class="sec-card sr sr-left">
+      <div class="sec-title">
+        <div class="sec-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+        Personal Information
+      </div>
+      <div class="info-row sr sr-left sr-d1"><span class="info-key">Full Name</span><span class="info-val" id="infoName">Ahmad Raza</span></div>
+      <div class="info-row sr sr-left sr-d2"><span class="info-key">Email</span><span class="info-val"><a href="mailto:ahmad.raza@nexus.ai" id="infoEmail">ahmad.raza@nexus.ai</a></span></div>
+      <div class="info-row sr sr-left sr-d3"><span class="info-key">Department</span><span class="info-val" id="infoDept">Compliance & Risk</span></div>
+      <div class="info-row sr sr-left sr-d4"><span class="info-key">Employee ID</span><span class="info-val mono">#NX-00142</span></div>
+      <div class="info-row sr sr-left sr-d5"><span class="info-key">Location</span><span class="info-val">Karachi, PK</span></div>
+      <div class="info-row sr sr-left sr-d6"><span class="info-key">Phone</span><span class="info-val mono">+92 300 0000000</span></div>
+    </div>
+
+    <!-- Activity Feed -->
+    <div class="sec-card sr sr-right">
+      <div class="sec-title">
+        <div class="sec-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        Recent Activity
+      </div>
+      <div class="activity-item">
+        <div class="act-dot gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg></div>
+        <div class="act-body sr sr-right sr-d1"><div class="act-title">Completed AML Training</div><div class="act-sub">Module 7 · Advanced Risk Assessment</div></div>
+        <div class="act-time">2h ago</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-dot green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+        <div class="act-body sr sr-right sr-d2"><div class="act-title">Certification Earned</div><div class="act-sub">ISO 27001 Lead Auditor</div></div>
+        <div class="act-time">1d ago</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-dot blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="act-body sr sr-right sr-d3"><div class="act-title">Submitted Audit Report</div><div class="act-sub">Q2 Compliance Review · 48 pages</div></div>
+        <div class="act-time">3d ago</div>
+      </div>
+      <div class="activity-item">
+        <div class="act-dot red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="act-body sr sr-right sr-d4"><div class="act-title">Alert Raised</div><div class="act-sub">Policy breach detected · Finance dept.</div></div>
+        <div class="act-time">5d ago</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKILLS / COMPETENCIES -->
+  <div class="one-col sr sr-up">
+    <div class="sec-card">
+      <div class="sec-title">
+        <div class="sec-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
+        Skills & Competencies
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px 40px;">
+        <div>
+          <div class="skill-item sr sr-left sr-d1"><div class="skill-header"><span class="skill-name">Regulatory Compliance</span><span class="skill-pct">96%</span></div><div class="skill-track"><div class="skill-fill" data-width="96"></div></div></div>
+          <div class="skill-item sr sr-left sr-d2"><div class="skill-header"><span class="skill-name">Risk Management</span><span class="skill-pct">88%</span></div><div class="skill-track"><div class="skill-fill" data-width="88"></div></div></div>
+          <div class="skill-item sr sr-left sr-d3"><div class="skill-header"><span class="skill-name">AML / KYC</span><span class="skill-pct">91%</span></div><div class="skill-track"><div class="skill-fill" data-width="91"></div></div></div>
+        </div>
+        <div>
+          <div class="skill-item sr sr-right sr-d1"><div class="skill-header"><span class="skill-name">Data Privacy (GDPR)</span><span class="skill-pct">82%</span></div><div class="skill-track"><div class="skill-fill green" data-width="82"></div></div></div>
+          <div class="skill-item sr sr-right sr-d2"><div class="skill-header"><span class="skill-name">Audit & Reporting</span><span class="skill-pct">89%</span></div><div class="skill-track"><div class="skill-fill green" data-width="89"></div></div></div>
+          <div class="skill-item sr sr-right sr-d3"><div class="skill-header"><span class="skill-name">AI Policy & Ethics</span><span class="skill-pct">79%</span></div><div class="skill-track"><div class="skill-fill blue" data-width="79"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CERTIFICATIONS -->
+  <div class="one-col reveal" style="animation-delay:.85s">
+    <div class="sec-card">
+      <div class="sec-title">
+        <div class="sec-title-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></div>
+        Certifications & Badges
+      </div>
+      <div class="cert-grid">
+        <div class="cert-badge sr sr-pop sr-d1">
+          <div class="cert-icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div class="cert-name">ISO 27001 Lead Auditor</div>
+          <div class="cert-date">Earned May 2025</div>
+        </div>
+        <div class="cert-badge sr sr-pop sr-d2">
+          <div class="cert-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+          <div class="cert-name">CAMS Certified</div>
+          <div class="cert-date">Earned Feb 2025</div>
+        </div>
+        <div class="cert-badge sr sr-pop sr-d3">
+          <div class="cert-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <div class="cert-name">GDPR Data Protection</div>
+          <div class="cert-date">Earned Nov 2024</div>
+        </div>
+        <div class="cert-badge sr sr-pop sr-d4">
+          <div class="cert-icon gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div class="cert-name">AI Governance Pro</div>
+          <div class="cert-date">Earned Sep 2024</div>
+        </div>
+        <div class="cert-badge sr sr-pop sr-d5">
+          <div class="cert-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></div>
+          <div class="cert-name">SOX Compliance Lead</div>
+          <div class="cert-date">Earned Jul 2024</div>
+        </div>
+        <div class="cert-badge sr sr-pop sr-d6">
+          <div class="cert-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></div>
+          <div class="cert-name">Global Risk Analyst</div>
+          <div class="cert-date">Earned Apr 2024</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /profile-wrap -->
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title">
+      Edit Profile
+      <button class="modal-close" onclick="closeEditModal()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="editName">Full Name</label>
+      <input class="field-input" id="editName" type="text" placeholder="Ahmad Raza" value="Ahmad Raza"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="editEmail">Email</label>
+      <input class="field-input" id="editEmail" type="email" placeholder="ahmad.raza@nexus.ai" value="ahmad.raza@nexus.ai"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="editDept">Department</label>
+      <input class="field-input" id="editDept" type="text" placeholder="Compliance & Risk" value="Compliance & Risk"/>
+    </div>
+    <div class="field-group">
+      <label class="field-label" for="editRole">Job Title</label>
+      <input class="field-input" id="editRole" type="text" placeholder="Chief Compliance Officer" value="Chief Compliance Officer"/>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveProfile()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        Save Changes
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <div class="toast-dot"></div>
+  <span id="toastMsg">Profile updated successfully!</span>
+</div>
+
+<script>
+  /* ══ SCROLL REVEAL ENGINE ══ */
+  const srObs = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add('visible');
+      srObs.unobserve(e.target);
+
+      // Fire skill bars when their container is visible
+      e.target.querySelectorAll('.skill-fill[data-width]').forEach((bar, i) => {
+        setTimeout(() => { bar.style.width = bar.dataset.width + '%'; }, 300 + i * 100);
+      });
+
+      // Fire stat count-up
+      e.target.querySelectorAll('.stat-value[data-count]').forEach(el => {
+        const v = parseInt(el.dataset.count);
+        const suffix = v === 94 ? '%' : '';
+        const dur = 1400, start = performance.now();
+        const tick = now => {
+          const p = Math.min((now - start) / dur, 1);
+          el.textContent = Math.round((1 - Math.pow(1-p, 4)) * v) + suffix;
+          if (p < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
+      });
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -30px 0px' });
+
+  // Observe every .sr element
+  document.querySelectorAll('.sr').forEach(el => srObs.observe(el));
+
+  /* ══ PRELOADER ══ */
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      document.getElementById('preloader').classList.add('hide');
+    }, 1000);
+  });
+
+  /* ══ FLOATING PARTICLES ══ */
+  function spawnParticle() {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 4 + 2;
+    p.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}vw;bottom:-10px;animation-duration:${Math.random()*8+6}s;animation-delay:${Math.random()*2}s;`;
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 14000);
+  }
+  setInterval(spawnParticle, 1200);
+
+  /* ══ HERO CARD 3D TILT ══ */
+  const heroCard = document.querySelector('.hero-card');
+  heroCard.addEventListener('mousemove', e => {
+    const r = heroCard.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - .5;
+    const y = (e.clientY - r.top) / r.height - .5;
+    heroCard.style.transform = `perspective(900px) rotateY(${x*4}deg) rotateX(${-y*2.5}deg) translateY(-4px)`;
+  });
+  heroCard.addEventListener('mouseleave', () => {
+    heroCard.style.transition = 'transform .6s cubic-bezier(0.16,1,0.3,1), box-shadow .5s, border-color .4s';
+    heroCard.style.transform = '';
+    setTimeout(() => { heroCard.style.transition = ''; }, 650);
+  });
+
+  /* ══ EDIT MODAL ══ */
+  function openEditModal() { document.getElementById('editModal').classList.add('open'); }
+  function closeEditModal() { document.getElementById('editModal').classList.remove('open'); }
+  document.getElementById('editModal').addEventListener('click', function(e) {
+    if (e.target === this) closeEditModal();
+  });
+
+  function saveProfile() {
+    const name = document.getElementById('editName').value.trim();
+    const email = document.getElementById('editEmail').value.trim();
+    const dept = document.getElementById('editDept').value.trim();
+    if (name) {
+      document.getElementById('displayName').textContent = name;
+      document.getElementById('infoName').textContent = name;
+      document.getElementById('avatarEl').textContent = name.split(' ').map(n=>n[0]).join('').slice(0,2).toUpperCase();
+    }
+    if (email) { document.getElementById('infoEmail').textContent = email; document.getElementById('infoEmail').href = 'mailto:'+email; }
+    if (dept) document.getElementById('infoDept').textContent = dept;
+    closeEditModal();
+    showToast('Profile updated successfully!');
+  }
+
+  /* ══ TOAST ══ */
+  let toastTimer;
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+
+<!-- ══ NEXUS CUSTOM CURSOR ══ -->
+<style>
+  #nxs-cur{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--gold);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform .1s,opacity .3s,width .25s cubic-bezier(0.34,1.56,0.64,1),height .25s cubic-bezier(0.34,1.56,0.64,1),background .2s;mix-blend-mode:multiply;will-change:transform;}
+  #nxs-cur-ring{position:fixed;width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(200,169,110,0.5);pointer-events:none;z-index:9997;transform:translate(-50%,-50%);transition:transform .08s,opacity .3s,width .35s cubic-bezier(0.16,1,0.3,1),height .35s cubic-bezier(0.16,1,0.3,1),border-color .2s;will-change:transform;}
+  body:has(a:hover) #nxs-cur,body:has(button:hover) #nxs-cur{width:6px;height:6px;}
+  body:has(a:hover) #nxs-cur-ring,body:has(button:hover) #nxs-cur-ring{width:44px;height:44px;border-color:rgba(200,169,110,0.7);}
+  @media(hover:none){#nxs-cur,#nxs-cur-ring{display:none;}}
+</style>
+<script>
+(function(){
+  if(window.matchMedia('(hover:hover)').matches){
+    const cur=document.createElement('div');cur.id='nxs-cur';
+    const ring=document.createElement('div');ring.id='nxs-cur-ring';
+    document.body.appendChild(cur);document.body.appendChild(ring);
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';},{passive:true});
+    function animRing(){rx+=(mx-rx)*.15;ry+=(my-ry)*.15;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);}
+    animRing();
+  }
+})();
+</script>
+
+<!-- ══ NEXUS CHAT FAB ══ -->
+<style>
+  .chat-fab{position:fixed;bottom:32px;right:32px;z-index:500;width:56px;height:56px;border-radius:50%;background:#1C1C1E;border:1.5px solid rgba(200,169,110,0.35);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(28,28,30,0.2),0 4px 12px rgba(28,28,30,0.12);transition:all .4s cubic-bezier(0.34,1.56,0.64,1);animation:fabBreathe 4s ease-in-out infinite;outline:none;text-decoration:none;}
+  @keyframes fabBreathe{0%,100%{box-shadow:0 8px 32px rgba(28,28,30,0.2),0 0 0 0 rgba(200,169,110,0);}50%{box-shadow:0 8px 32px rgba(28,28,30,0.2),0 0 0 8px rgba(200,169,110,0.1);}}
+  .chat-fab:hover{transform:scale(1.12) rotate(-5deg);box-shadow:0 16px 48px rgba(28,28,30,0.28),0 6px 18px rgba(200,169,110,0.2);animation:none;}
+  .chat-fab:active{transform:scale(0.95);}
+  .chat-fab-badge{position:absolute;top:-3px;right:-3px;width:18px;height:18px;border-radius:50%;background:#E24B4A;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FAF8F5;animation:badgeBounce 2s ease-in-out infinite;}
+  @keyframes badgeBounce{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+  @media(max-width:600px){.chat-fab{bottom:20px;right:20px;}}
+</style>
+<a class="chat-fab" href="dashbaord.html" aria-label="Back to Dashboard">
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+  <span class="chat-fab-badge">2</span>
+</a>
+</body>
+</html>

@@ -1,0 +1,1824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NEXUS.AI | Settings</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,700;12..96,800&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <script src="i18n.js"></script>
+  <!-- ══ NEXUS THEME ENGINE — reads localStorage set by settings.html ══ -->
+  <script>
+  (function(){
+    const ACCENTS = {
+      '#C8A96E': { gold:'#C8A96E', soft:'rgba(200,169,110,0.12)', glow:'rgba(200,169,110,0.18)' },
+      '#2D7A4F': { gold:'#2D7A4F', soft:'rgba(45,122,79,0.12)',   glow:'rgba(45,122,79,0.18)'   },
+      '#3B6FD8': { gold:'#3B6FD8', soft:'rgba(59,111,216,0.12)',  glow:'rgba(59,111,216,0.18)'  },
+      '#8E5BD8': { gold:'#8E5BD8', soft:'rgba(142,91,216,0.12)',  glow:'rgba(142,91,216,0.18)'  },
+      '#C0392B': { gold:'#C0392B', soft:'rgba(192,57,43,0.12)',   glow:'rgba(192,57,43,0.18)'   },
+      '#1C1C1E': { gold:'#1C1C1E', soft:'rgba(26,26,26,0.12)',    glow:'rgba(26,26,26,0.18)'    },
+    };
+
+    const LIGHT= { '--bg':'#FAF8F5','--ink':'#1C1C1E','--ink-soft':'#6B6860','--ink-ghost':'#9B9890','--card':'rgba(255,255,255,0.72)','--border':'rgba(26,26,26,0.09)' };
+    try {
+      const hex   = localStorage.getItem('nxs_accent') || '#C8A96E';
+
+      const p = ACCENTS[hex] || ACCENTS['#C8A96E'];
+      const r = document.documentElement.style;
+      r.setProperty('--gold', p.gold);
+      r.setProperty('--gold-soft', p.soft);
+      r.setProperty('--glow', p.glow);
+
+
+      Object.entries(LIGHT).forEach(([k,v])=>r.setProperty(k,v));
+      document.documentElement.setAttribute('data-theme', 'light');
+      const html = document.documentElement;
+      html.setAttribute('data-compact', localStorage.getItem('nxs_compact') === '1' ? '1' : '0');
+      html.setAttribute('data-reduce-motion', localStorage.getItem('nxs_reduce_motion') === '1' ? '1' : '0');
+      html.setAttribute('data-tooltips', localStorage.getItem('nxs_tooltips') === '0' ? '0' : '1');
+      html.setAttribute('data-density', localStorage.getItem('nxs_density') || 'comfortable');
+      html.setAttribute('data-fontsize', localStorage.getItem('nxs_fontsize') || 'medium');
+    } catch(e){}
+  })();
+  </script>
+  <style>
+    :root{--ink:#1C1C1E;--ink-soft:#6B6860;--ink-ghost:#9B9890;--bg:#FAF8F5;--gold:#C8A96E;--gold-soft:rgba(200,169,110,0.12);--border:rgba(26,26,26,0.09);--card:rgba(255,255,255,0.85);--green:#2D7A4F;--red:#C0392B;}
+    *{box-sizing:border-box;margin:0;padding:0;}
+    html{scroll-behavior:smooth;}
+    body{background:var(--bg);color:var(--ink);font-family:'Plus Jakarta Sans',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+    /* NOISE + ORBS */
+    body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");background-size:200px;mix-blend-mode:multiply;}
+    .orb{position:fixed;border-radius:50%;pointer-events:none;z-index:0;}
+    .orb1{width:600px;height:600px;top:-150px;right:-150px;background:radial-gradient(circle,rgba(200,169,110,0.07) 0%,transparent 70%);animation:o1 20s ease-in-out infinite alternate;}
+    .orb2{width:400px;height:400px;bottom:-80px;left:-80px;background:radial-gradient(circle,rgba(45,122,79,0.05) 0%,transparent 70%);animation:o2 25s ease-in-out infinite alternate;}
+    @keyframes o1{from{transform:translate(0,0)}to{transform:translate(-50px,40px)}}
+    @keyframes o2{from{transform:translate(0,0)}to{transform:translate(40px,-50px)}}
+    .scan-grid{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:0.016;background-image:linear-gradient(rgba(200,169,110,0.5) 1px,transparent 1px),linear-gradient(90deg,rgba(200,169,110,0.5) 1px,transparent 1px);background-size:60px 60px;}
+
+    /* PRELOADER */
+    #preloader{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:16px;transition:opacity .6s ease,transform .6s ease;}
+    #preloader.hide{opacity:0;pointer-events:none;transform:scale(1.03);}
+    .preloader-logo{width:56px;height:56px;background:#1C1C1E;border-radius:14px;display:flex;align-items:center;justify-content:center;animation:preloaderPulse 1.2s ease-in-out infinite;}
+    @keyframes preloaderPulse{0%,100%{transform:scale(1);box-shadow:0 0 0 0 rgba(200,169,110,0);}50%{transform:scale(1.08);box-shadow:0 0 0 12px rgba(200,169,110,0.15);}}
+    .preloader-bar-wrap{width:140px;height:3px;background:rgba(26,26,26,0.1);border-radius:2px;overflow:hidden;}
+    .preloader-bar{height:100%;width:0;background:linear-gradient(90deg,var(--gold),rgba(200,169,110,0.5));border-radius:2px;animation:preloaderLoad 1.4s cubic-bezier(0.16,1,0.3,1) forwards;}
+    @keyframes preloaderLoad{0%{width:0;}60%{width:80%;}100%{width:100%;}}
+    .preloader-text{font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:700;letter-spacing:.15em;color:#9B9890;animation:preloaderFade 1.4s ease-in-out infinite alternate;}
+    @keyframes preloaderFade{from{opacity:.5;}to{opacity:1;}}
+
+    /* TOP HEADER */
+    .s-header{
+      position:sticky;top:0;z-index:200;
+      background:rgba(250,248,245,0.92);
+      backdrop-filter:blur(20px) saturate(1.6);
+      border-bottom:1px solid rgba(26,26,26,0.08);
+      padding:0 28px;
+      display:flex;align-items:center;
+      height:58px;gap:20px;
+      animation:hdrIn .4s ease both;
+    }
+    @keyframes hdrIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+    .s-hdr-back{
+      display:flex;align-items:center;gap:6px;text-decoration:none;
+      font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:700;
+      color:#9B9890;padding:6px 10px;border-radius:8px;border:1px solid transparent;
+      transition:all .2s;flex-shrink:0;
+    }
+    .s-hdr-back:hover{background:rgba(26,26,26,0.05);color:#1C1C1E;border-color:rgba(26,26,26,0.08);transform:translateX(-2px);}
+    .s-hdr-back svg{width:13px;height:13px;}
+    .s-hdr-div{width:1px;height:18px;background:rgba(26,26,26,0.1);flex-shrink:0;}
+    .s-hdr-brand{display:flex;align-items:center;gap:8px;text-decoration:none;flex-shrink:0;}
+    .s-hdr-mark{width:28px;height:28px;background:#1C1C1E;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+    .s-hdr-name{font-family:'Bricolage Grotesque',sans-serif;font-size:14.5px;font-weight:800;color:#1C1C1E;letter-spacing:.04em;}
+    .s-hdr-name span{color:var(--gold);}
+
+    .s-hdr-search{
+      margin-left:auto;display:flex;align-items:center;gap:8px;
+      background:rgba(26,26,26,0.04);border:1px solid rgba(26,26,26,0.08);
+      border-radius:10px;padding:7px 12px;width:230px;transition:all .2s;
+    }
+    .s-hdr-search:focus-within{border-color:var(--gold);background:#fff;box-shadow:0 0 0 3px rgba(200,169,110,0.1);}
+    .s-hdr-search svg{width:13px;height:13px;color:#9B9890;flex-shrink:0;}
+    .s-hdr-search input{border:none;background:none;outline:none;font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;color:#1C1C1E;width:100%;}
+    .s-hdr-search input::placeholder{color:#9B9890;}
+
+    .s-hdr-save{
+      display:inline-flex;align-items:center;gap:6px;
+      padding:7px 16px;border-radius:100px;
+      font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:700;letter-spacing:.03em;
+      background:#1C1C1E;color:#FAF8F5;border:none;cursor:pointer;
+      transition:all .3s cubic-bezier(0.34,1.56,0.64,1);flex-shrink:0;
+    }
+    .s-hdr-save:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(28,28,30,0.28);}
+    .s-hdr-save svg{width:13px;height:13px;}
+
+    /* TAB BAR — horizontal, side-scrollable, sits under header */
+    .s-tabbar-wrap{
+      position:sticky;top:58px;z-index:190;
+      background:rgba(250,248,245,0.95);
+      backdrop-filter:blur(20px) saturate(1.6);
+      border-bottom:1px solid rgba(26,26,26,0.08);
+      animation:hdrIn .45s ease both;
+    }
+    .s-tabbar{
+      max-width:1160px;margin:0 auto;
+      display:flex;align-items:center;gap:4px;
+      padding:10px 28px;overflow-x:auto;
+      scrollbar-width:none;-ms-overflow-style:none;
+    }
+    .s-tabbar::-webkit-scrollbar{display:none;}
+    .tab-item{
+      display:flex;align-items:center;gap:7px;flex-shrink:0;white-space:nowrap;
+      padding:8px 15px;border-radius:10px;cursor:pointer;position:relative;
+      font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:700;
+      color:#6B6860;border:1px solid transparent;
+      transition:all .25s cubic-bezier(0.4,0,0.2,1);
+    }
+    .tab-item svg{width:15px;height:15px;flex-shrink:0;transition:transform .3s cubic-bezier(0.34,1.56,0.64,1);}
+    .tab-item:hover{color:#1C1C1E;background:rgba(26,26,26,0.045);}
+    .tab-item:hover svg{transform:scale(1.12);}
+    .tab-item.active{background:#fff;color:#1C1C1E;border-color:rgba(26,26,26,0.1);box-shadow:0 2px 10px rgba(28,28,30,0.08);}
+    .tab-item.active svg{color:var(--gold);}
+    .tab-dot{width:5px;height:5px;border-radius:50%;background:#E24B4A;position:absolute;top:6px;right:6px;animation:dotP 2s ease-in-out infinite;}
+    @keyframes dotP{0%,100%{box-shadow:0 0 0 0 rgba(226,75,74,0);}50%{box-shadow:0 0 0 4px rgba(226,75,74,0.12);}}
+    .tab-divider{width:1px;height:20px;background:rgba(26,26,26,0.09);flex-shrink:0;margin:0 6px;}
+
+    /* MAIN */
+    .s-body{max-width:1060px;margin:0 auto;padding:40px 28px 80px;position:relative;z-index:2;}
+
+    /* PAGE */
+    .s-page{display:none;}
+    .s-page.active{display:block;animation:pgIn .45s cubic-bezier(0.16,1,0.3,1) both;}
+    @keyframes pgIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+
+    /* PAGE HEADER */
+    .pg-hd{margin-bottom:36px;}
+    .pg-eyebrow{font-size:10px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;}
+    .pg-title{font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:800;color:#1C1C1E;line-height:1.15;}
+    .pg-sub{font-size:13px;color:#9B9890;margin-top:5px;line-height:1.6;}
+
+    /* GRID */
+    .s-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+    .s-grid.wide{grid-template-columns:1fr;}
+    .s-grid.thirds{grid-template-columns:1fr 1fr 1fr;}
+    @media(max-width:820px){.s-grid,.s-grid.thirds{grid-template-columns:1fr;}}
+
+    /* ══ Compact Mode (Display Preferences) ══ */
+    html[data-compact="1"] .s-body{padding:26px 22px 56px;}
+    html[data-compact="1"] .s-grid{gap:12px;}
+    html[data-compact="1"] .card-head{padding:13px 16px 10px;}
+    html[data-compact="1"] .card-body{padding:13px 16px 16px;gap:10px;}
+    html[data-compact="1"] .s-row{padding:7px 0;}
+    html[data-compact="1"] .item-row,html[data-compact="1"] .sess-item,html[data-compact="1"] .notif-row,html[data-compact="1"] .mem-item,html[data-compact="1"] .key-item{padding:7px 0;}
+    html[data-compact="1"] .pg-hd{margin-bottom:22px;}
+
+    /* ══ Reduce Animations / Reduce Motion ══ */
+    html[data-reduce-motion="1"] *, html[data-reduce-motion="1"] *::before, html[data-reduce-motion="1"] *::after{
+      animation-duration:0.001ms !important;animation-iteration-count:1 !important;
+      transition-duration:0.001ms !important;scroll-behavior:auto !important;
+    }
+
+    /* ══ Interface Font Size ══ */
+    html[data-fontsize="small"] .s-body{zoom:0.92;}
+    html[data-fontsize="large"] .s-body{zoom:1.08;}
+
+    /* ══ Tooltips toggle ══ */
+    html[data-tooltips="0"] .tooltip-wrap .tooltip-box{display:none !important;}
+
+    /* CARD */
+    .s-card{
+      background:var(--card);
+      border:1.5px solid rgba(26,26,26,0.08);
+      border-radius:18px;
+      backdrop-filter:blur(10px) saturate(1.3);
+      overflow:hidden;position:relative;
+      transition:box-shadow .35s cubic-bezier(0.16,1,0.3,1),border-color .3s,transform .35s cubic-bezier(0.16,1,0.3,1);
+      animation:cardIn .5s cubic-bezier(0.16,1,0.3,1) both;
+    }
+    @keyframes cardIn{from{opacity:0;transform:translateY(18px) scale(0.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+    .s-card:hover{box-shadow:0 12px 40px rgba(200,169,110,0.09),0 4px 14px rgba(28,28,30,0.05);border-color:rgba(200,169,110,0.22);transform:translateY(-2px);}
+    .s-card::after{content:'';position:absolute;bottom:0;left:18px;right:18px;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:0;transition:opacity .4s;}
+    .s-card:hover::after{opacity:0.45;}
+
+    /* CARD HEAD */
+    .card-head{display:flex;align-items:center;gap:13px;padding:20px 22px 16px;border-bottom:1px solid rgba(26,26,26,0.06);}
+    .card-icon{width:38px;height:38px;border-radius:11px;background:rgba(26,26,26,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .4s cubic-bezier(0.34,1.56,0.64,1);}
+    .s-card:hover .card-icon{background:rgba(200,169,110,0.12);transform:scale(1.1) rotate(-6deg);}
+    .card-icon svg{width:17px;height:17px;color:#6B6860;transition:color .3s;}
+    .s-card:hover .card-icon svg{color:var(--gold);}
+    .card-title{font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:800;color:#1C1C1E;}
+    .card-sub{font-size:11.5px;color:#9B9890;margin-top:2px;}
+
+    /* CARD BODY */
+    .card-body{padding:20px 22px 22px;display:flex;flex-direction:column;gap:16px;}
+
+    /* ROW */
+    .s-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid rgba(26,26,26,0.05);transition:background .2s,padding-left .2s;}
+    .s-row:last-child{border-bottom:none;padding-bottom:0;}
+    .s-row:first-child{padding-top:0;}
+    .s-row:hover{background:rgba(200,169,110,0.03);padding-left:5px;border-radius:7px;}
+    .s-lbl{font-size:13px;font-weight:600;color:#1C1C1E;}
+    .s-desc{font-size:11.5px;color:#9B9890;margin-top:3px;line-height:1.5;}
+
+    /* ITEM ROW (icon + label + control, like the screenshot) */
+    .item-row{display:flex;align-items:center;gap:13px;padding:13px 0;border-bottom:1px solid rgba(26,26,26,0.05);transition:background .2s,padding-left .2s;}
+    .item-row:last-child{border-bottom:none;padding-bottom:0;}
+    .item-row:first-child{padding-top:0;}
+    .item-row:hover{background:rgba(200,169,110,0.03);padding-left:5px;border-radius:7px;}
+    .item-ico{width:38px;height:38px;border-radius:11px;background:rgba(26,26,26,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s cubic-bezier(0.34,1.56,0.64,1);}
+    .item-row:hover .item-ico{transform:scale(1.06);}
+    .item-ico svg{width:16px;height:16px;color:#6B6860;}
+    .item-ico.green{background:rgba(45,122,79,0.1);}
+    .item-ico.green svg{color:var(--green);}
+    .item-ico.gold{background:rgba(200,169,110,0.14);}
+    .item-ico.gold svg{color:#8B6B2E;}
+    .item-name{font-size:13px;font-weight:700;color:#1C1C1E;}
+    .item-meta{font-size:11.5px;color:#9B9890;margin-top:2px;}
+    .item-ctrl{margin-left:auto;flex-shrink:0;}
+
+    /* PILL BUTTON (outline, like screenshot's "Change"/"Update") */
+    .pill-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 15px;border-radius:100px;font-family:'Bricolage Grotesque',sans-serif;font-size:11.5px;font-weight:700;background:rgba(26,26,26,0.04);color:#1C1C1E;border:1.5px solid rgba(26,26,26,0.1);cursor:pointer;transition:all .22s;}
+    .pill-btn:hover{background:rgba(26,26,26,0.08);transform:translateY(-1px);}
+    .pill-btn.red{background:rgba(192,57,43,0.08);color:#C0392B;border-color:rgba(192,57,43,0.18);}
+    .pill-btn.red:hover{background:rgba(192,57,43,0.14);}
+
+    /* STATUS PILL (like "Enabled" / "Configured" / "This device") */
+    .stat-pill{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:100px;font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:700;}
+    .stat-pill svg{width:10px;height:10px;}
+    .stat-pill.green{background:rgba(45,122,79,0.1);color:#2D7A4F;border:1px solid rgba(45,122,79,0.2);}
+    .stat-pill.gold{background:rgba(200,169,110,0.14);color:#8B6B2E;border:1px solid rgba(200,169,110,0.28);}
+
+    /* TOGGLE */
+    .tog{position:relative;width:42px;height:23px;flex-shrink:0;cursor:pointer;}
+    .tog input{opacity:0;width:0;height:0;position:absolute;}
+    .tog-track{position:absolute;inset:0;background:rgba(26,26,26,0.11);border-radius:100px;transition:background .3s;}
+    .tog input:checked+.tog-track{background:#1C1C1E;}
+    .tog-thumb{position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,0.18);transition:transform .35s cubic-bezier(0.34,1.56,0.64,1);}
+
+    /* INPUT */
+    .s-input{width:100%;padding:9px 13px;background:rgba(255,255,255,0.9);border:1.5px solid rgba(26,26,26,0.12);border-radius:10px;font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#1C1C1E;outline:none;transition:border-color .25s,box-shadow .25s,transform .2s;}
+    .s-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,169,110,0.1);}
+    .s-input::placeholder{color:#9B9890;}
+
+
+    /* SELECT / DROPDOWN */
+    .s-sel{
+      width:100%;padding:9px 36px 9px 13px;
+      background:rgba(255,255,255,0.9) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236B6860' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") no-repeat right 12px center;
+      border:1.5px solid rgba(26,26,26,0.12);border-radius:10px;
+      font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:#1C1C1E;
+      outline:none;cursor:pointer;
+      -webkit-appearance:none;-moz-appearance:none;appearance:none;
+      transition:border-color .25s,box-shadow .25s;
+    }
+    .s-sel:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,169,110,0.1);}
+    .s-sel:hover{border-color:rgba(26,26,26,0.24);}
+
+    .s-sel.full{width:100%;}
+
+    /* FIELD LABEL */
+    .f-lbl{font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9B9890;margin-bottom:5px;display:block;}
+
+    /* GRID 2 */
+    .g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+    /* AVATAR */
+    .av-row{display:flex;align-items:center;gap:16px;padding-bottom:16px;border-bottom:1px solid rgba(26,26,26,0.06);margin-bottom:4px;}
+    .av-circle{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,#333,#1C1C1E);display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-size:20px;font-weight:800;color:var(--gold);flex-shrink:0;transition:transform .5s cubic-bezier(0.34,1.56,0.64,1);}
+    .av-circle:hover{transform:scale(1.08) rotate(8deg);}
+    .btn-sm{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid rgba(26,26,26,0.13);background:transparent;color:#6B6860;transition:all .2s;}
+    .btn-sm:hover{border-color:rgba(26,26,26,0.28);color:#1C1C1E;background:rgba(26,26,26,0.03);transform:translateY(-1px);}
+    .btn-sm svg{width:11px;height:11px;}
+    .btn-sm.gold{border-color:rgba(200,169,110,0.4);color:#8B6B2E;background:rgba(200,169,110,0.06);}
+    .btn-sm.gold:hover{background:rgba(200,169,110,0.14);}
+
+    /* PLAN BADGE */
+    .plan-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 11px;border-radius:100px;background:rgba(200,169,110,0.1);border:1px solid rgba(200,169,110,0.24);font-size:11px;font-weight:700;color:#8B6B2E;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:.03em;margin-left:auto;}
+    .plan-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);animation:dotP 2.5s ease-in-out infinite;}
+
+    /* USAGE BAR */
+    .usage-item{margin-bottom:12px;}
+    .usage-item:last-child{margin-bottom:0;}
+    .usage-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;}
+    .usage-name{font-size:12px;font-weight:600;color:#1C1C1E;}
+    .usage-nums{font-family:'JetBrains Mono',monospace;font-size:11px;color:#9B9890;}
+    .usage-bar{height:5px;border-radius:3px;background:rgba(26,26,26,0.08);overflow:hidden;}
+    .usage-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,#1C1C1E,#3a3a3a);transition:width 1.6s cubic-bezier(0.16,1,0.3,1);}
+    .usage-fill.warn{background:linear-gradient(90deg,var(--gold),#b8962e);}
+
+    /* SESSION */
+    .sess-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(26,26,26,0.05);transition:background .2s,padding-left .2s;}
+    .sess-item:last-child{border-bottom:none;}
+    .sess-item:hover{background:rgba(200,169,110,0.03);padding-left:4px;border-radius:7px;}
+    .sess-ico{width:32px;height:32px;border-radius:8px;background:rgba(26,26,26,0.05);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s cubic-bezier(0.34,1.56,0.64,1);}
+    .sess-item:hover .sess-ico{background:rgba(200,169,110,0.1);transform:scale(1.08) rotate(-5deg);}
+    .sess-ico svg{width:14px;height:14px;color:#6B6860;}
+    .sess-name{font-size:13px;font-weight:600;color:#1C1C1E;}
+    .sess-meta{font-size:11px;color:#9B9890;margin-top:1px;}
+    .sess-cur{font-size:10px;font-weight:700;padding:2px 8px;border-radius:100px;background:rgba(45,122,79,0.09);color:#2D7A4F;border:1px solid rgba(45,122,79,0.16);}
+    .btn-rev{font-size:11px;font-weight:700;color:#C0392B;background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:6px;transition:background .2s;}
+    .btn-rev:hover{background:rgba(192,57,43,0.07);}
+
+    /* NOTIF ROW */
+    .notif-row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid rgba(26,26,26,0.05);}
+    .notif-row:last-child{border-bottom:none;}
+    .notif-ctrls{display:flex;gap:10px;flex-shrink:0;margin-top:2px;}
+
+    /* DANGER */
+    .danger-card{background:rgba(255,232,232,0.4);border:1.5px solid rgba(192,57,43,0.13);border-radius:14px;padding:18px 20px;margin-top:4px;transition:border-color .3s;}
+    .danger-card:hover{border-color:rgba(192,57,43,0.28);}
+    .danger-title{font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:800;color:#C0392B;margin-bottom:4px;display:flex;align-items:center;gap:6px;}
+    .danger-desc{font-size:12px;color:#9B9890;line-height:1.55;margin-bottom:12px;}
+    .btn-danger{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:8px;font-family:'Bricolage Grotesque',sans-serif;font-size:12px;font-weight:700;background:rgba(192,57,43,0.08);color:#C0392B;border:1.5px solid rgba(192,57,43,0.18);cursor:pointer;transition:all .25s;}
+    .btn-danger:hover{background:rgba(192,57,43,0.14);transform:translateY(-1px);}
+    .btn-danger svg{width:12px;height:12px;}
+    .danger-row{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;}
+
+    /* API KEY */
+    .api-row{display:flex;gap:7px;align-items:center;}
+    .api-field{flex:1;padding:9px 12px;background:rgba(26,26,26,0.03);border:1.5px solid rgba(26,26,26,0.09);border-radius:9px;font-family:'JetBrains Mono',monospace;font-size:12px;color:#6B6860;letter-spacing:.02em;outline:none;}
+    .btn-ico{width:36px;height:36px;border-radius:8px;border:1.5px solid rgba(26,26,26,0.11);background:rgba(255,255,255,0.8);display:flex;align-items:center;justify-content:center;cursor:pointer;color:#6B6860;transition:all .25s cubic-bezier(0.34,1.56,0.64,1);flex-shrink:0;}
+    .btn-ico:hover{border-color:var(--gold);color:#1C1C1E;transform:scale(1.08);background:rgba(200,169,110,0.08);}
+    .btn-ico svg{width:14px;height:14px;}
+
+    /* API KEY LIST ITEM */
+    .key-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid rgba(26,26,26,0.05);}
+    .key-item:last-child{border-bottom:none;}
+    .key-meta{font-size:11px;color:#9B9890;margin-top:2px;font-family:'JetBrains Mono',monospace;}
+
+    /* MEMBER ITEM */
+    .mem-item{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid rgba(26,26,26,0.05);}
+    .mem-item:last-child{border-bottom:none;}
+    .mem-av{width:34px;height:34px;border-radius:50%;background:#1C1C1E;display:flex;align-items:center;justify-content:center;font-family:'Bricolage Grotesque',sans-serif;font-size:11px;font-weight:800;color:var(--gold);flex-shrink:0;}
+    .mem-name{font-size:13px;font-weight:600;color:#1C1C1E;}
+    .mem-email{font-size:11px;color:#9B9890;margin-top:1px;}
+    .role-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:100px;font-family:'Bricolage Grotesque',sans-serif;flex-shrink:0;}
+    .role-badge.admin{background:rgba(200,169,110,0.1);color:#8B6B2E;}
+    .role-badge.member{background:rgba(26,26,26,0.07);color:#1C1C1E;}
+    .role-badge.viewer{background:rgba(26,26,26,0.05);color:#6B6860;}
+    .role-badge.pending{background:rgba(45,122,79,0.08);color:#2D7A4F;}
+
+    /* SECTION DIVIDER */
+    .s-div{height:1px;background:rgba(26,26,26,0.07);margin:4px 0 18px;}
+
+    .theme-opt{
+      border:2px solid rgba(26,26,26,0.09);border-radius:16px;
+      padding:0;cursor:pointer;overflow:hidden;
+      transition:all .3s cubic-bezier(0.4,0,0.2,1);
+      position:relative;
+    }
+    .theme-opt:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(28,28,30,0.12);}
+    .theme-opt.sel{border-color:var(--gold);box-shadow:0 0 0 3px rgba(200,169,110,0.18),0 16px 40px rgba(200,169,110,0.1);}
+    .theme-opt.sel .theme-check{opacity:1;transform:scale(1);}
+
+    /* Selected checkmark badge */
+    .theme-check{
+      position:absolute;top:8px;right:8px;z-index:3;
+      width:20px;height:20px;border-radius:50%;
+      background:var(--gold);
+      display:flex;align-items:center;justify-content:center;
+      opacity:0;transform:scale(0.5);
+      transition:all .3s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .theme-check svg{width:10px;height:10px;color:#fff;}
+
+    /* Mini dashboard scene */
+    .theme-scene{
+      height:90px;position:relative;overflow:hidden;
+      display:flex;
+    }
+    /* Sidebar strip */
+    .ts-sidebar{width:22%;height:100%;display:flex;flex-direction:column;gap:4px;padding:8px 5px;}
+    .ts-sb-dot{width:100%;height:6px;border-radius:3px;}
+    .ts-sb-dot:first-child{width:60%;height:8px;border-radius:4px;margin-bottom:2px;}
+
+    /* Main content area */
+    .ts-main{flex:1;padding:7px 8px;display:flex;flex-direction:column;gap:5px;}
+    .ts-row{display:flex;gap:4px;}
+    .ts-card{border-radius:5px;height:18px;flex:1;}
+    .ts-card.tall{height:28px;}
+    .ts-bar{border-radius:2px;height:6px;}
+    .ts-bar.w60{width:60%;}
+    .ts-bar.w40{width:40%;}
+    .ts-bar.w80{width:80%;}
+
+    /* ── 1. Cream Gold (default NEXUS light) ── */
+    .ts-cream{background:#FAF8F5;}
+    .ts-cream .ts-sidebar{background:#fff;border-right:1px solid rgba(26,26,26,0.07);}
+    .ts-cream .ts-sb-dot{background:rgba(26,26,26,0.08);}
+    .ts-cream .ts-sb-dot:first-child{background:#C8A96E;opacity:.7;}
+    .ts-cream .ts-card{background:rgba(255,255,255,0.9);border:1px solid rgba(26,26,26,0.07);}
+    .ts-cream .ts-bar{background:rgba(26,26,26,0.08);}
+    .ts-cream .ts-bar.accent{background:#C8A96E;opacity:.7;}
+
+    /* ── 2. Obsidian Dark ── */
+
+
+    /* ── 3. Pure White ── */
+    .ts-white{background:#ffffff;}
+    .ts-white .ts-sidebar{background:#F4F4F6;border-right:1px solid rgba(0,0,0,0.07);}
+    .ts-white .ts-sb-dot{background:rgba(0,0,0,0.1);}
+    .ts-white .ts-sb-dot:first-child{background:#C8A96E;opacity:.75;}
+    .ts-white .ts-card{background:#ffffff;border:1px solid rgba(0,0,0,0.08);box-shadow:0 1px 4px rgba(0,0,0,0.05);}
+    .ts-white .ts-bar{background:rgba(0,0,0,0.09);}
+    .ts-white .ts-bar.accent{background:#C8A96E;opacity:.7;}
+
+    /* ── 4. Midnight Blue ── */
+    .ts-navy{background:#0D1B2A;}
+    .ts-navy .ts-sidebar{background:#112233;border-right:1px solid rgba(255,255,255,0.06);}
+    .ts-navy .ts-sb-dot{background:rgba(255,255,255,0.1);}
+    .ts-navy .ts-sb-dot:first-child{background:#4A9EFF;opacity:.8;}
+    .ts-navy .ts-card{background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);}
+    .ts-navy .ts-bar{background:rgba(255,255,255,0.1);}
+    .ts-navy .ts-bar.accent{background:#4A9EFF;opacity:.7;}
+
+    /* ── 5. Sage (soft green) ── */
+    .ts-sage{background:#F5F7F4;}
+    .ts-sage .ts-sidebar{background:#EBF0E8;border-right:1px solid rgba(0,0,0,0.07);}
+    .ts-sage .ts-sb-dot{background:rgba(0,0,0,0.1);}
+    .ts-sage .ts-sb-dot:first-child{background:#3A7D52;opacity:.8;}
+    .ts-sage .ts-card{background:#fff;border:1px solid rgba(0,0,0,0.07);}
+    .ts-sage .ts-bar{background:rgba(0,0,0,0.08);}
+    .ts-sage .ts-bar.accent{background:#3A7D52;opacity:.7;}
+
+    /* ── 6. System (auto) ── */
+    .ts-sys{background:linear-gradient(90deg,#FAF8F5 50%,#1a1a1c 50%);}
+    .ts-sys .ts-sidebar{background:linear-gradient(90deg,#fff 50%,#222224 50%);border-right:1px solid rgba(128,128,128,0.1);}
+    .ts-sys .ts-sb-dot{background:rgba(128,128,128,0.15);}
+    .ts-sys .ts-sb-dot:first-child{background:#C8A96E;opacity:.7;}
+    .ts-sys .ts-card{background:rgba(128,128,128,0.07);border:1px solid rgba(128,128,128,0.1);}
+    .ts-sys .ts-bar{background:rgba(128,128,128,0.12);}
+    .ts-sys .ts-bar.accent{background:#C8A96E;opacity:.65;}
+
+    /* Theme label area */
+    .theme-label{padding:10px 12px 11px;display:flex;align-items:center;justify-content:space-between;}
+    .theme-name{font-family:'Bricolage Grotesque',sans-serif;font-size:12.5px;font-weight:800;color:#1C1C1E;}
+    .theme-badge{font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 7px;border-radius:100px;background:rgba(200,169,110,0.1);color:#8B6B2E;border:1px solid rgba(200,169,110,0.2);}
+
+    /* ACCENT SWATCHES */
+    .accent-row{display:flex;gap:12px;flex-wrap:wrap;}
+    .accent-dot{width:34px;height:34px;border-radius:50%;cursor:pointer;border:3px solid transparent;display:flex;align-items:center;justify-content:center;transition:all .25s cubic-bezier(0.34,1.56,0.64,1);position:relative;}
+    .accent-dot:hover{transform:scale(1.1);}
+    .accent-dot.sel{border-color:#1C1C1E;}
+    .accent-dot.sel::after{content:'✓';color:#fff;font-size:13px;font-weight:800;}
+
+    /* DENSITY SLIDER */
+    .density-row{display:flex;gap:8px;background:rgba(26,26,26,0.04);border-radius:11px;padding:4px;}
+    .density-opt{flex:1;text-align:center;padding:9px 0;border-radius:8px;font-size:12px;font-weight:700;color:#9B9890;cursor:pointer;transition:all .25s;font-family:'Bricolage Grotesque',sans-serif;}
+    .density-opt.sel{background:#fff;color:#1C1C1E;box-shadow:0 1px 6px rgba(28,28,30,0.08);}
+
+    /* BILLING — plan compare cards */
+    .plan-card{border:1.5px solid rgba(26,26,26,0.09);border-radius:14px;padding:18px;position:relative;transition:all .25s;}
+    .plan-card.current{border-color:var(--gold);background:rgba(200,169,110,0.04);}
+    .plan-card:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(28,28,30,0.06);}
+    .plan-card-name{font-family:'Bricolage Grotesque',sans-serif;font-size:14px;font-weight:800;color:#1C1C1E;}
+    .plan-card-price{font-family:'Bricolage Grotesque',sans-serif;font-size:24px;font-weight:800;color:#1C1C1E;margin:8px 0 2px;}
+    .plan-card-price span{font-size:12px;font-weight:600;color:#9B9890;}
+    .plan-card-tag{position:absolute;top:-10px;right:14px;background:var(--gold);color:#1C1C1E;font-size:9.5px;font-weight:800;padding:3px 9px;border-radius:100px;font-family:'Bricolage Grotesque',sans-serif;letter-spacing:.04em;}
+    .plan-feat{font-size:11.5px;color:#6B6860;display:flex;align-items:center;gap:6px;margin-top:8px;}
+    .plan-feat svg{width:11px;height:11px;color:var(--green);flex-shrink:0;}
+
+    /* TOAST */
+    .toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(16px);background:#1C1C1E;color:#FAF8F5;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;padding:11px 20px;border-radius:100px;display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:all .4s cubic-bezier(0.34,1.56,0.64,1);z-index:500;box-shadow:0 12px 32px rgba(28,28,30,0.22);}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+    .toast svg{width:15px;height:15px;color:var(--gold);}
+
+    /* STAGGER */
+    .s-grid .s-card:nth-child(1){animation-delay:.06s}
+    .s-grid .s-card:nth-child(2){animation-delay:.12s}
+    .s-grid .s-card:nth-child(3){animation-delay:.18s}
+    .s-grid .s-card:nth-child(4){animation-delay:.24s}
+    .s-grid .s-card:nth-child(5){animation-delay:.30s}
+    .s-grid .s-card:nth-child(6){animation-delay:.36s}
+
+    @media(max-width:900px){
+      .s-tabbar{padding:10px 16px;}
+      .s-hdr-search{display:none;}
+    }
+
+    /* ══════════════════════════════════════════
+       DARK MODE OVERRIDES — settings.html
+       ══════════════════════════════════════════ */
+
+    /* ══ RTL SUPPORT ══ */
+    [dir="rtl"] .s-tabbar{direction:rtl;}
+    [dir="rtl"] .s-hdr-back svg{transform:scaleX(-1);}
+    [dir="rtl"] .s-row,[dir="rtl"] .item-row{flex-direction:row-reverse;}
+    [dir="rtl"] .card-head{flex-direction:row-reverse;}
+    [dir="rtl"] .item-ctrl{margin-left:0;margin-right:auto;}
+    [dir="rtl"] body{font-family:'Noto Naskh Arabic','Plus Jakarta Sans',sans-serif;}
+  </style>
+</head>
+<body>
+
+<div id="preloader">
+  <div class="preloader-logo">
+    <svg width="24" height="24" viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="#FAF8F5" stroke-width="1.2"/><circle cx="7" cy="7" r="2" fill="#C8A96E"/></svg>
+  </div>
+  <div class="preloader-bar-wrap"><div class="preloader-bar"></div></div>
+  <div class="preloader-text">INITIALIZING NEXUS.AI</div>
+</div>
+
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="scan-grid"></div>
+
+<!-- HEADER -->
+<header class="s-header">
+  <a href="dashbaord.html" class="s-hdr-back">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+    Back
+  </a>
+  <div class="s-hdr-div"></div>
+  <a href="dashbaord.html" class="s-hdr-brand">
+    <div class="s-hdr-mark"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1L13 4.5V9.5L7 13L1 9.5V4.5L7 1Z" stroke="#FAF8F5" stroke-width="1.2"/><circle cx="7" cy="7" r="2" fill="#C8A96E"/></svg></div>
+    <span class="s-hdr-name">NEXUS<span>.</span>AI</span>
+  </a>
+
+    <button class="s-hdr-save" onclick="showToast()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    Save
+  </button>
+</header>
+
+<!-- TAB BAR -->
+<div class="s-tabbar-wrap">
+  <nav class="s-tabbar">
+    <div class="tab-item active" onclick="showTab('profile',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span data-i18n="settings.profile">Profile</span>
+    </div>
+    <div class="tab-item" onclick="showTab('security',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      <span data-i18n="settings.security">Security</span>
+    </div>
+    <div class="tab-item" onclick="showTab('notifications',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+      <span data-i18n="settings.notifications">Notifications</span>
+      <span class="tab-dot"></span>
+    </div>
+
+    <div class="tab-divider"></div>
+
+    <div class="tab-item" onclick="showTab('workspace',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Workspace
+    </div>
+    <div class="tab-item" onclick="showTab('members',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+      Members
+    </div>
+    <div class="tab-item" onclick="showTab('billing',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Billing
+    </div>
+
+    <div class="tab-divider"></div>
+
+    <div class="tab-item" onclick="showTab('aiprefs',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="15" x2="23" y2="15"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="15" x2="4" y2="15"/></svg>
+      AI Preferences
+    </div>
+    <div class="tab-item" onclick="showTab('aitraining',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/></svg>
+      AI &amp; Training
+    </div>
+
+    <div class="tab-divider"></div>
+
+    <div class="tab-item" onclick="showTab('api',this)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+      API Keys
+    </div>
+  </nav>
+</div>
+
+  <div class="s-body">
+
+  <!-- ══ PROFILE ══ -->
+  <div class="s-page active" id="pg-profile">
+    <div class="pg-hd">
+      <div class="pg-eyebrow">Account</div>
+      <div class="pg-title">Profile Settings</div>
+      <div class="pg-sub">Manage your personal information and display preferences</div>
+    </div>
+    <div class="s-grid">
+      <div class="s-card" style="grid-column:1/-1;">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
+          <div><div class="card-title">Personal Information</div><div class="card-sub">Your name, avatar, and contact</div></div>
+        </div>
+        <div class="card-body">
+          <div class="av-row">
+            <div class="av-circle">MA</div>
+            <div>
+              <button class="btn-sm"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Upload Photo</button>
+              <div style="font-size:11px;color:#9B9890;margin-top:5px;">JPG, PNG · Max 2MB</div>
+            </div>
+          </div>
+          <div class="g2">
+            <div><label class="f-lbl">First Name</label><input class="s-input" value="Maria" type="text"/></div>
+            <div><label class="f-lbl">Last Name</label><input class="s-input" value="Ahmed" type="text"/></div>
+          </div>
+          <div><label class="f-lbl">Email Address</label><input class="s-input" value="maria@nexusai.com" type="email"/></div>
+          <div><label class="f-lbl">Job Title</label><input class="s-input" value="Founder & CEO" type="text"/></div>
+        </div>
+      </div>
+
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div><div class="card-title">Region & Time</div><div class="card-sub">Timezone and date format</div></div>
+        </div>
+        <div class="card-body">
+          <div><label class="f-lbl">Timezone</label>
+            <select class="s-sel full"><option>Asia/Karachi (PKT, UTC+5)</option><option>America/New_York (EST)</option><option>Europe/London (GMT)</option><option>Asia/Dubai (GST, UTC+4)</option></select>
+          </div>
+          <div><label class="f-lbl">Date Format</label>
+            <select class="s-sel full"><option>DD/MM/YYYY</option><option>MM/DD/YYYY</option><option>YYYY-MM-DD</option></select>
+          </div>
+        </div>
+      </div>
+
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg></div>
+          <div><div class="card-title">Display Preferences</div><div class="card-sub">Language and interface options</div></div>
+        </div>
+        <div class="card-body">
+          <div class="s-row"><div><div class="s-lbl">Compact Mode</div><div class="s-desc">Reduce spacing across dashboard</div></div><label class="tog"><input type="checkbox" id="pref-compact-toggle" onchange="toggleCompactMode(this.checked)"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <div class="s-row"><div><div class="s-lbl">Reduce Animations</div><div class="s-desc">Minimize motion for performance</div></div><label class="tog"><input type="checkbox" id="pref-reduceanim-toggle" onchange="toggleReduceMotion(this.checked)"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SECURITY ══ -->
+  <div class="s-page" id="pg-security">
+    <div class="pg-hd">
+      <div class="pg-eyebrow">Security</div>
+      <div class="pg-title">Password &amp; Authentication</div>
+      <div class="pg-sub">Protect your account with strong credentials</div>
+    </div>
+    <div class="s-grid wide">
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+          <div><div class="card-title">Password &amp; Authentication</div><div class="card-sub">Protect your account with strong credentials</div></div>
+          <div class="item-ico green" style="margin-left:auto;width:34px;height:34px;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+        </div>
+        <div class="card-body">
+          <div class="item-row">
+            <div class="item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+            <div><div class="item-name">Password</div><div class="item-meta">Last changed 3 months ago</div></div>
+            <div class="item-ctrl"><button class="pill-btn" onclick="showToast('Redirecting to password change…')">Change</button></div>
+          </div>
+          <div class="item-row">
+            <div class="item-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div><div class="item-name">Two-factor authentication</div><div class="item-meta">Authenticator app enabled</div></div>
+            <div class="item-ctrl"><span class="stat-pill green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Enabled</span></div>
+          </div>
+          <div class="item-row">
+            <div class="item-ico gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+            <div><div class="item-name">SSO / Single sign-on</div><div class="item-meta">Google Workspace connected</div></div>
+            <div class="item-ctrl"><span class="stat-pill gold"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Configured</span></div>
+          </div>
+          <div class="item-row">
+            <div class="item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg></div>
+            <div><div class="item-name">Recovery email</div><div class="item-meta">adam.recovery@gmail.com</div></div>
+            <div class="item-ctrl"><button class="pill-btn" onclick="showToast('Redirecting to recovery email update…')">Update</button></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+          <div><div class="card-title">Active Sessions</div><div class="card-sub">Devices currently signed into your account</div></div>
+          <div style="margin-left:auto;"><button class="pill-btn red" onclick="showToast('All other sessions revoked')">Revoke all others</button></div>
+        </div>
+        <div class="card-body">
+          <div class="sess-item"><div class="sess-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div style="flex:1"><div class="sess-name">Chrome on macOS</div><div class="sess-meta">Karachi, PK · Active now</div></div><span class="stat-pill green">This device</span></div>
+          <div class="sess-item"><div class="sess-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div style="flex:1"><div class="sess-name">Safari on iPhone</div><div class="sess-meta">Karachi, PK · 2 hours ago</div></div><button class="pill-btn" onclick="this.closest('.sess-item').remove()">Revoke</button></div>
+          <div class="sess-item"><div class="sess-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div><div style="flex:1"><div class="sess-name">Edge on Windows</div><div class="sess-meta">Lahore, PK · Yesterday 6:42 PM</div></div><button class="pill-btn" onclick="this.closest('.sess-item').remove()">Revoke</button></div>
+        </div>
+      </div>
+
+      <div class="danger-card">
+        <div class="danger-row">
+          <div style="flex:1;min-width:240px;">
+            <div class="danger-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Danger Zone</div>
+            <div class="danger-desc">Deleting your account is permanent and will erase all data, workspaces, and training records. This cannot be undone.</div>
+          </div>
+          <button class="btn-danger" onclick="showToast('Account deletion requires email confirmation')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>Delete My Account</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ NOTIFICATIONS ══ -->
+  <div class="s-page" id="pg-notifications">
+    <div class="pg-hd">
+      <div class="pg-eyebrow">Notifications</div>
+      <div class="pg-title">Notification Preferences</div>
+      <div class="pg-sub">Control what you're alerted about and how</div>
+    </div>
+    <div class="s-grid">
+      <div class="s-card" style="grid-column:1/-1;">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+          <div><div class="card-title">Alert Channels</div><div class="card-sub">Email · Push · SMS per event type</div></div>
+        </div>
+        <div class="card-body">
+          <div style="display:flex;justify-content:flex-end;gap:24px;padding:0 2px 8px;border-bottom:1px solid rgba(26,26,26,0.07);">
+            <span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9B9890;width:42px;text-align:center;">Email</span>
+            <span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9B9890;width:42px;text-align:center;">Push</span>
+            <span style="font-size:9.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#9B9890;width:42px;text-align:center;">SMS</span>
+          </div>
+          <div class="notif-row"><div><div class="s-lbl">Compliance Alerts</div><div class="s-desc">When an SOP violation is detected</div></div><div class="notif-ctrls"><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div></div>
+          <div class="notif-row"><div><div class="s-lbl">Training Completions</div><div class="s-desc">When employees finish a module</div></div><div class="notif-ctrls"><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div></div>
+          <div class="notif-row"><div><div class="s-lbl">Document Updates</div><div class="s-desc">When a policy document is revised</div></div><div class="notif-ctrls"><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div></div>
+          <div class="notif-row"><div><div class="s-lbl">Weekly Reports</div><div class="s-desc">Monday digest of platform activity</div></div><div class="notif-ctrls"><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div></div>
+          <div class="notif-row"><div><div class="s-lbl">New Member Joins</div><div class="s-desc">When someone accepts a workspace invite</div></div><div class="notif-ctrls"><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div></div>
+        </div>
+      </div>
+
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div><div class="card-title">Quiet Hours</div><div class="card-sub">Suppress non-critical alerts</div></div>
+        </div>
+        <div class="card-body">
+          <div class="s-row"><div><div class="s-lbl">Enable Quiet Hours</div><div class="s-desc">Only critical alerts come through</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <div class="g2">
+            <div><label class="f-lbl">From</label><input class="s-input" type="time" value="22:00"/></div>
+            <div><label class="f-lbl">Until</label><input class="s-input" type="time" value="08:00"/></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.22 1.18 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.16 6.16l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+          <div><div class="card-title">SMS Settings</div><div class="card-sub">Phone number for text alerts</div></div>
+        </div>
+        <div class="card-body">
+          <div><label class="f-lbl">Phone Number</label><input class="s-input" type="tel" placeholder="+92 300 0000000"/></div>
+          <div class="s-row"><div><div class="s-lbl">Verified</div><div class="s-desc">Confirm your number to enable SMS</div></div><button class="btn-sm" onclick="showToast('Code sent!')">Send Code</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- ══ WORKSPACE ══ -->
+  <div class="s-page" id="pg-workspace">
+    <div class="pg-hd">
+      <div class="pg-eyebrow">Workspace</div>
+      <div class="pg-title">Workspace Settings</div>
+      <div class="pg-sub">Organization details and access permissions</div>
+    </div>
+    <div class="s-grid">
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+          <div><div class="card-title">Organization</div><div class="card-sub">Basic company information</div></div>
+        </div>
+        <div class="card-body">
+          <div><label class="f-lbl">Company Name</label><input class="s-input" id="ws-company-name" value="Acme Corporation" type="text"/></div>
+          <div><label class="f-lbl">Industry</label><select class="s-sel full" id="ws-industry"><option>Healthcare</option><option>Finance & Banking</option><option selected>Technology</option><option>Manufacturing</option><option>Legal</option><option>Education</option></select></div>
+          <div><label class="f-lbl">Company Size</label><select class="s-sel full" id="ws-size"><option>1–10</option><option>11–50</option><option selected>51–200</option><option>201–500</option><option>500+</option></select></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+            <button class="btn-sm gold" onclick="saveWorkspaceOrg()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div><div class="card-title">Permissions</div><div class="card-sub">Access control for members</div></div>
+        </div>
+        <div class="card-body">
+          <div class="s-row"><div><div class="s-lbl">Members Can Invite</div><div class="s-desc">Non-admins can send invites</div></div><label class="tog"><input type="checkbox" id="perm-invite"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <div class="s-row"><div><div class="s-lbl">Members Can Export</div><div class="s-desc">Download reports and analytics</div></div><label class="tog"><input type="checkbox" checked id="perm-export"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <div class="s-row"><div><div class="s-lbl">Require SSO</div><div class="s-desc">Force Single Sign-On for all</div></div><label class="tog"><input type="checkbox" id="perm-sso"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <div><label class="f-lbl">Session Timeout</label><select class="s-sel full" id="perm-timeout"><option>30 minutes</option><option selected>2 hours</option><option>8 hours</option><option>Never</option></select></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+            <button class="btn-sm gold" onclick="saveWorkspacePerms()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="s-card" style="grid-column:1/-1;">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <div><div class="card-title">Data &amp; Compliance</div><div class="card-sub">Workspace-wide data handling rules</div></div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px;">
+            <div class="s-row"><div><div class="s-lbl">Audit Log Retention</div><div class="s-desc">Keep activity logs for compliance</div></div><select class="s-sel" id="data-retention"><option>90 days</option><option selected>1 year</option><option>3 years</option></select></div>
+            <div class="s-row"><div><div class="s-lbl">Data Residency</div><div class="s-desc">Region where data is stored</div></div><select class="s-sel" id="data-residency"><option selected>EU (Frankfurt)</option><option>US (Virginia)</option><option>APAC (Singapore)</option></select></div>
+          </div>
+          <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+            <button class="btn-sm gold" onclick="saveWorkspaceData()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
+              Save Changes
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ MEMBERS ══ -->
+  <div class="s-page" id="pg-members">
+    <div class="pg-hd">
+      <div class="pg-eyebrow">Workspace</div>
+      <div class="pg-title">Members</div>
+      <div class="pg-sub">Manage who has access to this workspace</div>
+    </div>
+    <div class="s-grid">
+      <div class="s-card" style="grid-column:1/-1;">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg></div>
+          <div><div class="card-title">Team Members</div><div class="card-sub">4 active · 1 pending invite</div></div>
+          <div style="margin-left:auto;"><button class="btn-sm gold" onclick="openInviteModal()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Invite Member</button></div>
+        </div>
+        <div class="card-body">
+          <div class="mem-item" id="mem-MA"><div class="mem-av">MA</div><div style="flex:1"><div class="mem-name">Maria Ahmed <span style="font-size:11px;color:#9B9890;font-weight:400;">(you)</span></div><div class="mem-email">maria@nexusai.com</div></div><span class="role-badge admin">Admin</span></div>
+          <div class="mem-item" id="mem-AR"><div class="mem-av">AR</div><div style="flex:1"><div class="mem-name">Ahmed Raza</div><div class="mem-email">ahmed@acme.com</div></div><span class="role-badge member">Member</span><button class="btn-rev" onclick="confirmRemove('mem-AR','Ahmed Raza')">Remove</button></div>
+          <div class="mem-item" id="mem-SF"><div class="mem-av">SF</div><div style="flex:1"><div class="mem-name">Sara Farooq</div><div class="mem-email">sara@acme.com</div></div><span class="role-badge member">Member</span><button class="btn-rev" onclick="confirmRemove('mem-SF','Sara Farooq')">Remove</button></div>
+          <div class="mem-item" id="mem-ZK"><div class="mem-av">ZK</div><div style="flex:1"><div class="mem-name">Zaid Khan</div><div class="mem-email">zaid@acme.com</div></div><span class="role-badge viewer">Viewer</span><button class="btn-rev" onclick="confirmRemove('mem-ZK','Zaid Khan')">Remove</button></div>
+          <div class="mem-item" id="mem-HN"><div class="mem-av" style="background:rgba(26,26,26,0.08);color:#6B6860;">··</div><div style="flex:1"><div class="mem-name">hina@acme.com</div><div class="mem-email">Invited 2 days ago</div></div><span class="role-badge pending">Pending</span><button class="btn-rev" onclick="confirmRemove('mem-HN','hina@acme.com')">Cancel</button></div>
+        </div>
+      </div>
+
+      <div class="s-card" style="grid-column:1/-1;">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div><div class="card-title">Roles</div><div class="card-sub">What each role can do</div></div>
+        </div>
+        <div class="card-body">
+          <div class="s-row"><div><div class="s-lbl">Admin</div><div class="s-desc">Full access — billing, members, and all settings</div></div></div>
+          <div class="s-row"><div><div class="s-lbl">Member</div><div class="s-desc">Can use the product and view reports, no billing access</div></div></div>
+          <div class="s-row"><div><div class="s-lbl">Viewer</div><div class="s-desc">Read-only access to dashboards and audits</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ BILLING ══ -->
+  <div class="s-page" id="pg-billing">
+    <div class="pg-hd">
+      <div class="pg-eyebrow">Workspace</div>
+      <div class="pg-title">Billing &amp; Plan</div>
+      <div class="pg-sub">Subscription, usage limits, and payment details</div>
+    </div>
+    <div class="s-grid">
+      <div class="s-card" style="grid-column:1/-1;">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div><div class="card-title">Current Usage</div><div class="card-sub">Pro Plan · renews July 20, 2026</div></div>
+          <div class="plan-badge"><div class="plan-dot"></div>Pro Plan</div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px;">
+            <div>
+              <div class="usage-item"><div class="usage-top"><span class="usage-name">AI Audits</span><span class="usage-nums">182 / 250</span></div><div class="usage-bar"><div class="usage-fill warn" style="width:73%"></div></div></div>
+              <div class="usage-item"><div class="usage-top"><span class="usage-name">Active Employees</span><span class="usage-nums">48 / 100</span></div><div class="usage-bar"><div class="usage-fill" style="width:48%"></div></div></div>
+            </div>
+            <div>
+              <div class="usage-item"><div class="usage-top"><span class="usage-name">Documents Stored</span><span class="usage-nums">3.2GB / 5GB</span></div><div class="usage-bar"><div class="usage-fill warn" style="width:64%"></div></div></div>
+              <div class="usage-item"><div class="usage-top"><span class="usage-name">Simulator Sessions</span><span class="usage-nums">91 / 500</span></div><div class="usage-bar"><div class="usage-fill" style="width:18%"></div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="s-card" style="grid-column:1/-1;">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></div>
+          <div><div class="card-title">Available Plans</div><div class="card-sub">Switch anytime, billed monthly</div></div>
+        </div>
+        <div class="card-body">
+          <div class="s-grid thirds">
+            <div class="plan-card">
+              <div class="plan-card-name">Starter</div>
+              <div class="plan-card-price">$49<span>/mo</span></div>
+              <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>50 AI audits / mo</div>
+              <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Up to 20 employees</div>
+              <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>1GB storage</div>
+              <button class="btn-sm" style="margin-top:14px;width:100%;justify-content:center;" onclick="confirmDowngrade('Starter','$49/mo')">Downgrade</button>
+            </div>
+            <div class="plan-card current">
+              <div class="plan-card-tag">Current Plan</div>
+              <div class="plan-card-name">Pro</div>
+              <div class="plan-card-price">$149<span>/mo</span></div>
+              <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>250 AI audits / mo</div>
+              <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Up to 100 employees</div>
+              <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>5GB storage</div>
+              <button class="btn-sm" style="margin-top:14px;width:100%;justify-content:center;opacity:0.5;cursor:default;" disabled>✓ Active</button>
+            </div>
+            <div class="plan-card">
+              <div class="plan-card-name">Enterprise</div>
+              <div class="plan-card-price">Custom</div>
+              <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited audits</div>
+              <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Unlimited employees</div>
+              <div class="plan-feat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dedicated support</div>
+              <button class="btn-sm gold" style="margin-top:14px;width:100%;justify-content:center;" onclick="openContactSales()">Contact Sales</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+          <div><div class="card-title">Payment Method</div><div class="card-sub">Visa ending in 4242</div></div>
+        </div>
+        <div class="card-body">
+          <div class="s-row"><div><div class="s-lbl">Auto-Renew</div><div class="s-desc">Renew before expiry automatically</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <div class="s-row"><div><div class="s-lbl">Invoice Emails</div><div class="s-desc">Send to billing@acme.com</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <button class="btn-sm" onclick="openUpdatePayment()">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            Update Payment Details
+          </button>
+        </div>
+      </div>
+
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+          <div><div class="card-title">Invoices</div><div class="card-sub">Past 3 months</div></div>
+        </div>
+        <div class="card-body">
+          <div class="sess-item"><div style="flex:1"><div class="sess-name">May 2026</div><div class="sess-meta">Pro Plan · $149</div></div><button class="btn-sm" onclick="downloadInvoice('May 2026')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download</button></div>
+          <div class="sess-item"><div style="flex:1"><div class="sess-name">April 2026</div><div class="sess-meta">Pro Plan · $149</div></div><button class="btn-sm" onclick="downloadInvoice('April 2026')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download</button></div>
+          <div class="sess-item"><div style="flex:1"><div class="sess-name">March 2026</div><div class="sess-meta">Pro Plan · $149</div></div><button class="btn-sm" onclick="downloadInvoice('March 2026')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Download</button></div>
+        </div>
+      </div>
+
+      <div class="danger-card" style="grid-column:1/-1;">
+        <div class="danger-row">
+          <div style="flex:1;min-width:240px;">
+            <div class="danger-title"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Cancel Subscription</div>
+            <div class="danger-desc">Your workspace will be downgraded to the free tier at the end of this billing cycle. Audits, simulator sessions, and storage above the free limit will be paused.</div>
+          </div>
+          <button class="btn-danger" onclick="confirmCancelSub()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>Cancel Subscription</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ AI PREFERENCES ══ -->
+  <div class="s-page" id="pg-aiprefs">
+    <div class="pg-hd">
+      <div class="pg-eyebrow">Artificial Intelligence</div>
+      <div class="pg-title">AI Preferences</div>
+      <div class="pg-sub">How NEXUS.AI's intelligence behaves for your organization</div>
+    </div>
+
+    <!-- AI Sub-Tab Bar -->
+    <div style="display:flex;gap:6px;margin-bottom:28px;background:rgba(26,26,26,0.04);border-radius:13px;padding:5px;width:fit-content;">
+      <button class="ai-subtab-btn active" onclick="switchAiSubTab(this,'ai-sec-behavior')" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;background:#fff;font-family:'Bricolage Grotesque',sans-serif;font-size:12.5px;font-weight:700;color:#1C1C1E;cursor:pointer;box-shadow:0 2px 8px rgba(28,28,30,0.09);transition:all .22s;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Behavior
+      </button>
+      <button class="ai-subtab-btn" onclick="switchAiSubTab(this,'ai-sec-tuning')" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;background:transparent;font-family:'Bricolage Grotesque',sans-serif;font-size:12.5px;font-weight:700;color:#6B6860;cursor:pointer;transition:all .22s;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l-.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Tuning
+      </button>
+      <button class="ai-subtab-btn" onclick="switchAiSubTab(this,'ai-sec-content')" style="display:flex;align-items:center;gap:7px;padding:9px 18px;border-radius:9px;border:none;background:transparent;font-family:'Bricolage Grotesque',sans-serif;font-size:12.5px;font-weight:700;color:#6B6860;cursor:pointer;transition:all .22s;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+        AI Content
+      </button>
+    </div>
+
+    <!-- SECTION: Behavior -->
+    <div id="ai-sec-behavior" class="ai-sub-section">
+      <div class="s-grid">
+        <div class="s-card">
+          <div class="card-head">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+            <div><div class="card-title">Automatic Actions</div><div class="card-sub">What the AI does on its own</div></div>
+          </div>
+          <div class="card-body">
+            <div class="s-row"><div><div class="s-lbl">Auto-Audit on Upload</div><div class="s-desc">Analyze new documents automatically</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div class="s-row"><div><div class="s-lbl">Training Suggestions</div><div class="s-desc">AI recommends modules based on audit findings</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div class="s-row"><div><div class="s-lbl">Session Memory</div><div class="s-desc">AI remembers employee progress across sessions</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div class="s-row"><div><div class="s-lbl">Proactive Alerts</div><div class="s-desc">AI flags compliance risks before you ask</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+              <button class="btn-sm gold" onclick="showToast('AI Behavior settings saved ✓')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-card">
+          <div class="card-head">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></div>
+            <div><div class="card-title">Integrations</div><div class="card-sub">How AI connects to your tools</div></div>
+          </div>
+          <div class="card-body">
+            <div class="s-row"><div><div class="s-lbl">Slack Notifications</div><div class="s-desc">Send AI alerts to your Slack workspace</div></div><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div class="s-row"><div><div class="s-lbl">Email Digests</div><div class="s-desc">Weekly AI summary sent to admins</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div class="s-row"><div><div class="s-lbl">Webhook on Finding</div><div class="s-desc">POST to your endpoint when AI flags a risk</div></div><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+              <button class="btn-sm gold" onclick="showToast('Integration settings saved ✓')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: Tuning -->
+    <div id="ai-sec-tuning" class="ai-sub-section" style="display:none;">
+      <div class="s-grid">
+        <div class="s-card">
+          <div class="card-head">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l-.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div>
+            <div><div class="card-title">Sensitivity &amp; Tone</div><div class="card-sub">Fine-tune how the AI communicates</div></div>
+          </div>
+          <div class="card-body">
+            <div><label class="f-lbl">Audit Sensitivity</label><select class="s-sel full"><option>Low — critical violations only</option><option selected>Medium — balanced detection</option><option>High — all deviations flagged</option></select></div>
+            <div><label class="f-lbl">Simulator Difficulty</label><select class="s-sel full"><option>Beginner</option><option selected>Intermediate</option><option>Advanced</option><option>Expert</option></select></div>
+            <div><label class="f-lbl">AI Tone of Voice</label><select class="s-sel full"><option>Professional</option><option selected>Friendly &amp; Clear</option><option>Casual</option></select></div>
+            <div><label class="f-lbl">Response Language</label><select class="s-sel full"><option selected>English</option><option>Urdu</option><option>Arabic</option></select></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+              <button class="btn-sm gold" onclick="showToast('AI Tuning settings saved ✓')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-card">
+          <div class="card-head">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+            <div><div class="card-title">Performance</div><div class="card-sub">Speed vs accuracy tradeoff</div></div>
+          </div>
+          <div class="card-body">
+            <div><label class="f-lbl">AI Model Speed</label>
+              <div class="density-row">
+                <div class="density-opt" onclick="selDensity(this)">Fast</div>
+                <div class="density-opt sel" onclick="selDensity(this)">Balanced</div>
+                <div class="density-opt" onclick="selDensity(this)">Accurate</div>
+              </div>
+            </div>
+            <div class="s-row" style="margin-top:8px;"><div><div class="s-lbl">Confidence Threshold</div><div class="s-desc">Min confidence before flagging a finding</div></div><select class="s-sel"><option>60%</option><option selected>75%</option><option>90%</option></select></div>
+            <div class="s-row"><div><div class="s-lbl">Show AI Reasoning</div><div class="s-desc">Display explanation alongside each finding</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+              <button class="btn-sm gold" onclick="showToast('Performance settings saved ✓')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION: AI Content -->
+    <div id="ai-sec-content" class="ai-sub-section" style="display:none;">
+      <div class="s-grid">
+        <div class="s-card">
+          <div class="card-head">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg></div>
+            <div><div class="card-title">Disclosure Rules</div><div class="card-sub">How AI-generated content is labeled</div></div>
+          </div>
+          <div class="card-body">
+            <div class="s-row"><div><div class="s-lbl">Label AI-Generated Reports</div><div class="s-desc">Add a visible watermark to auto-generated audits</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div class="s-row"><div><div class="s-lbl">Require Human Review</div><div class="s-desc">Critical findings need admin sign-off before publishing</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div class="s-row"><div><div class="s-lbl">Show AI Confidence Score</div><div class="s-desc">Display certainty % alongside each finding</div></div><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+              <button class="btn-sm gold" onclick="showToast('AI Content settings saved ✓')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="s-card">
+          <div class="card-head">
+            <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div><div class="card-title">Content Safety</div><div class="card-sub">Guardrails on AI-generated output</div></div>
+          </div>
+          <div class="card-body">
+            <div class="s-row"><div><div class="s-lbl">Block Hallucinations</div><div class="s-desc">Reject outputs with no source evidence</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div class="s-row"><div><div class="s-lbl">Restrict External References</div><div class="s-desc">AI only cites your uploaded documents</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div><label class="f-lbl">Content Moderation Level</label><select class="s-sel full"><option>Relaxed</option><option selected>Standard</option><option>Strict</option></select></div>
+            <div style="display:flex;justify-content:flex-end;margin-top:6px;">
+              <button class="btn-sm gold" onclick="showToast('Content Safety settings saved ✓')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="12" height="12"><polyline points="20 6 9 17 4 12"/></svg>
+                Save Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ AI & TRAINING ══ -->
+  <div class="s-page" id="pg-aitraining">
+    <div class="pg-hd">
+      <div class="pg-eyebrow">Artificial Intelligence</div>
+      <div class="pg-title">AI &amp; Training</div>
+      <div class="pg-sub">Model training, data usage, and compliance training rules</div>
+    </div>
+    <div class="s-grid">
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+          <div><div class="card-title">Model Training &amp; Data Use</div><div class="card-sub">Control how your data trains NEXUS.AI</div></div>
+        </div>
+        <div class="card-body">
+          <div class="s-row"><div><div class="s-lbl">Improve AI With My Data</div><div class="s-desc">Allow anonymized conversations to improve models</div></div><label class="tog"><input type="checkbox"/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <div class="s-row"><div><div class="s-lbl">Share Audit Patterns</div><div class="s-desc">Help improve industry-wide compliance detection</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <div><label class="f-lbl">Data Retention Period</label><select class="s-sel full"><option>30 days</option><option selected>90 days</option><option>1 year</option><option>Indefinitely</option></select></div>
+          <button class="btn-sm" onclick="showToast('Export started — you will receive an email')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export My Training Data</button>
+        </div>
+      </div>
+
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5-10-5z"/><path d="M6 12v5c0 2 3 3 6 3s6-1 6-3v-5"/></svg></div>
+          <div><div class="card-title">Compliance Training Rules</div><div class="card-sub">Employee module assignment defaults</div></div>
+        </div>
+        <div class="card-body">
+          <div class="s-row"><div><div class="s-lbl">Auto-Enroll New Employees</div><div class="s-desc">Assign onboarding modules automatically</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <div class="s-row"><div><div class="s-lbl">Require Retake on Failure</div><div class="s-desc">Failed quizzes must be retaken within 7 days</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <div><label class="f-lbl">Certificate Validity</label><select class="s-sel full"><option>6 months</option><option selected>1 year</option><option>2 years</option></select></div>
+        </div>
+      </div>
+
+      <div class="s-card" style="grid-column:1/-1;">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></div>
+          <div><div class="card-title">Audit Trail</div><div class="card-sub">What gets logged for compliance review</div></div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px;">
+            <div class="s-row"><div><div class="s-lbl">Log AI Decisions</div><div class="s-desc">Record reasoning behind flagged findings</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+            <div class="s-row"><div><div class="s-lbl">Log Employee Interactions</div><div class="s-desc">Record simulator and chat usage</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ DEVELOPER / API KEYS ══ -->
+  <div class="s-page" id="pg-api">
+    <div class="pg-hd">
+      <div class="pg-eyebrow">Developer</div>
+      <div class="pg-title">API Keys</div>
+      <div class="pg-sub">Manage credentials and webhooks for integrations</div>
+    </div>
+    <div class="s-grid">
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div>
+          <div><div class="card-title">API Keys</div><div class="card-sub">Keep these secret</div></div>
+        </div>
+        <div class="card-body">
+          <div>
+            <label class="f-lbl">Live Secret Key</label>
+            <div class="api-row">
+              <input class="api-field" type="password" value="nxs_live_sk_a8f3d2c1e9b4f7a2" readonly/>
+              <button class="btn-ico" onclick="toggleKey(this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
+              <button class="btn-ico" onclick="copyVal(this,'nxs_live_sk_a8f3d2c1e9b4f7a2')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+            </div>
+          </div>
+          <div>
+            <label class="f-lbl">Publishable Key</label>
+            <div class="api-row">
+              <input class="api-field" type="text" value="nxs_pub_pk_9c2a7f1b3e6d4c8a" readonly/>
+              <button class="btn-ico" onclick="copyVal(this,'nxs_pub_pk_9c2a7f1b3e6d4c8a')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+            </div>
+          </div>
+          <button class="btn-sm" onclick="showToast('New key generated!')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" width="11" height="11"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Generate New Key</button>
+        </div>
+      </div>
+
+      <div class="s-card">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg></div>
+          <div><div class="card-title">Webhook</div><div class="card-sub">Receive real-time events</div></div>
+        </div>
+        <div class="card-body">
+          <div><label class="f-lbl">Endpoint URL</label><input class="s-input" type="url" value="https://acme.com/hooks/nexus"/></div>
+          <div class="s-row"><div><div class="s-lbl">Active</div><div class="s-desc">Enable webhook delivery</div></div><label class="tog"><input type="checkbox" checked/><div class="tog-track"></div><div class="tog-thumb"></div></label></div>
+          <button class="btn-sm" onclick="showToast('Webhook tested!')">Send Test Event</button>
+        </div>
+      </div>
+
+      <div class="s-card" style="grid-column:1/-1;">
+        <div class="card-head">
+          <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div><div class="card-title">Recent Keys</div><div class="card-sub">All keys created for this workspace</div></div>
+        </div>
+        <div class="card-body">
+          <div class="key-item"><div class="item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div><div style="flex:1"><div class="item-name">Production Key</div><div class="key-meta">nxs_live_sk_••••f7a2 · created May 2, 2026</div></div><button class="btn-rev">Revoke</button></div>
+          <div class="key-item"><div class="item-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg></div><div style="flex:1"><div class="item-name">Staging Key</div><div class="key-meta">nxs_test_sk_••••2b91 · created March 18, 2026</div></div><button class="btn-rev">Revoke</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /s-body -->
+  </div><!-- /s-main -->
+
+</div><!-- /s-shell -->
+
+<div class="toast" id="toast">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toast-msg">Settings saved</span>
+</div>
+
+<script>
+  window.addEventListener('load',()=>setTimeout(()=>document.getElementById('preloader').classList.add('hide'),950));
+
+  // Toggles
+  document.querySelectorAll('.tog input').forEach(i=>{
+    const t=()=>{i.parentElement.querySelector('.tog-thumb').style.transform=i.checked?'translateX(19px)':''};
+    t();i.addEventListener('change',t);
+  });
+
+  // Tab routing
+  const pageIds={
+    profile:'pg-profile',security:'pg-security',notifications:'pg-notifications',appearance:'pg-appearance',
+    workspace:'pg-workspace',members:'pg-members',billing:'pg-billing',
+    aiprefs:'pg-aiprefs',aitraining:'pg-aitraining',
+    api:'pg-api'
+  };
+  function showTab(key,el){
+    document.querySelectorAll('.s-page').forEach(p=>p.classList.remove('active'));
+    document.getElementById(pageIds[key]).classList.add('active');
+    document.querySelectorAll('.tab-item').forEach(t=>t.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('#'+pageIds[key]+' .s-card').forEach((c,i)=>{
+      c.style.animation='none';void c.offsetWidth;
+      c.style.animation=`cardIn .45s cubic-bezier(0.16,1,0.3,1) ${0.05+i*0.07}s both`;
+    });
+    // Re-init toggles on newly shown page
+    document.querySelectorAll('#'+pageIds[key]+' .tog input').forEach(i=>{
+      i.parentElement.querySelector('.tog-thumb').style.transform=i.checked?'translateX(19px)':'';
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  // Toast
+  let tt;
+  function showToast(msg){
+    const t=document.getElementById('toast');
+    document.getElementById('toast-msg').textContent=msg||'Settings saved';
+    t.classList.add('show');clearTimeout(tt);
+    tt=setTimeout(()=>t.classList.remove('show'),2600);
+  }
+
+  // API key visibility
+  function toggleKey(btn){
+    const inp=btn.parentElement.querySelector('.api-field');
+    inp.type=inp.type==='password'?'text':'password';
+  }
+
+  // Copy
+  function copyVal(btn,val){
+    navigator.clipboard.writeText(val).catch(()=>{});
+    const o=btn.innerHTML;
+    btn.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+    btn.style.cssText+='border-color:rgba(45,122,79,0.4);color:#2D7A4F;';
+    setTimeout(()=>{btn.innerHTML=o;btn.style.borderColor='';btn.style.color='';},1600);
+  }
+
+  // ══ NEXUS THEME ENGINE ══
+  const THEME_VARS = {
+    light: {
+      '--bg':'#FAF8F5','--ink':'#1C1C1E','--ink-soft':'#6B6860','--ink-ghost':'#9B9890',
+      '--card':'rgba(255,255,255,0.85)','--border':'rgba(26,26,26,0.09)',
+      dark: false
+    },
+  };
+
+  // Accent palette
+  const ACCENTS = {
+    '#C8A96E': { gold:'#C8A96E', goldSoft:'rgba(200,169,110,0.12)', glow:'rgba(200,169,110,0.18)' },
+    '#2D7A4F': { gold:'#2D7A4F', goldSoft:'rgba(45,122,79,0.12)',   glow:'rgba(45,122,79,0.18)'   },
+    '#3B6FD8': { gold:'#3B6FD8', goldSoft:'rgba(59,111,216,0.12)',  glow:'rgba(59,111,216,0.18)'  },
+    '#8E5BD8': { gold:'#8E5BD8', goldSoft:'rgba(142,91,216,0.12)',  glow:'rgba(142,91,216,0.18)'  },
+    '#C0392B': { gold:'#C0392B', goldSoft:'rgba(192,57,43,0.12)',   glow:'rgba(192,57,43,0.18)'   },
+    '#1C1C1E': { gold:'#1C1C1E', goldSoft:'rgba(26,26,26,0.12)',    glow:'rgba(26,26,26,0.18)'    },
+  };
+
+  function resolveTheme(mode){
+    return THEME_VARS.light;
+  }
+
+  function applyAccent(hex){
+    const p = ACCENTS[hex] || ACCENTS['#C8A96E'];
+    const r = document.documentElement.style;
+    r.setProperty('--gold', p.gold);
+    r.setProperty('--gold-soft', p.goldSoft);
+    r.setProperty('--glow', p.glow);
+  }
+
+  function applyThemeMode(mode){
+    const t = THEME_VARS.light;
+    const r = document.documentElement.style;
+    Object.entries(t).forEach(([k,v])=>{ if(k !== 'dark') r.setProperty(k,v); });
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.body.style.background = t['--bg'];
+  }
+
+  function saveAndApply(){
+    const accent = localStorage.getItem('nxs_accent') || '#C8A96E';
+    const theme  = localStorage.getItem('nxs_theme')  || 'light';
+    applyAccent(accent);
+    applyThemeMode(theme);
+  }
+
+  saveAndApply();
+
+  // ── Invite Member Modal ──
+  (function(){
+    const inv = document.createElement('div');
+    inv.id = 'inv-overlay';
+    inv.style.cssText = 'display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.38);backdrop-filter:blur(4px);align-items:center;justify-content:center;';
+    inv.innerHTML = `
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:28px;max-width:400px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.22);animation:pgIn .3s cubic-bezier(0.16,1,0.3,1) both;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:var(--gold-soft);display:flex;align-items:center;justify-content:center;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+          </div>
+          <div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700;color:var(--ink);">Invite Member</div>
+            <div style="font-size:12px;color:var(--ink-soft);">They'll receive an email to join your workspace</div>
+          </div>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:6px;">Email Address</label>
+          <input id="inv-email" type="email" placeholder="colleague@company.com" style="width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.8);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;" onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'" onkeydown="if(event.key==='Enter')doInvite()"/>
+        </div>
+        <div style="margin-bottom:20px;">
+          <label style="font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:6px;">Role</label>
+          <select id="inv-role" class="s-sel">
+            <option value="Member">Member — Can use product and view reports</option>
+            <option value="Viewer">Viewer — Read-only access</option>
+            <option value="Admin">Admin — Full access</option>
+          </select>
+        </div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button onclick="closeInviteModal()" style="padding:9px 18px;border-radius:10px;border:1.5px solid var(--border);background:transparent;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;">Cancel</button>
+          <button onclick="doInvite()" style="padding:9px 20px;border-radius:10px;border:none;background:var(--gold);color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send Invite
+          </button>
+        </div>
+      </div>`;
+    document.body.appendChild(inv);
+    inv.addEventListener('click', function(e){ if(e.target===this) closeInviteModal(); });
+  })();
+
+  function openInviteModal(){
+    document.getElementById('inv-email').value = '';
+    document.getElementById('inv-role').value = 'Member';
+    document.getElementById('inv-overlay').style.display = 'flex';
+    setTimeout(function(){ document.getElementById('inv-email').focus(); }, 100);
+  }
+  function closeInviteModal(){
+    document.getElementById('inv-overlay').style.display = 'none';
+  }
+  function doInvite(){
+    const email = document.getElementById('inv-email').value.trim();
+    if(!email || !email.includes('@')){ 
+      const inp = document.getElementById('inv-email');
+      inp.style.borderColor = '#C0392B';
+      setTimeout(function(){ inp.style.borderColor = 'var(--border)'; }, 1500);
+      return;
+    }
+    closeInviteModal();
+    showToast('Invite sent to ' + email + ' ✓');
+  }
+
+
+  function saveWorkspaceOrg(){
+    const name = document.getElementById('ws-company-name').value.trim();
+    if(!name){ showToast('Company name cannot be empty'); return; }
+    showToast('Organization settings saved ✓');
+  }
+  function saveWorkspacePerms(){
+    showToast('Permission settings saved ✓');
+  }
+  function saveWorkspaceData(){
+    showToast('Data & Compliance settings saved ✓');
+  }
+
+  // ── Remove Member Confirm Modal ──
+  (function(){
+    const overlay = document.createElement('div');
+    overlay.id = 'rem-overlay';
+    overlay.style.cssText = 'display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.38);backdrop-filter:blur(4px);align-items:center;justify-content:center;';
+    overlay.innerHTML = `
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:28px 28px 22px;max-width:360px;width:90%;box-shadow:0 24px 60px rgba(0,0,0,0.22);animation:pgIn .3s cubic-bezier(0.16,1,0.3,1) both;">
+        <div style="width:40px;height:40px;border-radius:10px;background:#FEE8E8;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+        </div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px;">Remove Member?</div>
+        <div id="rem-desc" style="font-size:13px;color:var(--ink-soft);line-height:1.55;margin-bottom:20px;"></div>
+        <div style="display:flex;gap:8px;justify-content:flex-end;">
+          <button onclick="closeRemoveModal()" style="padding:9px 18px;border-radius:10px;border:1.5px solid var(--border);background:transparent;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;">Cancel</button>
+          <button id="rem-confirm-btn" style="padding:9px 18px;border-radius:10px;border:none;background:#C0392B;color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;"></button>
+        </div>
+      </div>`;
+    document.body.appendChild(overlay);
+  })();
+
+  let _remId = null;
+  function confirmRemove(id, name){
+    _remId = id;
+    const isPending = id === 'mem-HN';
+    document.getElementById('rem-desc').textContent = isPending
+      ? 'Cancel the pending invite for "' + name + '"? They won\'t be able to join the workspace.'
+      : 'Remove "' + name + '" from the workspace? They will lose access immediately.';
+    const btn = document.getElementById('rem-confirm-btn');
+    btn.innerHTML = isPending
+      ? '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> Yes, Cancel Invite'
+      : '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/></svg> Yes, Remove';
+    btn.onclick = doRemove;
+    const ov = document.getElementById('rem-overlay');
+    ov.style.display = 'flex';
+  }
+  function doRemove(){
+    if(!_remId) return;
+    const el = document.getElementById(_remId);
+    if(el){
+      el.style.transition = 'all .35s ease';
+      el.style.opacity = '0';
+      el.style.transform = 'translateX(30px)';
+      setTimeout(function(){ el.remove(); }, 350);
+    }
+    closeRemoveModal();
+    showToast('Member removed successfully');
+    _remId = null;
+  }
+  function closeRemoveModal(){
+    document.getElementById('rem-overlay').style.display = 'none';
+    _remId = null;
+  }
+  document.addEventListener('DOMContentLoaded', function(){
+    document.getElementById('rem-overlay').addEventListener('click', function(e){
+      if(e.target === this) closeRemoveModal();
+    });
+  });
+
+  // ══ UPDATE PAYMENT METHOD MODAL ══
+  (function(){
+    const m = document.createElement('div');
+    m.id = 'pay-overlay';
+    m.style.cssText = 'display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.42);backdrop-filter:blur(6px);align-items:center;justify-content:center;';
+    m.innerHTML = `
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:22px;padding:30px;max-width:440px;width:92%;box-shadow:0 28px 70px rgba(0,0,0,0.24);animation:pgIn .3s cubic-bezier(0.16,1,0.3,1) both;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:22px;">
+          <div style="width:42px;height:42px;border-radius:11px;background:var(--gold-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:800;color:var(--ink);">Update Payment Method</div>
+            <div style="font-size:12px;color:var(--ink-soft);margin-top:2px;">Your card details are encrypted & secure</div>
+          </div>
+          <button onclick="closePayModal()" style="width:30px;height:30px;border-radius:8px;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+
+        <div style="background:linear-gradient(135deg,#1C1C1E,#2d2d30);border-radius:14px;padding:20px 22px;margin-bottom:20px;position:relative;overflow:hidden;">
+          <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;border-radius:50%;background:rgba(200,169,110,0.12);"></div>
+          <div style="position:absolute;bottom:-30px;left:40px;width:80px;height:80px;border-radius:50%;background:rgba(200,169,110,0.07);"></div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;color:#fff;letter-spacing:.14em;margin-bottom:14px;">•••• •••• •••• 4242</div>
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;">
+            <div>
+              <div style="font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;">Card Holder</div>
+              <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:700;color:#fff;">Maria Ahmed</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px;color:rgba(255,255,255,0.5);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;">Expires</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:13px;color:#fff;">08 / 28</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid;gap:13px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:5px;">Card Number</label>
+            <input id="pay-num" type="text" placeholder="1234 5678 9012 3456" maxlength="19"
+              style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.85);font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"
+              oninput="this.value=this.value.replace(/\D/g,'').replace(/(.{4})/g,'$1 ').trim().slice(0,19)"/>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+            <div>
+              <label style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:5px;">Expiry</label>
+              <input id="pay-exp" type="text" placeholder="MM / YY" maxlength="7"
+                style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.85);font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;"
+                onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"
+                oninput="let v=this.value.replace(/\D/g,'');if(v.length>=2)v=v.slice(0,2)+' / '+v.slice(2);this.value=v.slice(0,7)"/>
+            </div>
+            <div>
+              <label style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:5px;">CVV</label>
+              <input id="pay-cvv" type="password" placeholder="•••" maxlength="4"
+                style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.85);font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;"
+                onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"
+                oninput="this.value=this.value.replace(/\D/g,'').slice(0,4)"/>
+            </div>
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:5px;">Name on Card</label>
+            <input id="pay-name" type="text" placeholder="Maria Ahmed"
+              style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.85);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:22px;">
+          <button onclick="closePayModal()" style="padding:10px 18px;border-radius:10px;border:1.5px solid var(--border);background:transparent;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='rgba(26,26,26,0.25)'" onmouseout="this.style.borderColor='var(--border)'">Cancel</button>
+          <button onclick="doUpdatePayment()" style="padding:10px 22px;border-radius:10px;border:none;background:var(--gold);color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:7px;transition:all .2s;" onmouseover="this.style.opacity='.88'" onmouseout="this.style.opacity='1'">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            Save Card
+          </button>
+        </div>
+      </div>`;
+    document.body.appendChild(m);
+    m.addEventListener('click', function(e){ if(e.target===this) closePayModal(); });
+  })();
+
+  function openUpdatePayment(){
+    document.getElementById('pay-num').value='';
+    document.getElementById('pay-exp').value='';
+    document.getElementById('pay-cvv').value='';
+    document.getElementById('pay-name').value='';
+    document.getElementById('pay-overlay').style.display='flex';
+  }
+  function closePayModal(){
+    document.getElementById('pay-overlay').style.display='none';
+  }
+  function doUpdatePayment(){
+    const num = document.getElementById('pay-num').value.replace(/\s/g,'');
+    const exp = document.getElementById('pay-exp').value;
+    const cvv = document.getElementById('pay-cvv').value;
+    const name = document.getElementById('pay-name').value.trim();
+    if(num.length < 16 || !exp.includes('/') || cvv.length < 3 || !name){
+      showToast('Please fill in all card details correctly');
+      return;
+    }
+    closePayModal();
+    const last4 = num.slice(-4);
+    document.querySelector('#pg-billing .card-sub').textContent = 'Visa ending in ' + last4;
+    showToast('Payment method updated successfully ✓');
+  }
+
+  // ══ INVOICE DOWNLOAD MODAL ══
+  (function(){
+    const m = document.createElement('div');
+    m.id = 'inv-dl-overlay';
+    m.style.cssText = 'display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.38);backdrop-filter:blur(5px);align-items:center;justify-content:center;';
+    m.innerHTML = `
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:28px;max-width:380px;width:92%;box-shadow:0 24px 60px rgba(0,0,0,0.22);animation:pgIn .3s cubic-bezier(0.16,1,0.3,1) both;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <div style="width:42px;height:42px;border-radius:11px;background:rgba(45,122,79,0.1);display:flex;align-items:center;justify-content:center;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="#2D7A4F" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:15px;font-weight:800;color:var(--ink);" id="inv-dl-title">Invoice — May 2026</div>
+            <div style="font-size:12px;color:var(--ink-soft);">Pro Plan · $149.00</div>
+          </div>
+        </div>
+        <div style="background:rgba(26,26,26,0.035);border-radius:12px;padding:16px;margin-bottom:18px;display:grid;gap:9px;">
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:var(--ink-soft);">Invoice #</span><span style="font-family:'JetBrains Mono',monospace;font-weight:600;color:var(--ink);" id="inv-dl-num">NXS-2026-005</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:var(--ink-soft);">Billing Period</span><span style="font-weight:600;color:var(--ink);" id="inv-dl-period">May 1 – May 31, 2026</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:12.5px;"><span style="color:var(--ink-soft);">Plan</span><span style="font-weight:600;color:var(--ink);">Pro</span></div>
+          <div style="height:1px;background:var(--border);"></div>
+          <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="font-weight:700;color:var(--ink);">Total</span><span style="font-weight:800;color:var(--ink);">$149.00</span></div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="closeInvDlModal()" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:transparent;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;">Close</button>
+          <button onclick="doDownloadInvoice()" style="flex:2;padding:10px;border-radius:10px;border:none;background:#2D7A4F;color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download PDF
+          </button>
+        </div>
+      </div>`;
+    document.body.appendChild(m);
+    m.addEventListener('click', function(e){ if(e.target===this) closeInvDlModal(); });
+  })();
+
+  const _invData = {
+    'May 2026':   { num:'NXS-2026-005', period:'May 1 – May 31, 2026' },
+    'April 2026': { num:'NXS-2026-004', period:'Apr 1 – Apr 30, 2026' },
+    'March 2026': { num:'NXS-2026-003', period:'Mar 1 – Mar 31, 2026' },
+  };
+
+  function downloadInvoice(month){
+    const d = _invData[month] || { num:'NXS-2026-XXX', period:month };
+    document.getElementById('inv-dl-title').textContent = 'Invoice — ' + month;
+    document.getElementById('inv-dl-num').textContent = d.num;
+    document.getElementById('inv-dl-period').textContent = d.period;
+    document.getElementById('inv-dl-overlay').style.display = 'flex';
+  }
+  function closeInvDlModal(){
+    document.getElementById('inv-dl-overlay').style.display = 'none';
+  }
+  function doDownloadInvoice(){
+    closeInvDlModal();
+    showToast('Invoice PDF downloading… check your Downloads folder ✓');
+  }
+
+  // ══ CANCEL SUBSCRIPTION MODAL ══
+  (function(){
+    const m = document.createElement('div');
+    m.id = 'cancel-sub-overlay';
+    m.style.cssText = 'display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.42);backdrop-filter:blur(5px);align-items:center;justify-content:center;';
+    m.innerHTML = `
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:28px;max-width:380px;width:92%;box-shadow:0 24px 60px rgba(0,0,0,0.22);animation:pgIn .3s cubic-bezier(0.16,1,0.3,1) both;">
+        <div style="width:44px;height:44px;border-radius:12px;background:#FEE8E8;display:flex;align-items:center;justify-content:center;margin-bottom:16px;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C0392B" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </div>
+        <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:800;color:var(--ink);margin-bottom:8px;">Cancel Pro Subscription?</div>
+        <div style="font-size:13px;color:var(--ink-soft);line-height:1.6;margin-bottom:20px;">Your workspace will be downgraded to the <strong>Free tier</strong> at the end of this billing cycle on <strong>July 20, 2026</strong>. Active audits and stored data above the free limit will be paused.</div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="closeCancelSub()" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:transparent;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;">Keep Plan</button>
+          <button onclick="doCancelSub()" style="flex:1;padding:10px;border-radius:10px;border:none;background:#C0392B;color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            Yes, Cancel
+          </button>
+        </div>
+      </div>`;
+    document.body.appendChild(m);
+    m.addEventListener('click', function(e){ if(e.target===this) closeCancelSub(); });
+  })();
+
+  function confirmCancelSub(){
+    document.getElementById('cancel-sub-overlay').style.display='flex';
+  }
+  function closeCancelSub(){
+    document.getElementById('cancel-sub-overlay').style.display='none';
+  }
+  function doCancelSub(){
+    closeCancelSub();
+    showToast('Subscription cancelled — active until July 20, 2026');
+  }
+
+  // ══ PLAN DOWNGRADE CONFIRM ══
+  function confirmDowngrade(plan, price){
+    if(confirm('Downgrade to ' + plan + ' (' + price + ')? Changes take effect next billing cycle.')){
+      showToast('Downgraded to ' + plan + ' — effective next cycle ✓');
+    }
+  }
+
+  // ══ CONTACT SALES MODAL ══
+  (function(){
+    const m = document.createElement('div');
+    m.id = 'sales-overlay';
+    m.style.cssText = 'display:none;position:fixed;inset:0;z-index:800;background:rgba(0,0,0,0.38);backdrop-filter:blur(5px);align-items:center;justify-content:center;';
+    m.innerHTML = `
+      <div style="background:var(--card);border:1.5px solid var(--border);border-radius:20px;padding:28px;max-width:400px;width:92%;box-shadow:0 24px 60px rgba(0,0,0,0.22);animation:pgIn .3s cubic-bezier(0.16,1,0.3,1) both;">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+          <div style="width:42px;height:42px;border-radius:11px;background:var(--gold-soft);display:flex;align-items:center;justify-content:center;">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:16px;font-weight:800;color:var(--ink);">Contact Enterprise Sales</div>
+            <div style="font-size:12px;color:var(--ink-soft);">Our team will reach out within 24 hours</div>
+          </div>
+        </div>
+        <div style="display:grid;gap:12px;margin-bottom:20px;">
+          <div>
+            <label style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:5px;">Full Name</label>
+            <input id="sales-name" type="text" placeholder="Maria Ahmed" value="Maria Ahmed"
+              style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.85);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:5px;">Work Email</label>
+            <input id="sales-email" type="email" placeholder="maria@nexusai.com" value="maria@nexusai.com"
+              style="width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:10px;background:rgba(255,255,255,0.85);font-family:'Plus Jakarta Sans',sans-serif;font-size:13px;color:var(--ink);outline:none;"
+              onfocus="this.style.borderColor='var(--gold)'" onblur="this.style.borderColor='var(--border)'"/>
+          </div>
+          <div>
+            <label style="font-size:10px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:5px;">Team Size</label>
+            <select id="sales-size" class="s-sel">
+              <option>100–500 employees</option><option>500–1000 employees</option><option>1000+ employees</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="closeSalesModal()" style="flex:1;padding:10px;border-radius:10px;border:1.5px solid var(--border);background:transparent;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;">Cancel</button>
+          <button onclick="doContactSales()" style="flex:2;padding:10px;border-radius:10px;border:none;background:var(--gold);color:#fff;font-family:'Bricolage Grotesque',sans-serif;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send Request
+          </button>
+        </div>
+      </div>`;
+    document.body.appendChild(m);
+    m.addEventListener('click', function(e){ if(e.target===this) closeSalesModal(); });
+  })();
+
+  function openContactSales(){
+    document.getElementById('sales-overlay').style.display='flex';
+  }
+  function closeSalesModal(){
+    document.getElementById('sales-overlay').style.display='none';
+  }
+  function doContactSales(){
+    closeSalesModal();
+    showToast('Enterprise inquiry sent — we\'ll contact you within 24 hours ✓');
+  }
+
+  // ══ AI PREFERENCES — SUB-TAB SWITCHER ══
+  function switchAiSubTab(btn, targetId) {
+    // Reset all sub-tab buttons
+    document.querySelectorAll('.ai-subtab-btn').forEach(function(b) {
+      b.style.background = 'transparent';
+      b.style.color = '#6B6860';
+      b.style.boxShadow = 'none';
+      var s = b.querySelector('svg');
+      if(s) s.setAttribute('stroke','currentColor');
+    });
+    // Activate clicked button
+    btn.style.background = '#fff';
+    btn.style.color = '#1C1C1E';
+    btn.style.boxShadow = '0 2px 8px rgba(28,28,30,0.09)';
+    var svg = btn.querySelector('svg');
+    if(svg) svg.setAttribute('stroke','var(--gold)');
+
+    // Hide all sections, show target
+    document.querySelectorAll('.ai-sub-section').forEach(function(sec) {
+      sec.style.display = 'none';
+    });
+    var target = document.getElementById(targetId);
+    if(target) {
+      target.style.display = 'block';
+      target.style.animation = 'none';
+      void target.offsetWidth;
+      target.style.animation = 'pgIn .38s cubic-bezier(0.16,1,0.3,1) both';
+      // Re-trigger card animations
+      target.querySelectorAll('.s-card').forEach(function(c, i) {
+        c.style.animation = 'none';
+        void c.offsetWidth;
+        c.style.animation = 'cardIn .45s cubic-bezier(0.16,1,0.3,1) '+(0.05+i*0.07)+'s both';
+      });
+    }
+  }
+</script>
+
+<!-- ══ NEXUS CUSTOM CURSOR ══ -->
+<style>
+  #nxs-cur{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--gold);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform .1s,opacity .3s,width .25s cubic-bezier(0.34,1.56,0.64,1),height .25s cubic-bezier(0.34,1.56,0.64,1),background .2s;mix-blend-mode:multiply;will-change:transform;}
+  #nxs-cur-ring{position:fixed;width:32px;height:32px;border-radius:50%;border:1.5px solid rgba(200,169,110,0.5);pointer-events:none;z-index:9997;transform:translate(-50%,-50%);transition:transform .08s,opacity .3s,width .35s cubic-bezier(0.16,1,0.3,1),height .35s cubic-bezier(0.16,1,0.3,1),border-color .2s;will-change:transform;}
+  body:has(a:hover) #nxs-cur,body:has(button:hover) #nxs-cur{width:6px;height:6px;}
+  body:has(a:hover) #nxs-cur-ring,body:has(button:hover) #nxs-cur-ring{width:44px;height:44px;border-color:rgba(200,169,110,0.7);}
+  @media(hover:none){#nxs-cur,#nxs-cur-ring{display:none;}}
+</style>
+<script>
+(function(){
+  if(window.matchMedia('(hover:hover)').matches){
+    const cur=document.createElement('div');cur.id='nxs-cur';
+    const ring=document.createElement('div');ring.id='nxs-cur-ring';
+    document.body.appendChild(cur);document.body.appendChild(ring);
+    let mx=0,my=0,rx=0,ry=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';},{passive:true});
+    function animRing(){rx+=(mx-rx)*.15;ry+=(my-ry)*.15;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(animRing);}
+    animRing();
+  }
+})();
+</script>
+
+<!-- ══ NEXUS CHAT FAB ══ -->
+<style>
+  .chat-fab{position:fixed;bottom:32px;right:32px;z-index:500;width:56px;height:56px;border-radius:50%;background:#1C1C1E;border:1.5px solid rgba(200,169,110,0.35);cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 32px rgba(28,28,30,0.2),0 4px 12px rgba(28,28,30,0.12);transition:all .4s cubic-bezier(0.34,1.56,0.64,1);animation:fabBreathe 4s ease-in-out infinite;outline:none;text-decoration:none;}
+  @keyframes fabBreathe{0%,100%{box-shadow:0 8px 32px rgba(28,28,30,0.2),0 0 0 0 rgba(200,169,110,0);}50%{box-shadow:0 8px 32px rgba(28,28,30,0.2),0 0 0 8px rgba(200,169,110,0.1);}}
+  .chat-fab:hover{transform:scale(1.12) rotate(-5deg);box-shadow:0 16px 48px rgba(28,28,30,0.28),0 6px 18px rgba(200,169,110,0.2);animation:none;}
+  .chat-fab:active{transform:scale(0.95);}
+  .chat-fab-badge{position:absolute;top:-3px;right:-3px;width:18px;height:18px;border-radius:50%;background:#E24B4A;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #FAF8F5;animation:badgeBounce 2s ease-in-out infinite;}
+  @keyframes badgeBounce{0%,100%{transform:scale(1);}50%{transform:scale(1.15);}}
+  @media(max-width:600px){.chat-fab{bottom:20px;right:20px;}}
+</style>
+<a class="chat-fab" href="dashbaord.html" aria-label="Back to Dashboard">
+  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C8A96E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+  <span class="chat-fab-badge">2</span>
+</a>
+</body>
+</html>
